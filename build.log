@@ -1,0 +1,5 @@
+Logfile initialized
+[INFO] logfile = /Users/admin/Documents/Titanium_Studio_Workspace/KievTours/build.log
+[INFO] logfile = /Users/admin/Documents/Titanium_Studio_Workspace/KievTours/build.log
+[DEBUG] /Users/admin/Library/Application Support/Titanium/mobilesdk/osx/3.0.0.GA/android/builder.py emulator KievTours /Users/admin/Library/Android /Users/admin/Documents/Titanium_Studio_Workspace/KievTours com.ipublisher.kievtours 2 WVGA854
+[DEBUG] /Users/admin/Library/Application Support/Titanium/mobilesdk/osx/3.0.0.GA/android/builder.py simulator KievTours /Users/admin/Library/Android /Users/admin/Documents/Titanium_Studio_Workspace/KievTours com.ipublisher.kievtours 2 WVGA854

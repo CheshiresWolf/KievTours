@@ -1,0 +1,13 @@
+<Alloy>
+	<Window class="container" showPaginControl="true">
+		<ImageView class="logo" />
+		<ScrollableView id="scrollView">
+			<View id="welcomeScreen">
+				<Label id="welcomeLabel">YOU MUST APPEAR!</Label>
+			</View>
+			<View id="toursScreen">
+				<Label>SLIIIIIDE</Label>
+			</View>
+		</ScrollableView>
+	</Window>
+</Alloy>

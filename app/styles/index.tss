@@ -1,0 +1,16 @@
+".container": {
+	backgroundColor:"white",
+	width: Ti.UI.SIZE,
+	height: Ti.UI.SIZE,
+	backgroundImage: "images/APP_Kiev_background.png"
+},
+".logo": {
+	image: "images/APP_Kiev_logo.png",
+	top: 50,
+	left: 50,
+	width: 96,
+	height: 96
+},
+"#welcomeLabel": {
+	color: "white"
+}
