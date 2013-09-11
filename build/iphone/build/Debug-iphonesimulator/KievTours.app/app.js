@@ -1,1 +1,1 @@
-/Users/admin/Documents/Titanium_Studio_Workspace/KievTours/Resources/app.js
+/Users/admin/Documents/GitHub/KievTours/Resources/app.js

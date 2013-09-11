@@ -1,1 +1,1 @@
-/Users/admin/Documents/Titanium_Studio_Workspace/KievTours/Resources/alloy/CFG.js
+/Users/admin/Documents/GitHub/KievTours/Resources/alloy/CFG.js
