@@ -11,7 +11,6 @@ function Controller() {
     });
     $.__views.tourView && $.addTopLevelView($.__views.tourView);
     $.__views.smallPicture = Ti.UI.createImageView({
-        image: "images/SmallSircle.png",
         zIndex: 5,
         id: "smallPicture"
     });

@@ -43,13 +43,29 @@ var smallPictureStyle = {
 	top: topOffset - smallImgSize / 2
 };
 
-var tourView = Alloy.createController("tourView");
+var tours = Alloy.Globals.getTours();
+
+for (i = 0; i < tours.length; i++) {
+	//===========================================
+	//Ti.API.info("index.js loop");
+	//===========================================
+	smallPictureStyle.image = tours[i].img;
+	
+	tours[i].controller = Alloy.createController("tourView");
+	tours[i].controller.getView("bigPicture").applyProperties(bigPictureStyle);
+	tours[i].controller.getView("smallPicture").applyProperties(smallPictureStyle);
+	
+	$.scrollView.addView(tours[i].controller.getView());
+}
+
+
+/*var tourView = Alloy.createController("tourView");
 tourView.getView("bigPicture").applyProperties(bigPictureStyle);
 tourView.getView("smallPicture").applyProperties(smallPictureStyle);
 $.scrollView.addView(tourView.getView());
 
 var tourView2 = Alloy.createController("tourView");
-$.scrollView.addView(tourView2.getView());
+$.scrollView.addView(tourView2.getView());*/
 
 //===========================================
 //Ti.API.info("index.js open");

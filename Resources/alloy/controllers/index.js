@@ -37,12 +37,15 @@ function Controller() {
         right: leftOffset,
         top: topOffset - smallImgSize / 2
     };
-    var tourView = Alloy.createController("tourView");
-    tourView.getView("bigPicture").applyProperties(bigPictureStyle);
-    tourView.getView("smallPicture").applyProperties(smallPictureStyle);
-    $.scrollView.addView(tourView.getView());
-    var tourView2 = Alloy.createController("tourView");
-    $.scrollView.addView(tourView2.getView());
+    var tours = Alloy.Globals.getTours();
+    for (i = 0; tours.length > i; i++) {
+        Ti.API.info("index.js loop");
+        smallPictureStyle.image = tours[i].img;
+        tours[i].controller = Alloy.createController("tourView");
+        tours[i].controller.getView("bigPicture").applyProperties(bigPictureStyle);
+        tours[i].controller.getView("smallPicture").applyProperties(smallPictureStyle);
+        $.scrollView.addView(tours[i].controller.getView());
+    }
     _.extend($, exports);
 }
 
