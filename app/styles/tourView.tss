@@ -1,0 +1,8 @@
+"#bigPicture": {
+	image: "images/BigSircle.png",
+	zIndex: 3
+},
+"#smallPicture": {
+	image: "images/SmallSircle.png",
+	zIndex: 5
+}

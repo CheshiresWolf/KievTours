@@ -7,7 +7,7 @@
     <url>http://</url>
     <description>not specified</description>
     <copyright>2013 by admin</copyright>
-    <icon>APP_Kiev_logo.png</icon>
+    <icon>appicon.png</icon>
     <persistent-wifi>false</persistent-wifi>
     <prerendered-icon>false</prerendered-icon>
     <statusbar-style>default</statusbar-style>

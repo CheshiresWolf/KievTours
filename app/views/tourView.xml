@@ -1,0 +1,6 @@
+<Alloy>
+	<View id="tourView">
+		<ImageView id="smallPicture"></ImageView>
+		<ImageView id="bigPicture"></ImageView>
+	</View>
+</Alloy>
