@@ -11,4 +11,7 @@
 	width: "auto",
 	height: "auto",
 	zIndex: 0
+},
+"button": {
+	zIndex: 4
 }

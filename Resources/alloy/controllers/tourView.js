@@ -1,4 +1,8 @@
 function Controller() {
+    function swap() {
+        tours[i].controller.getView("smallPicture").animate(model.bigImageStyle);
+        tours[i].controller.getView("bigPicture").animate(model.smallImageStyle);
+    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "tourView";
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -6,6 +10,7 @@ function Controller() {
     arguments[0] ? arguments[0]["__itemTemplate"] : null;
     var $ = this;
     var exports = {};
+    var __defers = {};
     $.__views.tourView = Ti.UI.createView({
         id: "tourView"
     });
@@ -24,6 +29,7 @@ function Controller() {
         id: "smallPicture"
     });
     $.__views.tourView.add($.__views.smallPicture);
+    swap ? $.__views.smallPicture.addEventListener("click", swap) : __defers["$.__views.smallPicture!click!swap"] = true;
     $.__views.bigPicture = Ti.UI.createImageView({
         image: "images/BigSircle.png",
         zIndex: 3,
@@ -44,6 +50,8 @@ function Controller() {
     $.__views.bigPicture.add($.__views.button);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    var model = Ti.include("model/tourViewModel.js");
+    __defers["$.__views.smallPicture!click!swap"] && $.__views.smallPicture.addEventListener("click", swap);
     _.extend($, exports);
 }
 

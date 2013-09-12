@@ -22,8 +22,10 @@ function tour() {
 	var dots = {};
 	var length = 0;
 	var background = "";
-}
-tour.prototype.set = function(img, title, text, size, dots, length, background) {
+	var price = 0;
+	var isDownloaded = false;
+};
+tour.prototype.set = function(img, title, text, size, dots, length, background, price) {
   	this.img = img
 	this.title = title;
 	this.text = text;
@@ -31,7 +33,14 @@ tour.prototype.set = function(img, title, text, size, dots, length, background) 
 	this.dots = dots;
 	this.length = length;
 	this.background = background;
-}
+	this.price = price;
+};
+tour.prototype.download = function() {
+	//downloading
+	//...
+	
+	this.isDownloaded = true;
+};
 
 var tours = [];
 
@@ -45,7 +54,8 @@ tour1.set(
 	125,
 	null,
 	"2:10",
-	"images/APP_Kiev_background.png"
+	"images/APP_Kiev_background.png",
+	9.99
 	);
 tours.push(tour1);
 
@@ -57,8 +67,10 @@ tour2.set(
 	125,
 	null,
 	"2:10",
-	"images/APP_Kiev_background_Buf.png"
+	"images/APP_Kiev_background_Buf.png",
+	0
 	);
+tour2.download();
 tours.push(tour2);
 //};
 

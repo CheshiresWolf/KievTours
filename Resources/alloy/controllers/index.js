@@ -29,43 +29,8 @@ function Controller() {
     $.__views.window.add($.__views.scrollView);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var bigImgSize = .9 * Titanium.Platform.displayCaps.platformWidth;
-    var leftOffset = (Titanium.Platform.displayCaps.platformWidth - bigImgSize) / 2;
-    var topOffset = Titanium.Platform.displayCaps.platformHeight / 2 - bigImgSize / 2;
-    var bigPictureStyle;
-    var smallPictureStyle;
-    var titleWidth;
-    var smallImgSize = bigImgSize / 3;
-    var tours = Alloy.Globals.getTours();
-    for (i = 0; tours.length > i; i++) {
-        tours[i].controller = Alloy.createController("tourView");
-        bigPictureStyle = {
-            width: bigImgSize,
-            height: bigImgSize,
-            left: leftOffset,
-            top: topOffset
-        };
-        tours[i].controller.getView("bigPicture").applyProperties(bigPictureStyle);
-        smallPictureStyle = {
-            width: smallImgSize,
-            height: smallImgSize,
-            right: leftOffset,
-            top: topOffset - smallImgSize / 2,
-            image: tours[i].img
-        };
-        tours[i].controller.getView("smallPicture").applyProperties(smallPictureStyle);
-        tours[i].controller.getView("background").applyProperties({
-            image: tours[i].background
-        });
-        tours[i].controller.getView("title").text = tours[i].text;
-        titleWidth = tours[i].controller.getView("title").toImage().width;
-        titleWidth > 7 * bigImgSize / 10 && (titleWidth = .7 * bigImgSize);
-        tours[i].controller.getView("title").applyProperties({
-            top: bigImgSize / 6,
-            width: titleWidth
-        });
-        $.scrollView.addView(tours[i].controller.getView());
-    }
+    var tour = Ti.require("lib/tourViewModel");
+    tour.showTours();
     _.extend($, exports);
 }
 
