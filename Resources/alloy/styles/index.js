@@ -1,1 +1,1 @@
-module.exports = [{"isId":true,"priority":100000.0002,"key":"window","style":{backgroundColor:"white",backgroundImage:"images/APP_Kiev_background_logo.png",zIndex:0,}}];
+module.exports = [{"isId":true,"priority":100000.0002,"key":"window","style":{zIndex:0,}},{"isId":true,"priority":100000.0003,"key":"logo","style":{zIndex:1,image:"images/APP_Kiev_logo.png",width:50,heigth:50,top:15,left:15,}}];

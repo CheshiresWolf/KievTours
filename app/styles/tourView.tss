@@ -4,4 +4,11 @@
 },
 "#smallPicture": {
 	zIndex: 5
+},
+"#background": {
+	top: 0,
+	left: 0,
+	width: "auto",
+	height: "auto",
+	zIndex: 0
 }

@@ -10,6 +10,15 @@ function Controller() {
         id: "tourView"
     });
     $.__views.tourView && $.addTopLevelView($.__views.tourView);
+    $.__views.background = Ti.UI.createImageView({
+        top: 0,
+        left: 0,
+        width: "auto",
+        height: "auto",
+        zIndex: 0,
+        id: "background"
+    });
+    $.__views.tourView.add($.__views.background);
     $.__views.smallPicture = Ti.UI.createImageView({
         zIndex: 5,
         id: "smallPicture"
@@ -21,6 +30,18 @@ function Controller() {
         id: "bigPicture"
     });
     $.__views.tourView.add($.__views.bigPicture);
+    $.__views.title = Ti.UI.createLabel({
+        id: "title"
+    });
+    $.__views.bigPicture.add($.__views.title);
+    $.__views.text = Ti.UI.createLabel({
+        id: "text"
+    });
+    $.__views.bigPicture.add($.__views.text);
+    $.__views.button = Ti.UI.createImageView({
+        id: "button"
+    });
+    $.__views.bigPicture.add($.__views.button);
     exports.destroy = function() {};
     _.extend($, $.__views);
     _.extend($, exports);
