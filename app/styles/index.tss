@@ -8,4 +8,12 @@
 	heigth: 50,
 	top: 15,
 	left: 15
+},
+"#menu": {
+	left: 0,
+	bottom: 0,
+	image: "images/Menu_closed.png",
+	width: Titanium.Platform.displayCaps.platformWidth,
+	height: 30,
+	zIndex: 7
 }

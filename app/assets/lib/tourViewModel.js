@@ -9,7 +9,7 @@ var smallImgSize = bigImgSize / 3;
 
 var tours = Alloy.Globals.getTours();
 
-var bigImageStyle = {
+/*var bigImageStyle = {
 	width: bigImgSize,
 	height: bigImgSize,
 	left: leftOffset,
@@ -22,9 +22,9 @@ var smallImageStyle = {
 	right: leftOffset,
 	top: topOffset - smallImgSize / 2,
 	image: tours[i].img
-};
+};*/
 
-exports.showTours = function() {
+exports.showTours = function(scrollView) {
 	//Read data about tours and create views
 	for (i = 0; i < tours.length; i++) {
 		//===========================================
@@ -34,10 +34,21 @@ exports.showTours = function() {
 		tours[i].controller = Alloy.createController("tourView");
 		
 		//bigPicture
-		tours[i].controller.getView("bigPicture").applyProperties(bigImageStyle);
+		tours[i].controller.getView("bigPicture").applyProperties({
+			width: bigImgSize,
+			height: bigImgSize,
+			left: leftOffset,
+			top: topOffset
+		});
 		
 		//smallPicture
-		tours[i].controller.getView("smallPicture").applyProperties(smallImageStyle);
+		tours[i].controller.getView("smallPicture").applyProperties({
+			width: smallImgSize,
+			height: smallImgSize,
+			right: leftOffset,
+			top: topOffset - smallImgSize / 2,
+			image: tours[i].img
+		});
 		
 		//background
 		tours[i].controller.getView("background").applyProperties({image: tours[i].background});
@@ -87,6 +98,6 @@ exports.showTours = function() {
 		});
 		
 		//show View
-		$.scrollView.addView(tours[i].controller.getView());
+		scrollView.addView(tours[i].controller.getView());
 	}
 }
