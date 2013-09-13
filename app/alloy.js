@@ -25,8 +25,9 @@ function tour() {
 	var price = 0;
 	var isDownloaded = false;
 };
+
 tour.prototype.set = function(img, title, text, size, dots, length, background, price) {
-  	this.img = img;
+	this.img = img;
 	this.title = title;
 	this.text = text;
 	this.size = size;
@@ -35,6 +36,7 @@ tour.prototype.set = function(img, title, text, size, dots, length, background, 
 	this.background = background;
 	this.price = price;
 };
+
 tour.prototype.download = function() {
 	//downloading
 	//...

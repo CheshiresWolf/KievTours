@@ -21,6 +21,7 @@
 @synthesize delegate;
 @synthesize needsRefreshingWithSelection;
 @synthesize placed;
+@synthesize offset;
 
 #define LEFT_BUTTON  1
 #define RIGHT_BUTTON 2
@@ -32,6 +33,8 @@
 	static int mapTags = 0;
 	tag = mapTags++;
 	needsRefreshingWithSelection = YES;
+	offset = CGPointZero;
+	[super _configure];
 }
 
 -(NSMutableDictionary*)langConversionTable
@@ -291,6 +294,37 @@
 	}
 }
 
+-(void)setCustomView:(id)customView
+{
+	id current = [self valueForUndefinedKey:@"customView"];
+	[self replaceValue:customView forKey:@"customView" notification:NO];
+	if ([current isEqual: customView] == NO)
+	{
+        [current setProxyObserver:nil];
+        [self forgetProxy:current];
+        [self rememberProxy:customView];
+        [customView setProxyObserver:self];
+        [self setNeedsRefreshingWithSelection:YES];
+	}
+}
+
+-(void)proxyDidRelayout:(id)sender
+{
+    id current = [self valueForUndefinedKey:@"customView"];
+    if ( ([current isEqual:sender] == YES) && (self.placed) ) {
+        [self setNeedsRefreshingWithSelection:YES];
+    }
+}
+
+- (void)setCenterOffset:(id)centeroffset
+{
+    [self replaceValue:centeroffset forKey:@"centerOffset" notification:NO];
+    CGPoint newVal = [TiUtils pointValue:centeroffset];
+    if (!CGPointEqualToPoint(newVal,offset)) {
+        offset = newVal;
+        [self setNeedsRefreshingWithSelection:YES];
+    }
+}
 
 -(int)tag
 {

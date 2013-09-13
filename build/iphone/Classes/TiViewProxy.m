@@ -26,6 +26,8 @@
 
 @implementation TiViewProxy
 
+@synthesize eventOverrideDelegate = eventOverrideDelegate;
+
 #pragma mark public API
 
 @synthesize vzIndex, parentVisible;
@@ -175,7 +177,7 @@
 			[self contentsWillChange];
 		}
 		else {
-			[self layoutChild:arg optimize:NO withMeasuredBounds:[[self size] rect]];
+			[self layoutChild:arg optimize:NO withMeasuredBounds:[[self view] bounds]];
 		}
 	}
 	else
@@ -262,20 +264,88 @@
 	[self forgetProxy:arg];
 }
 
+-(void)removeAllChildren:(id)arg
+{
+	ENSURE_UI_THREAD_1_ARG(arg);
+    
+    
+	if (children != nil) {
+		pthread_rwlock_wrlock(&childrenLock);
+
+		for (TiViewProxy* child in children)
+		{
+			if ([pendingAdds containsObject:child])
+			{
+				[pendingAdds removeObject:child];
+			}
+
+			[child setParent:nil];
+			[self forgetProxy:child];
+
+			if (view!=nil)
+			{
+				TiUIView *childView = [(TiViewProxy *)child view];
+				if ([NSThread isMainThread])
+				{
+					[childView removeFromSuperview];
+				}
+				else
+				{
+					TiThreadPerformOnMainThread(^{
+						[childView removeFromSuperview];
+					}, NO);
+				}
+			}
+		}
+
+		[self contentsWillChange];
+		if(parentVisible && !hidden)
+		{
+			[arg parentWillHide];
+		}
+
+		[children removeAllObjects];
+		RELEASE_TO_NIL(children);
+
+		pthread_rwlock_unlock(&childrenLock);
+
+		if (view!=nil)
+		{
+			BOOL layoutNeedsRearranging = !TiLayoutRuleIsAbsolute(layoutProperties.layoutStyle);
+			if ([NSThread isMainThread])
+			{
+				if (layoutNeedsRearranging)
+				{
+					[self layoutChildren:NO];
+				}
+			}
+			else
+			{
+				TiThreadPerformOnMainThread(^{
+					if (layoutNeedsRearranging)
+					{
+						[self layoutChildren:NO];
+					}
+				}, NO);
+			}
+		}
+	}
+}
+
 -(void)show:(id)arg
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
+	TiThreadPerformOnMainThread(^{
         [self setHidden:NO withArgs:arg];
         [self replaceValue:NUMBOOL(YES) forKey:@"visible" notification:YES];
-    });
+    }, NO);
 }
  
 -(void)hide:(id)arg
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    TiThreadPerformOnMainThread(^{
         [self setHidden:YES withArgs:arg];
         [self replaceValue:NUMBOOL(NO) forKey:@"visible" notification:YES];
-    });
+    }, NO);
 }
 
 -(void)animate:(id)arg
@@ -283,7 +353,6 @@
 	TiAnimation * newAnimation = [TiAnimation animationFromArg:arg context:[self executionContext] create:NO];
 	[self rememberProxy:newAnimation];
 	TiThreadPerformOnMainThread(^{
-		[parent contentsWillChange];
 		if ([view superview]==nil)
 		{
 			VerboseLog(@"Entering animation without a superview Parent is %@, props are %@",parent,dynprops);
@@ -930,7 +999,10 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
     [self windowWillOpen];
     [self setParentVisible:YES];
     [self layoutChildren:NO];
-
+    if (!isUsingBarButtonItem) {
+        [self refreshSize];
+        [self refreshPosition];
+    }
 	return barButtonView;
 }
 
@@ -1008,11 +1080,17 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 		[childrenArray release];
 		[self viewDidAttach];
 
-		// make sure we do a layout of ourselves
-		if(CGRectIsEmpty(sandboxBounds) && (view != nil)){
-			[self setSandboxBounds:view.bounds];
+		// If parent has a non absolute layout signal the parent that
+		//contents will change else just lay ourselves out
+		if (parent != nil && (!TiLayoutRuleIsAbsolute([parent layoutProperties]->layoutStyle))) {
+			[parent contentsWillChange];
 		}
-		[self relayout];
+		else {
+			if(CGRectIsEmpty(sandboxBounds) && (view != nil)){
+				[self setSandboxBounds:view.bounds];
+			}
+			[self relayout];
+		}
 		viewInitialized = YES;
 	}
 
@@ -1200,40 +1278,6 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 	// for subclasses
 }
 
--(void)parentWillAppear:(id)args
-{
-    if ([self viewAttached]) {
-        pthread_rwlock_rdlock(&childrenLock);
-        [children makeObjectsPerformSelector:@selector(parentWillAppear:) withObject:args];
-        pthread_rwlock_unlock(&childrenLock);
-    }
-}
--(void)parentDidAppear:(id)args
-{
-    if ([self viewAttached]) {
-        pthread_rwlock_rdlock(&childrenLock);
-        [children makeObjectsPerformSelector:@selector(parentDidAppear:) withObject:args];
-        pthread_rwlock_unlock(&childrenLock);
-    }
-}
--(void)parentWillDisappear:(id)args
-{
-    if ([self viewAttached]) {
-        pthread_rwlock_rdlock(&childrenLock);
-        [children makeObjectsPerformSelector:@selector(parentWillDisappear:) withObject:args];
-        pthread_rwlock_unlock(&childrenLock);
-    }
-}
--(void)parentDidDisappear:(id)args
-{
-    if ([self viewAttached]) {
-        pthread_rwlock_rdlock(&childrenLock);
-        [children makeObjectsPerformSelector:@selector(parentDidDisappear:) withObject:args];
-        pthread_rwlock_unlock(&childrenLock);
-    }
-}
-
-
 #pragma mark Housecleaning state accessors
 
 -(BOOL)viewHasSuperview:(UIView *)superview
@@ -1306,7 +1350,7 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 	{
 		destroyLock = [[NSRecursiveLock alloc] init];
 		pthread_rwlock_init(&childrenLock, NULL);
-		bubbleParent = YES;
+		_bubbleParent = YES;
 	}
 	return self;
 }
@@ -1413,9 +1457,10 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 {
 	[self willFirePropertyChanges];
 	
-	id<NSFastEnumeration> values = [self allKeys];
-	
-	[view readProxyValuesWithKeys:values];
+	if ([view respondsToSelector:@selector(readProxyValuesWithKeys:)]) {
+		id<NSFastEnumeration> values = [self allKeys];
+		[view readProxyValuesWithKeys:values];
+	}
 
 	[self didFirePropertyChanges];
 }
@@ -1559,6 +1604,9 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 {
 	[self forgetProxy:animation];
 	[[self view] animationCompleted];
+	//Let us add ourselves to the queue to cleanup layout
+	OSAtomicTestAndClearBarrier(TiRefreshViewEnqueued, &dirtyflags);
+	[self willEnqueue];
 }
 
 -(void)makeViewPerformSelector:(SEL)selector withObject:(id)object createIfNeeded:(BOOL)create waitUntilDone:(BOOL)wait
@@ -1591,21 +1639,11 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 
 -(BOOL)_hasListeners:(NSString *)type
 {
-	if ([super _hasListeners:type])
-	{
-		return YES;
-	}
-	// check our parent since we optimize the fire with
-	// the check
-	if (parent!=nil)
-	{
-		// walk up the chain
-		return [parent _hasListeners:type];
-	}
-	return NO;
+	return [super _hasListeners:type] || [[self parentForBubbling] _hasListeners:type];
 }
 
--(void)fireEvent:(NSString*)type withObject:(id)obj withSource:(id)source propagate:(BOOL)propagate
+//TODO: Remove once we've properly deprecated.
+-(void)fireEvent:(NSString*)type withObject:(id)obj withSource:(id)source propagate:(BOOL)propagate reportSuccess:(BOOL)report errorCode:(int)code message:(NSString*)message;
 {
 	// Note that some events (like movie 'complete') are fired after the view is removed/dealloc'd.
 	// Because of the handling below, we can safely set the view to 'nil' in this case.
@@ -1619,9 +1657,31 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 	// with table rows.  Automagically assume any nil view we're firing an event for is A-OK.
     // NOTE: We want to fire postlayout events on ANY view, even those which do not allow interactions.
 	if (proxyView == nil || [proxyView interactionEnabled] || [type isEqualToString:@"postlayout"]) {
-		[super fireEvent:type withObject:obj withSource:source propagate:propagate];
+		[super fireEvent:type withObject:obj withSource:source propagate:propagate reportSuccess:report errorCode:code message:message];
 	}
 }
+
+-(void)fireEvent:(NSString*)type withObject:(id)obj propagate:(BOOL)propagate reportSuccess:(BOOL)report errorCode:(int)code message:(NSString*)message;
+{
+	// Note that some events (like movie 'complete') are fired after the view is removed/dealloc'd.
+	// Because of the handling below, we can safely set the view to 'nil' in this case.
+	TiUIView* proxyView = [self viewAttached] ? view : nil;
+	//TODO: We have to do view instead of [self view] because of a freaky race condition that can
+	//happen in the background (See bug 2809). This assumes that view == [self view], which may
+	//not always be the case in the future. Then again, we shouldn't be dealing with view in the BG...
+	
+	
+	// Have to handle the situation in which the proxy's view might be nil... like, for example,
+	// with table rows.  Automagically assume any nil view we're firing an event for is A-OK.
+    // NOTE: We want to fire postlayout events on ANY view, even those which do not allow interactions.
+	if (proxyView == nil || [proxyView interactionEnabled] || [type isEqualToString:@"postlayout"]) {
+		if (eventOverrideDelegate != nil) {
+			obj = [eventOverrideDelegate overrideEventObject:obj forEvent:type fromViewProxy:self];
+		}
+		[super fireEvent:type withObject:obj propagate:propagate reportSuccess:report errorCode:code message:message];
+	}
+}
+
 
 -(void)_listenerAdded:(NSString*)type count:(int)count
 {
@@ -1631,7 +1691,9 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 	}
 	else if(view!=nil) // don't create the view if not already realized
 	{
-		[self.view listenerAdded:type count:count];
+		if ([self.view respondsToSelector:@selector(listenerAdded:count:)]) {
+			[self.view listenerAdded:type count:count];
+		}
 	}
 }
 
@@ -1643,7 +1705,9 @@ LAYOUTFLAGS_SETTER(setHorizontalWrap,horizontalWrap,horizontalWrap,[self willCha
 	}
 	else if(view!=nil) // don't create the view if not already realized
 	{
-		[self.view listenerRemoved:type count:count];
+		if ([self.view respondsToSelector:@selector(listenerRemoved:count:)]) {
+			[self.view listenerRemoved:type count:count];
+		}
 	}
 }
 
@@ -1817,15 +1881,17 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
 -(BOOL) widthIsAutoFill
 {
     BOOL isAutoFill = NO;
+    BOOL followsFillBehavior = TiDimensionIsAutoFill([self defaultAutoWidthBehavior:nil]);
+    
     if (TiDimensionIsAutoFill(layoutProperties.width))
     {
         isAutoFill = YES;
     }
-    else if (TiDimensionIsAuto(layoutProperties.width) && TiDimensionIsAutoFill([self defaultAutoWidthBehavior:nil]) )
+    else if (TiDimensionIsAuto(layoutProperties.width))
     {
-        isAutoFill = YES;
+        isAutoFill = followsFillBehavior;
     }
-    else if (TiDimensionIsUndefined(layoutProperties.width) && TiDimensionIsAutoFill([self defaultAutoWidthBehavior:nil]))
+    else if (TiDimensionIsUndefined(layoutProperties.width))
     {
         BOOL centerDefined = NO;
         int pinCount = 0;
@@ -1840,7 +1906,7 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
             pinCount ++;
         }
         if ( (pinCount < 2) || (!centerDefined) ){
-            isAutoFill = YES;
+            isAutoFill = followsFillBehavior;
         }
     }
     return isAutoFill;
@@ -1849,15 +1915,17 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
 -(BOOL) heightIsAutoFill
 {
     BOOL isAutoFill = NO;
+    BOOL followsFillBehavior = TiDimensionIsAutoFill([self defaultAutoHeightBehavior:nil]);
+    
     if (TiDimensionIsAutoFill(layoutProperties.height))
     {
         isAutoFill = YES;
     }
-    else if (TiDimensionIsAuto(layoutProperties.height) && TiDimensionIsAutoFill([self defaultAutoHeightBehavior:nil]) )
+    else if (TiDimensionIsAuto(layoutProperties.height))
     {
-        isAutoFill = YES;
+        isAutoFill = followsFillBehavior;
     }
-    else if (TiDimensionIsUndefined(layoutProperties.height) && TiDimensionIsAutoFill([self defaultAutoHeightBehavior:nil]))
+    else if (TiDimensionIsUndefined(layoutProperties.height))
     {
         BOOL centerDefined = NO;
         int pinCount = 0;
@@ -1872,7 +1940,7 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
             pinCount ++;
         }
         if ( (pinCount < 2) || (!centerDefined) ) {
-            isAutoFill = YES;
+            isAutoFill = followsFillBehavior;
         }
     }
     return isAutoFill;
@@ -1895,11 +1963,8 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
 
 -(void)parentSizeWillChange
 {
-//	if percent or undefined size, change size
-	if(TiDimensionIsUndefined(layoutProperties.width) ||
-			TiDimensionIsUndefined(layoutProperties.height) ||
-			TiDimensionIsPercent(layoutProperties.width) ||
-			TiDimensionIsPercent(layoutProperties.height))
+//	if not dip, change size
+	if(!TiDimensionIsDip(layoutProperties.width) || !TiDimensionIsDip(layoutProperties.height) )
 	{
 		[self willChangeSize];
 	}
@@ -2119,8 +2184,17 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
 		}
 	}
 	pthread_rwlock_unlock(&childrenLock);
-
-	[ourView insertSubview:childView atIndex:result];
+    if (result == 0) {
+        [ourView insertSubview:childView atIndex:result];
+    }
+    else {
+        //Doing a blind insert at index messes up the underlying sublayer indices
+        //if there are layers which do not belong to subviews (backgroundGradient)
+        //So ensure the subview layer goes at the right index
+        //See TIMOB-11586 for fail case
+        UIView *sibling = [[ourView subviews] objectAtIndex:result-1];
+        [ourView insertSubview:childView aboveSubview:sibling];
+    }
 }
 
 
@@ -2163,7 +2237,8 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
 
 		[parent insertSubview:view forProxy:self];
 
-
+		[self refreshSize];
+		[self refreshPosition];
 		repositioning = NO;
         
         if ([observer respondsToSelector:@selector(proxyDidRelayout:)]) {
@@ -2171,7 +2246,7 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
         }
 
         if (layoutChanged && [self _hasListeners:@"postlayout"]) {
-            [self fireEvent:@"postlayout" withObject:nil withSource:self propagate:NO];
+            [self fireEvent:@"postlayout" withObject:nil propagate:NO];
         }
 	}
 #ifdef VERBOSE
@@ -2209,7 +2284,8 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
 
 -(BOOL)willBeRelaying
 {
-	return dirtyflags != 0;
+    DebugLog(@"DIRTY FLAGS %d WILLBERELAYING %d",dirtyflags, (*((char*)&dirtyflags) & (1 << (7 - TiRefreshViewEnqueued))));
+    return ((*((char*)&dirtyflags) & (1 << (7 - TiRefreshViewEnqueued))) != 0);
 }
 
 -(void)childWillResize:(TiViewProxy *)child
@@ -2451,10 +2527,12 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
         
         CGFloat desiredWidth;
         BOOL recalculateWidth = NO;
+        BOOL isPercent = NO;
         
         if (TiDimensionIsDip(constraint) || TiDimensionIsPercent(constraint))
         {
             desiredWidth =  TiDimensionCalculateValue(constraint, bounds.size.width) + offsetH;
+            isPercent = TiDimensionIsPercent(constraint);
         }
         else if (TiDimensionIsUndefined(constraint))
         {
@@ -2501,7 +2579,14 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
                 bounds.origin.y = verticalLayoutBoundary;
                 if (!childIsFixedHeight)
                 {
-                    desiredHeight = [child minimumParentHeightForSize:CGSizeMake(desiredWidth,boundingHeight)];
+                    //TIMOB-11998. minimumParentHeightForSize:CGSize will limit width anyways. Pass bounding width here
+                    //desiredHeight = [child minimumParentHeightForSize:CGSizeMake(desiredWidth,boundingHeight)];
+                    if (isPercent) {
+                        desiredHeight = [child minimumParentHeightForSize:CGSizeMake(bounds.size.width,boundingHeight)];
+                    }
+                    else {
+                        desiredHeight = [child minimumParentHeightForSize:CGSizeMake(boundingWidth,boundingHeight)];
+                    }
                     bounds.size.height = desiredHeight;
                 }
                 verticalLayoutBoundary += bounds.size.height;
@@ -2522,7 +2607,14 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
                     if (desiredWidth < boundingWidth) {
                         if (!childIsFixedHeight)
                         {
-                            desiredHeight = [child minimumParentHeightForSize:CGSizeMake(desiredWidth,boundingHeight)];
+                            //TIMOB-11998. minimumParentHeightForSize:CGSize will limit width anyways. Pass bounding width here
+                            //desiredHeight = [child minimumParentHeightForSize:CGSizeMake(desiredWidth,boundingHeight)];
+                            if (isPercent) {
+                                desiredHeight = [child minimumParentHeightForSize:CGSizeMake(bounds.size.width,boundingHeight)];
+                            }
+                            else {
+                                desiredHeight = [child minimumParentHeightForSize:CGSizeMake(boundingWidth,boundingHeight)];
+                            }
                             bounds.size.height = desiredHeight;
                         }                    
                         horizontalLayoutBoundary += desiredWidth;
@@ -2533,7 +2625,12 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
                         //Will take up whole row
                         if (!childIsFixedHeight)
                         {
-                            desiredHeight = [child minimumParentHeightForSize:CGSizeMake(boundingWidth,boundingHeight)];
+                            if (isPercent) {
+                                desiredHeight = [child minimumParentHeightForSize:CGSizeMake(bounds.size.width,boundingHeight)];
+                            }
+                            else {
+                                desiredHeight = [child minimumParentHeightForSize:CGSizeMake(boundingWidth,boundingHeight)];
+                            }
                             bounds.size.height = desiredHeight;
                         }                    
                         verticalLayoutBoundary += bounds.size.height;
@@ -2553,7 +2650,14 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
                     if (desiredWidth < boundingWidth) {
                         if (!childIsFixedHeight)
                         {
-                            desiredHeight = [child minimumParentHeightForSize:CGSizeMake(desiredWidth,boundingHeight)];
+                            //TIMOB-11998. minimumParentHeightForSize:CGSize will limit width anyways. Pass bounding width here
+                            //desiredHeight = [child minimumParentHeightForSize:CGSizeMake(desiredWidth,boundingHeight)];
+                            if (isPercent) {
+                                desiredHeight = [child minimumParentHeightForSize:CGSizeMake(bounds.size.width,boundingHeight)];
+                            }
+                            else {
+                                desiredHeight = [child minimumParentHeightForSize:CGSizeMake(boundingWidth,boundingHeight)];
+                            }
                             bounds.size.height = desiredHeight;
                         }                    
                         bounds.size.width = desiredWidth;
@@ -2564,7 +2668,12 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
                         //Will take up whole row
                         if (!childIsFixedHeight)
                         {
-                            desiredHeight = [child minimumParentHeightForSize:CGSizeMake(boundingWidth,boundingHeight)];
+                            if (isPercent) {
+                                desiredHeight = [child minimumParentHeightForSize:CGSizeMake(bounds.size.width,boundingHeight)];
+                            }
+                            else {
+                                desiredHeight = [child minimumParentHeightForSize:CGSizeMake(boundingWidth,boundingHeight)];
+                            }
                             bounds.size.height = desiredHeight;
                         }
                         verticalLayoutBoundary += bounds.size.height;
@@ -2577,7 +2686,14 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
             //If it fits update the horizontal layout row height
             if (!childIsFixedHeight)
             {
-                desiredHeight = [child minimumParentHeightForSize:CGSizeMake(desiredWidth,boundingHeight)];
+                //TIMOB-11998. minimumParentHeightForSize:CGSize will limit width anyways. Pass bounding width here
+                //desiredHeight = [child minimumParentHeightForSize:CGSizeMake(desiredWidth,boundingHeight)];
+                if (isPercent) {
+                    desiredHeight = [child minimumParentHeightForSize:CGSizeMake(bounds.size.width,boundingHeight)];
+                }
+                else {
+                    desiredHeight = [child minimumParentHeightForSize:CGSizeMake(boundingWidth,boundingHeight)];
+                }
                 bounds.size.height = desiredHeight;
             }
             bounds.origin.x = horizontalLayoutBoundary;
@@ -2667,17 +2783,19 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
 			[ourView insertSubview:childView atIndex:insertPosition];
 			pthread_rwlock_unlock(&childrenLock); // must release before calling resize
 			
-            if ( !CGSizeEqualToSize(child.sandboxBounds.size, bounds.size) ) {
-                //Child will not resize if sandbox size does not change
-                [self childWillResize:child];
-            }
+//            TIMOB-14488. This is a bad message. We should not be signalling a child
+//            resize to the parent when the parent is laying out the child.
+//            if ( !CGSizeEqualToSize(child.sandboxBounds.size, bounds.size) ) {
+//                //Child will not resize if sandbox size does not change
+//                [self childWillResize:child];
+//            }
 		}
 	}
 	[child setSandboxBounds:bounds];
 	if ([[child view] animating])
 	{
-        // changing the layout while animating is bad, ignore for now
-        DebugLog(@"[WARN] New layout set while view %@ animating: Will relayout after animation.", child);
+		// changing the layout while animating is bad, ignore for now
+		DebugLog(@"[WARN] New layout set while view %@ animating: Will relayout after animation.", child);
 	}
 	else
 	{
@@ -2771,6 +2889,63 @@ if(OSAtomicTestAndSetBarrier(flagBit, &dirtyflags))	\
 		[[self view] setAccessibilityHidden_:accessibilityHidden];
 	}
 	[self replaceValue:accessibilityHidden forKey:@"accessibilityHidden" notification:NO];
+}
+
+#pragma mark - View Templates
+
+- (void)unarchiveFromTemplate:(id)viewTemplate_
+{
+	TiViewTemplate *viewTemplate = [TiViewTemplate templateFromViewTemplate:viewTemplate_];
+	if (viewTemplate == nil) {
+		return;
+	}
+	
+	id<TiEvaluator> context = self.executionContext;
+	if (context == nil) {
+		context = self.pageContext;
+	}
+	
+	[self _initWithProperties:viewTemplate.properties];
+	if ([viewTemplate.events count] > 0) {
+		[context.krollContext invokeBlockOnThread:^{
+			[viewTemplate.events enumerateKeysAndObjectsUsingBlock:^(NSString *eventName, NSArray *listeners, BOOL *stop) {
+				[listeners enumerateObjectsUsingBlock:^(KrollWrapper *wrapper, NSUInteger idx, BOOL *stop) {
+					[self addEventListener:[NSArray arrayWithObjects:eventName, wrapper, nil]];
+				}];
+			}];
+		}];		
+	}
+	
+	[viewTemplate.childTemplates enumerateObjectsUsingBlock:^(TiViewTemplate *childTemplate, NSUInteger idx, BOOL *stop) {
+		TiViewProxy *child = [[self class] unarchiveFromTemplate:childTemplate inContext:context];
+		if (child != nil) {
+			[context.krollContext invokeBlockOnThread:^{
+				[self rememberProxy:child];
+				[child forgetSelf];
+			}];
+			[self add:child];
+		}
+	}];
+}
+
+// Returns protected proxy, caller should do forgetSelf.
++ (TiViewProxy *)unarchiveFromTemplate:(id)viewTemplate_ inContext:(id<TiEvaluator>)context
+{
+	TiViewTemplate *viewTemplate = [TiViewTemplate templateFromViewTemplate:viewTemplate_];
+	if (viewTemplate == nil) {
+		return;
+	}
+	
+	if (viewTemplate.type != nil) {
+		TiViewProxy *proxy = [[self class] createProxy:viewTemplate.type withProperties:nil inContext:context];
+		[context.krollContext invokeBlockOnThread:^{
+			[context registerProxy:proxy];
+			[proxy rememberSelf];
+		}];
+		[proxy unarchiveFromTemplate:viewTemplate];
+		return proxy;
+	}
+	return nil;
 }
 
 @end

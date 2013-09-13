@@ -36,7 +36,7 @@
 -(void) setBackgroundGradient_:(TiGradient *)newGradient;
 -(void) setSelectedBackgroundGradient_:(TiGradient *)newGradient;
 
--(void) updateGradientLayer:(BOOL)useSelected;
+-(void) updateGradientLayer:(BOOL)useSelected withAnimation:(BOOL)animated;
 -(CGSize)computeCellSize;
 
 @end
@@ -72,7 +72,10 @@
 	NSInteger frameChanges;
     TiViewProxy* headerViewProxy;
     TiViewProxy* footerViewProxy;
+    BOOL viewWillDetach;
 }
+
+@property (nonatomic, assign) BOOL viewWillDetach;
 
 #pragma mark Framework
 -(CGFloat)tableRowHeight:(CGFloat)height;

@@ -1,6 +1,6 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2009-2012 by KievTours, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  * 
@@ -17,12 +17,12 @@
 @interface TiScriptError : NSObject
 
 /**
- * Returns source URL where error happenned.
+ * Returns source URL where error happened.
  */
 @property (nonatomic, readonly) NSString *sourceURL;
 
 /**
- * Returns line number where error happenned.
+ * Returns line number where error happened.
  */
 @property (nonatomic, readonly) NSInteger lineNo;
 
@@ -31,8 +31,23 @@
  */
 @property (nonatomic, readonly) NSString *message;
 
+/**
+ * If created with a dictionary, returns the creating dictionary. Otherwise, may be nil.
+ */
+@property (nonatomic, readonly) NSDictionary *dictionaryValue;
+
+/**
+ * Returns the call stack as a static string. May or may not include the most recent function.
+ */
+@property (nonatomic, readonly)	NSString *backtrace;
+
 - (id)initWithMessage:(NSString *)message sourceURL:(NSString *)sourceURL lineNo:(NSInteger)lineNo;
 - (id)initWithDictionary:(NSDictionary *)dictionary;
+
+/**
+ * Returns detailed description.
+ */
+- (NSString *)detailedDescription;
 
 @end
 

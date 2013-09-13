@@ -1,1 +1,0 @@
-/Users/admin/Documents/GitHub/KievTours/Resources/alloy/sync/localStorage.js

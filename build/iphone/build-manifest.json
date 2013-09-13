@@ -1,0 +1,22 @@
+{
+	"target": "simulator",
+	"deployType": "development",
+	"deviceFamily": "iphone",
+	"iosSdkPath": "/Users/vladislavzhovtiy/Library/Application Support/Titanium/mobilesdk/osx/3.1.2.GA/iphone",
+	"appGuid": "a9dc9c02-4dea-456a-bf44-081adbd04d2e",
+	"tiCoreHash": "77157e1ffaec640cf559356a147b6a4c",
+	"modulesHash": "d41d8cd98f00b204e9800998ecf8427e",
+	"gitHash": "5ceaff8",
+	"name": "KievTours",
+	"id": "com.ipublisher.kievtours",
+	"analytics": true,
+	"publisher": "admin",
+	"url": "http://",
+	"version": "1.0",
+	"description": "not specified",
+	"copyright": "2013 by admin",
+	"guid": "a9dc9c02-4dea-456a-bf44-081adbd04d2e",
+	"skipJSMinification": true,
+	"forceCopy": false,
+	"forceCopyAll": false
+}

@@ -1,6 +1,6 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2009-2012 by KievTours, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  * 
@@ -25,7 +25,7 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 	for (id mode in args)
 	{
 		UIInterfaceOrientation orientation = (UIInterfaceOrientation)[TiUtils orientationValue:mode def:-1];
-		switch (orientation)
+		switch ((int)orientation)
 		{
 			case UIDeviceOrientationPortrait:
 			case UIDeviceOrientationPortraitUpsideDown:
@@ -77,6 +77,7 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 	if (controller == nil)
 	{
 		controller = [[TiViewController alloc] initWithViewProxy:self];
+		[TiUtils configureController:controller withObject:nil];
 	}
 	return controller;
 }
@@ -184,9 +185,12 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
             TiUIView* tiview = (TiUIView*)animatedOver;
             LayoutConstraint* layoutProps = [(TiViewProxy*)[tiview proxy] layoutProperties];
             ApplyConstraintToViewWithBounds(layoutProps, tiview, rootView.bounds);
+            [(TiViewProxy*)[tiview proxy] layoutChildren:NO];
         }
         RELEASE_TO_NIL(animatedOver);
     }
+	// Send notification to Accessibility subsystem that the screen has changed. This will refresh accessibility focus
+	UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil);
 }
 
 -(void)windowReady
@@ -246,6 +250,14 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 	
 	[self windowDidClose];
 	[self forgetSelf];
+	
+	// Make previous window elements accessible again
+	UIView *rootView = [[TiApp app] controller].view;
+	if ([TiUtils isIOS5OrGreater]) {
+		[(UIView *)[[rootView subviews] lastObject] setAccessibilityElementsHidden:NO];
+	}
+	// Send notification to Accessibility subsystem that the screen has changed. This will refresh accessibility focus
+	UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nil);
 }
 
 -(void)windowWillClose
@@ -330,7 +342,7 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 		controller = [controller_ retain];
 		[(TiViewController *)controller setProxy:self];
 		tab = (TiViewProxy<TiTab>*)[tab_ retain];
-		
+		[TiUtils configureController:controller withObject:nil];
 		[self _tabAttached];
 	}
 	else
@@ -449,7 +461,7 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 			TiViewController *wc = (TiViewController*)[self controller];
 
 			UINavigationController *nc = [[[UINavigationController alloc] initWithRootViewController:wc] autorelease];
-
+			[TiUtils configureController:nc withObject:nil];
 			BOOL navBarHidden = [self argOrWindowProperty:@"navBarHidden" args:args];
 			[nc setNavigationBarHidden:navBarHidden];
 
@@ -555,8 +567,10 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 			 ![TiUtils boolValue:@"closeByTab" properties:[args objectAtIndex:0] def:NO]))
 		{
 			NSMutableArray* closeArgs = [NSMutableArray arrayWithObject:self];
-			if (args != nil) {
+			if ([args isKindOfClass:[NSArray class]]) {
 				[closeArgs addObject:[args objectAtIndex:0]];
+			} else if (args != nil) {
+				[closeArgs addObject:args];
 			}
 			[self forgetProxy:closeAnimation];
 			RELEASE_TO_NIL(closeAnimation);
@@ -591,13 +605,17 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 -(void)closeOnUIThread:(id)args
 {
 	[self windowWillClose];
-
+	BOOL animated;
+	id propsDict = args;
+	if ([args isKindOfClass:[NSArray class]] && ([args count] > 0)) {
+		propsDict = [args objectAtIndex:0];
+	}
+	animated = [TiUtils boolValue:@"animated" properties:propsDict def:YES]; //TiUtils checks to see if NSDictionary
+	
+	
 	//TEMP hack until we can figure out split view issue
     // appears to be a dead code
 	if ((tempController != nil) && modalFlag) {
-        BOOL animated = (args!=nil && [args isKindOfClass:[NSDictionary class]]) ? 
-            [TiUtils boolValue:@"animated" properties:[args objectAtIndex:0] def:YES] : YES;
-
         [tempController dismissModalViewControllerAnimated:animated];
 
         if (!animated) {
@@ -616,7 +634,6 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 
 		if (modalFlag)
 		{
-			BOOL animated = args!=nil && [args isKindOfClass:[NSDictionary class]] ? [TiUtils boolValue:@"animated" properties:[args objectAtIndex:0] def:YES] : YES;
 			[[TiApp app] hideModalController:vc animated:animated];
 			if (animated)
 			{
@@ -662,6 +679,7 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 		{
 			[[UIApplication sharedApplication] setStatusBarHidden:restoreFullscreen withAnimation:UIStatusBarAnimationNone];
 			self.view.frame = [[[TiApp app] controller] resizeViewForStatusBarHidden];
+			[[[TiApp app] controller] repositionSubviews];
 		} 
  
 		if (closeAnimation!=nil)
@@ -710,6 +728,10 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
      */
     if (![self _isChildOfTab]) {
         if (!modalFlag) {
+			// Hide inactive window elements for accessibility
+			if ([TiUtils isIOS5OrGreater]) {
+				[(UIView *)[[rootView subviews] lastObject] setAccessibilityElementsHidden:YES];
+			}
             [rootView addSubview:view_];
         }
 
@@ -768,9 +790,6 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 	{
 		DeveloperLog(@"[DEBUG] Focused was already set while in viewDidAppear.");
 	}
-    
-    //Propagate this state to children
-    [self parentDidAppear:[NSNumber numberWithBool:animated]];
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -783,23 +802,17 @@ TiOrientationFlags TiOrientationFlagsFromObject(id args)
 	{
 		DeveloperLog(@"[DEBUG] Focused was already cleared while in viewWillDisappear.");
 	}
-    //Propagate this state to children
-    [self parentWillDisappear:[NSNumber numberWithBool:animated]];
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
 	[self parentWillShow];
 	TiThreadProcessPendingMainThreadBlocks(0.1, YES, nil);
-    //Propagate this state to children
-    [self parentWillAppear:[NSNumber numberWithBool:animated]];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
 	[self parentWillHide];
-    //Propagate this state to children
-    [self parentDidDisappear:[NSNumber numberWithBool:animated]];
 }
 
 #pragma mark Animation Delegates

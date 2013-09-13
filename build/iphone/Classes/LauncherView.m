@@ -39,6 +39,7 @@
 #import "LauncherView.h"
 #import "LauncherItem.h"
 #import "LauncherButton.h"
+#import "TiBase.h"
 
 static const CGFloat kLauncherViewMargin = 0;
 static const CGFloat kLauncherViewPadding = 0;
@@ -200,7 +201,6 @@ static const NSTimeInterval kLauncherViewFastTransitionDuration = 0.2;
 	if (numberOfPages != pager.numberOfPages) 
 	{
 		pager.numberOfPages = numberOfPages;
-		[pager setCurrentPage:numberOfPages-1];
 	}
 }
 - (void)layoutButtons 
@@ -242,9 +242,9 @@ static const NSTimeInterval kLauncherViewFastTransitionDuration = 0.2;
 - (void)recreateButtons 
 {
     if (![NSThread isMainThread]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+        TiThreadPerformOnMainThread( ^{
             [self recreateButtons];
-        });
+        }, NO);
         return;
     }
     
@@ -275,7 +275,13 @@ static const NSTimeInterval kLauncherViewFastTransitionDuration = 0.2;
     
 	[self layoutButtons];
 	
-	[pager setCurrentPage:curIndex];
+    NSInteger oldPageNo = pager.currentPage;
+    [pager setCurrentPage:curIndex];
+    if (oldPageNo != curIndex) {
+        if ([delegate respondsToSelector:@selector(launcherView:didChangePage:)]) {
+            [delegate launcherView:self didChangePage:[NSNumber numberWithInteger:pager.currentPage]];
+        }
+    }
 }
 
 - (void)scrollToItem:(LauncherItem*)item animated:(BOOL)animated 
@@ -562,6 +568,20 @@ static const NSTimeInterval kLauncherViewFastTransitionDuration = 0.2;
 	}
 }
 
+- (NSArray*)launcheritems_
+{
+    NSMutableArray *items = [NSMutableArray array];
+	for (NSArray* buttonPage in buttons)
+	{
+		for (LauncherButton* button in buttonPage)
+		{
+			[items addObject:button.item];
+		}
+	}
+	return items;
+
+}
+
 - (NSArray*)items
 {
 	NSMutableArray *items = [NSMutableArray array];
@@ -665,8 +685,13 @@ static const NSTimeInterval kLauncherViewFastTransitionDuration = 0.2;
 	}
 	
 	[self layoutButtons];
-	
+	NSInteger oldPageNo = pager.currentPage;
 	[pager setCurrentPage:curIndex];
+	if (oldPageNo != curIndex) {
+		if ([delegate respondsToSelector:@selector(launcherView:didChangePage:)]) {
+			[delegate launcherView:self didChangePage:[NSNumber numberWithInteger:pager.currentPage]];
+		}
+	}
 	
 	if ([delegate respondsToSelector:@selector(launcherViewDidEndEditing:)]) 
 	{
@@ -757,8 +782,15 @@ static const NSTimeInterval kLauncherViewFastTransitionDuration = 0.2;
 
 - (void)updatePagerWithContentOffset:(CGPoint)contentOffset 
 {
-	CGFloat pageWidth = scrollView.frame.size.width;
-	pager.currentPage = floor((contentOffset.x - pageWidth / 2) / pageWidth) + 1;
+    CGFloat pageWidth = scrollView.frame.size.width;
+    NSInteger oldPageNo = pager.currentPage;
+    pager.currentPage = floor((contentOffset.x - pageWidth / 2) / pageWidth) + 1;
+    if (oldPageNo != pager.currentPage) {
+        if ([delegate respondsToSelector:@selector(launcherView:didChangePage:)]) {
+            [delegate launcherView:self didChangePage:[NSNumber numberWithInteger:pager.currentPage]];
+        }
+        
+    }
 }
 
 - (void)springLoadTimer:(NSTimer*)timer 
@@ -919,7 +951,10 @@ static const NSTimeInterval kLauncherViewFastTransitionDuration = 0.2;
 
 - (void)pageChanged 
 {
-	scrollView.contentOffset = CGPointMake(pager.currentPage * scrollView.frame.size.width, 0);
+    if ([delegate respondsToSelector:@selector(launcherView:didChangePage:)]) {
+        [delegate launcherView:self didChangePage:[NSNumber numberWithInteger:pager.currentPage]];
+    }
+    scrollView.contentOffset = CGPointMake(pager.currentPage * scrollView.frame.size.width, 0);
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView*)scrollView 

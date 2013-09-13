@@ -9,7 +9,7 @@ var smallImgSize = bigImgSize / 3;
 
 var tours = Alloy.Globals.getTours();
 
-/*var bigImageStyle = {
+var bigImageStyle = {
 	width: bigImgSize,
 	height: bigImgSize,
 	left: leftOffset,
@@ -20,9 +20,11 @@ var smallImageStyle = {
 	width: smallImgSize,
 	height: smallImgSize,
 	right: leftOffset,
-	top: topOffset - smallImgSize / 2,
-	image: tours[i].img
-};*/
+	top: topOffset - smallImgSize / 2
+};
+
+Alloy.Globals.smallImageStyle = smallImageStyle;
+Alloy.Globals.bigImageStyle = bigImageStyle;
 
 exports.showTours = function(scrollView) {
 	//Read data about tours and create views
@@ -34,21 +36,11 @@ exports.showTours = function(scrollView) {
 		tours[i].controller = Alloy.createController("tourView");
 		
 		//bigPicture
-		tours[i].controller.getView("bigPicture").applyProperties({
-			width: bigImgSize,
-			height: bigImgSize,
-			left: leftOffset,
-			top: topOffset
-		});
+		tours[i].controller.getView("bigPicture").applyProperties(bigImageStyle);
 		
 		//smallPicture
-		tours[i].controller.getView("smallPicture").applyProperties({
-			width: smallImgSize,
-			height: smallImgSize,
-			right: leftOffset,
-			top: topOffset - smallImgSize / 2,
-			image: tours[i].img
-		});
+		smallImageStyle.image = tours[i].img;
+		tours[i].controller.getView("smallPicture").applyProperties(smallImageStyle);
 		
 		//background
 		tours[i].controller.getView("background").applyProperties({image: tours[i].background});

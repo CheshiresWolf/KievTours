@@ -7,7 +7,7 @@
  * WARNING: This is generated code. Modify at your own risk and without support.
  */
 
-#if defined(USE_TI_FILESYSTEM) || defined(USE_TI_DATABASE)
+#if defined(USE_TI_FILESYSTEM) || defined(USE_TI_DATABASE) || defined(USE_TI_MEDIA)
 
 #include <sys/xattr.h>
 
@@ -159,6 +159,18 @@ FILENOOP(setHidden:(id)x);
 		result = [fm createDirectoryAtPath:path withIntermediateDirectories:recurse attributes:nil error:nil];
 	}
 	return NUMBOOL(result);
+}
+
+-(id)isFile:(id)unused
+{
+	BOOL isDirectory;
+	return NUMBOOL([fm fileExistsAtPath:path isDirectory:&isDirectory] && !isDirectory);		
+}
+
+-(id)isDirectory:(id)unused
+{
+	BOOL isDirectory;
+	return NUMBOOL([fm fileExistsAtPath:path isDirectory:&isDirectory] && isDirectory);
 }
 
 -(TiFilesystemFileStreamProxy *) open:(id) args {

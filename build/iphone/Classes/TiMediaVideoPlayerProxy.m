@@ -345,9 +345,9 @@ NSArray* moviePlayerKeys = nil;
 -(void)setMediaControlStyle:(NSNumber *)value
 {
 	if (movie != nil) {
-		dispatch_async(dispatch_get_main_queue(), ^{
+		TiThreadPerformOnMainThread(^{
 			[movie setControlStyle:[TiUtils intValue:value def:MPMovieControlStyleDefault]];
-		});
+		}, NO);
 	} else {
 		[loadProperties setValue:value forKey:@"mediaControlStyle"];
 	}
@@ -840,13 +840,31 @@ NSArray* moviePlayerKeys = nil;
 	{
 		if ([self _hasListeners:@"complete"])
 		{
-			NSMutableDictionary *event = [NSMutableDictionary dictionary];
 			NSNumber *reason = [[notification userInfo] objectForKey:MPMoviePlayerPlaybackDidFinishReasonUserInfoKey];
+
+			NSString * errorMessage;
+			int errorCode;
+			if ([reason intValue] == MPMovieFinishReasonPlaybackError)
+			{
+				errorMessage = @"Video Playback encountered an error";
+				errorCode = -1;
+			}
+			else
+			{
+				errorMessage = nil;
+				errorCode = 0;
+			}
+
+			NSMutableDictionary *event;
 			if (reason!=nil)
 			{
-				[event setObject:reason forKey:@"reason"];
+				event = [NSDictionary dictionaryWithObject:reason forKey:@"reason"];
 			}
-			[self fireEvent:@"complete" withObject:event];
+			else
+			{
+				event = nil;
+			}
+			[self fireEvent:@"complete" withObject:event errorCode:errorCode message:errorMessage];
 		}
 		playing = NO;
 	}
@@ -872,16 +890,10 @@ NSArray* moviePlayerKeys = nil;
 	if (thumbnailCallback!=nil)
 	{
 		NSDictionary *userinfo = [note userInfo];
-		NSMutableDictionary *event = [NSMutableDictionary dictionary];
 		NSError* value = [userinfo objectForKey:MPMoviePlayerThumbnailErrorKey];
-		if (value!=nil)
+		NSMutableDictionary *event = [TiUtils dictionaryWithCode:[value code] message:[TiUtils messageFromError:value]];
+		if (value==nil)
 		{
-			[event setObject:NUMBOOL(NO) forKey:@"success"];
-			[event setObject:[value description] forKey:@"error"];
-		}
-		else 
-		{
-			[event setObject:NUMBOOL(YES) forKey:@"success"];
 			UIImage *image = [userinfo valueForKey:MPMoviePlayerThumbnailImageKey];
 			TiBlob *blob = [[[TiBlob alloc] initWithImage:image] autorelease];
 			[event setObject:blob forKey:@"image"];

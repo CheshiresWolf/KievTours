@@ -1,6 +1,6 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2010 by KievTours, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  * 
@@ -8,6 +8,7 @@
  */
 
 #import "TiBase.h"
+#include <math.h>
 
 #define INCH_IN_CM 2.54
 #define INCH_IN_MM 25.4
@@ -188,7 +189,7 @@ TI_INLINE BOOL TiDimensionDidCalculateValue(TiDimension dimension,CGFloat boundi
 			*result = dimension.value;
 			return YES;
 		case TiDimensionTypePercent:
-			*result = dimension.value * boundingValue;
+			*result = roundf(dimension.value * boundingValue);
 			return YES;
 		default: {
 			break;

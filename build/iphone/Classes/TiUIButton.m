@@ -93,9 +93,9 @@
 	[button setBackgroundImage:backgroundImageUnstretchedCache forState:UIControlStateNormal];	
 }
 
--(void)layoutSubviews
+-(void)frameSizeChanged:(CGRect)frame bounds:(CGRect)bounds
 {
-	[super layoutSubviews];
+	[super frameSizeChanged:frame bounds:bounds];
 	[self updateBackgroundImage];
 }
 
@@ -119,7 +119,7 @@
             touchStarted = NO;
             fireEvent = @"touchend";
             if (button.highlighted) {
-                fireActionEvent = [touch tapCount] < 2 ? @"click" : @"dblclick";
+                fireActionEvent = [touch tapCount] == 1 ? @"click" : ([touch tapCount] == 2 ? @"dblclick" : nil);
             }
             break;
         case UITouchPhaseCancelled:

@@ -17,6 +17,7 @@
 
 -(void)_destroy
 {
+	controller.delegate = nil;
 	RELEASE_TO_NIL(controller);
 	[super _destroy];
 }
@@ -40,10 +41,8 @@
 -(void)show:(id)args
 {
 	ENSURE_SINGLE_ARG_OR_NIL(args,NSDictionary);
-	if (![NSThread isMainThread]) {
-		TiThreadPerformOnMainThread(^{[self show:args];}, YES);
-		return;
-	}	
+	[self rememberSelf];
+	ENSURE_UI_THREAD(show, args);
 	BOOL animated = [TiUtils boolValue:@"animated" properties:args def:YES];
 
 	TiViewProxy* view = [args objectForKey:@"view"];
@@ -67,6 +66,7 @@
 -(void)hide:(id)args
 {
 	ENSURE_TYPE_OR_NIL(args,NSDictionary);
+	ENSURE_UI_THREAD(hide, args);
 	BOOL animated = [TiUtils boolValue:@"animated" properties:args def:YES];
 	[[self controller] dismissPreviewAnimated:animated];
 }
@@ -145,6 +145,7 @@
 	{
 		[self fireEvent:@"unload" withObject:nil];
 	}
+	[self forgetSelf];
 }
 
 

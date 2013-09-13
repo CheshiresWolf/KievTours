@@ -25,6 +25,7 @@ extern NSString * const TI_APPLICATION_ID;
 
 @implementation TiHost
 @synthesize debugMode;
+@synthesize profileMode = _profileMode;
 
 +(NSString *)resourcePath
 {
@@ -84,6 +85,7 @@ extern NSString * const TI_APPLICATION_ID;
 		baseURL = [[NSURL fileURLWithPath:base] retain];
 		stylesheet = [[TiStylesheet alloc] init];
         debugMode = NO;
+		_profileMode = NO;
 	}
 	return self;
 }

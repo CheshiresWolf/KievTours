@@ -306,17 +306,54 @@ DEFINE_EXCEPTIONS
 
 -(void)setTabsBackgroundColor_:(id)value
 {
-    if ([TiUtils isIOS5OrGreater]) {
-        TiColor* color = [TiUtils colorValue:value];
-        if (color != nil) {
-            controller.tabBar.tintColor = color.color;
-        }
+	if (![TiUtils isIOS5OrGreater])
+	{
+		NSLog(@"[WARN] tabsBackgroundColor is only supported in iOS 5 or above.");
+		return;
+	}
+	TiColor* color = [TiUtils colorValue:value];
+	//A nil tintColor is fine, too.
+	controller.tabBar.tintColor = color.color;
+}
 
-    } else {
-        NSLog(@"[WARN] tabsBackgroundColor is only supported in iOS 5 or above.");
-    }
+-(void)setTabsBackgroundImage_:(id)value
+{
+    if (![TiUtils isIOS5OrGreater]) {
+		NSLog(@"[WARN] tabsBackgroundImage is only supported in iOS 5 or above.");
+		return;
+	}
+	controller.tabBar.backgroundImage = [self loadImage:value];
+}
 
+-(void)setActiveTabBackgroundImage_:(id)value
+{
+    if (![TiUtils isIOS5OrGreater]) {
+		NSLog(@"[WARN] activeTabBackgroundImage is only supported in iOS 5 or above.");
+		return;
+	}
+	controller.tabBar.selectionIndicatorImage = [self loadImage:value];
+}
 
+-(void)setShadowImage_:(id)value
+{
+    if (![TiUtils isIOS6OrGreater]) {
+		NSLog(@"[WARN] activeTabBackgroundImage is only supported in iOS 6 or above.");
+		return;
+	}
+	//Because we still support XCode 4.3, we cannot use the shadowImage property
+	[controller.tabBar setShadowImage:[self loadImage:value]];
+}
+
+-(void) setActiveTabIconTint_:(id)value
+{
+	if (![TiUtils isIOS5OrGreater])
+	{
+		NSLog(@"[WARN] activeTabIconTint is only supported in iOS 5 or above.");
+		return;
+	}
+	TiColor* color = [TiUtils colorValue:value];
+	//A nil tintColor is fine, too.
+	controller.tabBar.selectedImageTintColor = color.color;
 }
 
 #pragma mark Public APIs
@@ -396,52 +433,62 @@ DEFINE_EXCEPTIONS
 
 -(void)setTabs_:(id)tabs
 {
-	ENSURE_TYPE_OR_NIL(tabs,NSArray);
+    ENSURE_TYPE_OR_NIL(tabs,NSArray);
 
-	if (tabs!=nil && [tabs count] > 0)
-	{		
-		NSMutableArray *controllers = [[NSMutableArray alloc] init];
-		id thisTab = [[self proxy] valueForKey:@"activeTab"];
-		
-		for (TiUITabProxy *tabProxy in tabs)
-		{
-			[controllers addObject:[tabProxy controller]];
-			if ([TiUtils boolValue:[tabProxy valueForKey:@"active"]])
-			{
-                RELEASE_TO_NIL(focused);
-				focused = [tabProxy retain];
-			}
-		}
-
-		[self tabController].viewControllers = nil;
-		[self tabController].viewControllers = controllers;
-		if (![tabs containsObject:focused])
-		{
-            if ( (thisTab != nil) && (![thisTab isKindOfClass:[TiUITabProxy class]]) ) {
+    if (tabs!=nil && [tabs count] > 0) {
+        NSMutableArray *controllers = [[NSMutableArray alloc] init];
+        id thisTab = [[self proxy] valueForKey:@"activeTab"];
+        
+        TiUITabProxy *theActiveTab = nil;
+        
+        if (thisTab != nil && thisTab != [NSNull null]) {
+            if (![thisTab isKindOfClass:[TiUITabProxy class]]) {
                 int index = [TiUtils intValue:thisTab];
                 if (index < [tabs count]) {
-                    thisTab = [tabs objectAtIndex:index];
+                    theActiveTab = [tabs objectAtIndex:index];
                 }
             }
-            if ([tabs containsObject:thisTab]) {
-                [self setActiveTab_:thisTab];
+            else {
+                if ([tabs containsObject:thisTab]) {
+                    theActiveTab = thisTab;
+                }
+            }
+        }
+		
+        for (TiUITabProxy *tabProxy in tabs) {
+            [controllers addObject:[tabProxy controller]];
+            if ([TiUtils boolValue:[tabProxy valueForKey:@"active"]]) {
+                RELEASE_TO_NIL(focused);
+                focused = [tabProxy retain];
+            }
+        }
+        
+        if (theActiveTab != nil && focused != theActiveTab) {
+            RELEASE_TO_NIL(focused);
+            focused = [theActiveTab retain];
+        }
+
+        [self tabController].viewControllers = nil;
+        [self tabController].viewControllers = controllers;
+        if ( focused != nil && ![tabs containsObject:focused]) {
+            if (theActiveTab != nil) {
+                [self setActiveTab_:theActiveTab];
             }
             else {
                 DebugLog(@"[WARN] ActiveTab property points to tab not in list. Ignoring");
                 RELEASE_TO_NIL(focused);
             }
-		}
+        }
 
-		[controllers release];
-	}
-	else
-	{
-		RELEASE_TO_NIL(focused);
-		[self tabController].viewControllers = nil;
-	}
+        [controllers release];
+    }
+    else {
+        RELEASE_TO_NIL(focused);
+        [self tabController].viewControllers = nil;
+    }
 
-	[self.proxy	replaceValue:focused forKey:@"activeTab" notification:YES];
-	[self setAllowUserCustomization_:[NSNumber numberWithBool:allowConfiguration]];
+    [self.proxy	replaceValue:focused forKey:@"activeTab" notification:YES];
+    [self setAllowUserCustomization_:[NSNumber numberWithBool:allowConfiguration]];
 }
 
 -(void)open:(id)args

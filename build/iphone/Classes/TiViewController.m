@@ -1,6 +1,6 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2009-2011 by KievTours, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  * 
@@ -30,7 +30,27 @@
 
 -(void)loadView
 {
-	self.view = [proxy view];
+    if (proxy == nil) {
+        return;
+    }
+    BOOL wrap = [TiUtils isIOS7OrGreater];
+    if (![proxy isKindOfClass:[TiWindowProxy class]]) {
+        DebugLog(@"[WARN] TiViewController - The proxy %@ is not of type TiWindowProxy.", proxy);
+        wrap = NO;
+    }
+    if (wrap) {
+        //IOS7 now automatically sets the frame of its view based on the fullscreen control props.
+        //However this will not work for our layout system since now the reference size in which to
+        //layout the view is always the full screen. So we are going to wrap our window in a wrapper
+        //so it lays out correctly.
+        UIView *wrapperView = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] applicationFrame]];
+        wrapperView.autoresizingMask = UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+        [wrapperView addSubview:[proxy view]];
+        self.view = wrapperView;
+        [wrapperView release];
+    } else {
+        self.view = [proxy view];
+    }
 }
 
 @synthesize proxy;

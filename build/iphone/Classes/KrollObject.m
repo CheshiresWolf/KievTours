@@ -1,6 +1,6 @@
 /**
  * Appcelerator Titanium Mobile
- * Copyright (c) 2009-2012 by KievTours, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  * 
@@ -205,7 +205,6 @@ TiValueRef KrollGetProperty(TiContextRef jsContext, TiObjectRef object, TiString
 		[name autorelease];		
 
 		id result = [o valueForKey:name];
-		TiObjectRef cachedObject = [o objectForTiString:prop context:jsContext];
 
 		if ([result isKindOfClass:[KrollWrapper class]])
 		{
@@ -217,6 +216,7 @@ TiValueRef KrollGetProperty(TiContextRef jsContext, TiObjectRef object, TiString
 			}
 			else
 			{
+				TiObjectRef cachedObject = [o objectForTiString:prop context:jsContext];
 				TiObjectRef remoteFunction = [(KrollWrapper *)result jsobject];
 				if ((cachedObject != NULL) && (cachedObject != remoteFunction))
 				{
@@ -896,7 +896,7 @@ bool KrollHasInstance(TiContextRef ctx, TiObjectRef constructor, TiValueRef poss
 			return;
 		}
 		selector = NSSelectorFromString([NSString stringWithFormat:@"set%@:",name]);
-		if ([target respondsToSelector:selector] && ![name isEqualToString:@"ZIndex"] && ![name isEqualToString:@"BubbleParent"])//TODO: Quick hack is quick.
+		if ([target respondsToSelector:selector] && ![name isEqualToString:@"ZIndex"])//TODO: Quick hack is quick.
 		{
 			[target performSelector:selector withObject:value];
 		}
@@ -1127,6 +1127,11 @@ TI_INLINE TiStringRef TiStringCreateWithPointerValue(int value)
 
 	TiValueRef jsEventData = ConvertIdTiValue(context, eventData);
 	TiObjectCallAsFunction(jsContext, jsCallback, [thisObject jsobject], 1, &jsEventData,&exception);
+	if (exception!=NULL)
+	{
+		id excm = [KrollObject toID:context value:exception];
+		[[TiExceptionHandler defaultExceptionHandler] reportScriptError:[TiUtils scriptErrorValue:excm]];
+	}
 }
 
 -(void)noteKrollObject:(KrollObject *)value forKey:(NSString *)key
@@ -1166,7 +1171,7 @@ TI_INLINE TiStringRef TiStringCreateWithPointerValue(int value)
 	TiStringRelease(nameRef);
 }
 
--(void)noteObject:(TiObjectRef)storedJSObject forTiString:(TiStringRef) keyString context:(TiContextRef) jsContext
+-(void)noteObject:(TiObjectRef)storedJSObject forTiString:(TiStringRef) keyString context:(TiContextRef) jsContextRef
 {
 	if ((propsObject == NULL) || (storedJSObject == NULL) || finalized)
 	{
@@ -1174,20 +1179,20 @@ TI_INLINE TiStringRef TiStringCreateWithPointerValue(int value)
 	}
 	TiValueRef exception=NULL;
 
-	TiObjectRef jsProxyHash = (TiObjectRef)TiObjectGetProperty(jsContext, propsObject, kTiStringPropertyKey, &exception);
+	TiObjectRef jsProxyHash = (TiObjectRef)TiObjectGetProperty(jsContextRef, propsObject, kTiStringPropertyKey, &exception);
 
-	if ((jsProxyHash == NULL) || (TiValueGetType(jsContext,jsProxyHash) != kTITypeObject))
+	if ((jsProxyHash == NULL) || (TiValueGetType(jsContextRef,jsProxyHash) != kTITypeObject))
 	{
-		jsProxyHash = TiObjectMake(jsContext, NULL, &exception);
-		TiObjectSetProperty(jsContext, propsObject, kTiStringPropertyKey, jsProxyHash,
+		jsProxyHash = TiObjectMake(jsContextRef, NULL, &exception);
+		TiObjectSetProperty(jsContextRef, propsObject, kTiStringPropertyKey, jsProxyHash,
 				kTiPropertyAttributeDontEnum , &exception);
 	}
 
-	TiObjectSetProperty(jsContext, jsProxyHash, keyString, storedJSObject,
+	TiObjectSetProperty(jsContextRef, jsProxyHash, keyString, storedJSObject,
 			kTiPropertyAttributeDontEnum , &exception);
 }
 
--(void)forgetObjectForTiString:(TiStringRef) keyString context:(TiContextRef) jsContext
+-(void)forgetObjectForTiString:(TiStringRef) keyString context:(TiContextRef) jsContextRef
 {
 	if ((propsObject == NULL) || finalized)
 	{
@@ -1195,17 +1200,17 @@ TI_INLINE TiStringRef TiStringCreateWithPointerValue(int value)
 	}
 	TiValueRef exception=NULL;
 
-	TiObjectRef jsProxyHash = (TiObjectRef)TiObjectGetProperty(jsContext, propsObject, kTiStringPropertyKey, &exception);
+	TiObjectRef jsProxyHash = (TiObjectRef)TiObjectGetProperty(jsContextRef, propsObject, kTiStringPropertyKey, &exception);
 
-	if ((jsProxyHash == NULL) || (TiValueGetType(jsContext,jsProxyHash) != kTITypeObject))
+	if ((jsProxyHash == NULL) || (TiValueGetType(jsContextRef,jsProxyHash) != kTITypeObject))
 	{
 		return;
 	}
 
-	TiObjectDeleteProperty(jsContext, jsProxyHash, keyString, &exception);
+	TiObjectDeleteProperty(jsContextRef, jsProxyHash, keyString, &exception);
 }
 
--(TiObjectRef)objectForTiString:(TiStringRef) keyString context:(TiContextRef) jsContext
+-(TiObjectRef)objectForTiString:(TiStringRef) keyString context:(TiContextRef) jsContextRef
 {
 	if(finalized){
 		return NULL;
@@ -1213,15 +1218,15 @@ TI_INLINE TiStringRef TiStringCreateWithPointerValue(int value)
 
 	TiValueRef exception=NULL;
 
-	TiObjectRef jsProxyHash = (TiObjectRef)TiObjectGetProperty(jsContext, propsObject, kTiStringPropertyKey, &exception);
+	TiObjectRef jsProxyHash = (TiObjectRef)TiObjectGetProperty(jsContextRef, propsObject, kTiStringPropertyKey, &exception);
 
-	if ((jsProxyHash == NULL) || (TiValueGetType(jsContext,jsProxyHash) != kTITypeObject))
+	if ((jsProxyHash == NULL) || (TiValueGetType(jsContextRef,jsProxyHash) != kTITypeObject))
 	{
 		return NULL;
 	}
 	
-	TiObjectRef result = (TiObjectRef)TiObjectGetProperty(jsContext, jsProxyHash, keyString, NULL);
-	if ((result == NULL) || (TiValueGetType(jsContext,result) != kTITypeObject))
+	TiObjectRef result = (TiObjectRef)TiObjectGetProperty(jsContextRef, jsProxyHash, keyString, NULL);
+	if ((result == NULL) || (TiValueGetType(jsContextRef,result) != kTITypeObject))
 	{
 		return NULL;
 	}
@@ -1229,7 +1234,7 @@ TI_INLINE TiStringRef TiStringCreateWithPointerValue(int value)
 	return result;
 }
 
--(void)storeListener:(KrollCallback *)eventCallback forEvent:(NSString *)eventName
+-(void)storeListener:(id)eventCallbackOrWrapper forEvent:(NSString *)eventName
 {
 	if ((propsObject == NULL) || finalized)
 	{
@@ -1250,7 +1255,12 @@ TI_INLINE TiStringRef TiStringCreateWithPointerValue(int value)
 
 	TiStringRef jsEventTypeString = TiStringCreateWithCFString((CFStringRef) eventName);
 	TiObjectRef jsCallbackArray = (TiObjectRef)TiObjectGetProperty(jsContext, jsEventHash, jsEventTypeString, &exception);
-	TiObjectRef callbackFunction = [eventCallback function];
+	TiObjectRef callbackFunction = nil;
+	if ([eventCallbackOrWrapper isKindOfClass:[KrollCallback class]]) {
+		callbackFunction = [(KrollCallback *)eventCallbackOrWrapper function];
+	} else if ([eventCallbackOrWrapper isKindOfClass:[KrollWrapper class]]) {
+		callbackFunction = [(KrollWrapper *)eventCallbackOrWrapper jsobject];
+	}
 	jsCallbackArray = TiValueToObject(jsContext, jsCallbackArray, &exception);
 
 	if ((jsCallbackArray == NULL) || (TiValueGetType(jsContext,jsCallbackArray) != kTITypeObject))
@@ -1363,13 +1373,7 @@ TI_INLINE TiStringRef TiStringCreateWithPointerValue(int value)
 		if (exception!=NULL)
 		{
 			id excm = [KrollObject toID:context value:exception];
-			TiScriptError *scriptError = nil;
-			if ([excm isKindOfClass:[NSDictionary class]]) {
-				scriptError = [[TiScriptError alloc] initWithDictionary:excm];
-			} else {
-				scriptError = [[TiScriptError alloc] initWithMessage:[excm description] sourceURL:nil lineNo:0];
-			}
-			[[TiExceptionHandler defaultExceptionHandler] reportScriptError:scriptError];
+			[[TiExceptionHandler defaultExceptionHandler] reportScriptError:[TiUtils scriptErrorValue:excm]];
 		}
 	}
 }

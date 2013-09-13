@@ -1,7 +1,8 @@
-//var smallPictureStyle = 
 
-function swap() {
-	//tours[i].controller.getView("smallPicture").animate(model.bigImageStyle);
+$.smallPicture.addEventListener("click", function(e) {
+	Ti.API.info("swapped");
 	
-	//tours[i].controller.getView("bigPicture").animate(model.smallImageStyle);
-}
+	$.bigPicture.animate(Alloy.Globals.smallImageStyle);
+	$.bigPicture.removeAllChildren();
+	$.smallPicture.animate(Alloy.Globals.bigImageStyle);
+});

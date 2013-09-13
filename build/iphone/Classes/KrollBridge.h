@@ -65,6 +65,7 @@ extern NSString * KievTours$ModuleRequireFormat;
 + (NSArray *)krollBridgesUsingProxy:(id)proxy;
 + (BOOL)krollBridgeExists:(KrollBridge *)bridge;
 + (KrollBridge *)krollBridgeForThreadName:(NSString *)threadName;
++ (NSArray *)krollContexts;
 
 -(void)enqueueEvent:(NSString*)type forProxy:(TiProxy *)proxy withObject:(id)obj;
 -(void)registerProxy:(id)proxy krollObject:(KrollObject *)ourKrollObject;

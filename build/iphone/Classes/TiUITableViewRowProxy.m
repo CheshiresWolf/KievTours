@@ -16,14 +16,14 @@
 #import "TiUtils.h"
 #import "Webcolor.h"
 #import "ImageLoader.h"
-
+#import "TiLayoutQueue.h"
 #import <libkern/OSAtomic.h>
 
 NSString * const defaultRowTableClass = @"_default_";
 #define CHILD_ACCESSORY_WIDTH 20.0
 #define CHECK_ACCESSORY_WIDTH 20.0
 #define DETAIL_ACCESSORY_WIDTH 33.0
-
+#define IOS7_ACCESSORY_EXTRA_OFFSET 15.0
 // TODO: Clean this up a bit
 #define NEEDS_UPDATE_ROW 1
 
@@ -71,6 +71,15 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect,
 
 @implementation TiSelectedCellBackgroundView
 @synthesize position,fillColor,grouped;
+
+- (id)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame])
+    {
+        self.fillColor = [UIColor clearColor];
+        position = TiCellBackgroundViewPositionMiddle;
+    }
+    return self;
+}
 
 -(void)dealloc
 {
@@ -152,7 +161,7 @@ static void addRoundedRectToPath(CGContextRef context, CGRect rect,
 
 -(void)setPosition:(TiCellBackgroundViewPosition)inPosition
 {
-	if(position != inPosition)
+	if((position != inPosition) && (![TiUtils isIOS7OrGreater]))
 	{
 		position = inPosition;
 		[self setNeedsDisplay];
@@ -355,34 +364,42 @@ TiProxy * DeepScanForProxyOfViewContainingPoint(UIView * targetView, CGPoint poi
 
 -(CGFloat)sizeWidthForDecorations:(CGFloat)oldWidth forceResizing:(BOOL)force
 {
-	CGFloat width = oldWidth;
-	if (force || !configuredChildren) {
-		if ([TiUtils boolValue:[self valueForKey:@"hasChild"] def:NO]) {
-			width -= CHILD_ACCESSORY_WIDTH;
-		}
-		else if ([TiUtils boolValue:[self valueForKey:@"hasDetail"] def:NO]) {
-			width -= DETAIL_ACCESSORY_WIDTH;
-		}
-		else if ([TiUtils boolValue:[self valueForKey:@"hasCheck"] def:NO]) {
-			width -= CHECK_ACCESSORY_WIDTH;
-		}
+    CGFloat width = oldWidth;
+    BOOL updateForiOS7 = NO;
+    if (force || !configuredChildren) {
+        if ([TiUtils boolValue:[self valueForKey:@"hasChild"] def:NO]) {
+            width -= CHILD_ACCESSORY_WIDTH;
+            updateForiOS7 = YES;
+        }
+        else if ([TiUtils boolValue:[self valueForKey:@"hasDetail"] def:NO]) {
+            width -= DETAIL_ACCESSORY_WIDTH;
+            updateForiOS7 = YES;
+        }
+        else if ([TiUtils boolValue:[self valueForKey:@"hasCheck"] def:NO]) {
+            width -= CHECK_ACCESSORY_WIDTH;
+            updateForiOS7 = YES;
+        }
 		
-		id rightImage = [self valueForKey:@"rightImage"];
-		if (rightImage != nil) {
-			NSURL *url = [TiUtils toURL:rightImage proxy:self];
-			UIImage *image = [[ImageLoader sharedLoader] loadImmediateImage:url];
-			width -= [image size].width;
-		}
+        id rightImage = [self valueForKey:@"rightImage"];
+        if (rightImage != nil) {
+            NSURL *url = [TiUtils toURL:rightImage proxy:self];
+            UIImage *image = [[ImageLoader sharedLoader] loadImmediateImage:url];
+            width -= [image size].width;
+        }
 		
-		id leftImage = [self valueForKey:@"leftImage"];
-		if (leftImage != nil) {
-			NSURL *url = [TiUtils toURL:leftImage proxy:self];
-			UIImage *image = [[ImageLoader sharedLoader] loadImmediateImage:url];
-			width -= [image size].width;			
-		}
-	}
+        id leftImage = [self valueForKey:@"leftImage"];
+        if (leftImage != nil) {
+            NSURL *url = [TiUtils toURL:leftImage proxy:self];
+            UIImage *image = [[ImageLoader sharedLoader] loadImmediateImage:url];
+            width -= [image size].width;
+        }
+    }
+    
+    if (updateForiOS7 && [TiUtils isIOS7OrGreater]) {
+        width -= IOS7_ACCESSORY_EXTRA_OFFSET;
+    }
 	
-	return width;
+    return width;
 }
 
 -(CGFloat)rowHeight:(CGFloat)width
@@ -522,78 +539,52 @@ TiProxy * DeepScanForProxyOfViewContainingPoint(UIView * targetView, CGPoint poi
 		cell.backgroundView = nil;
 	}
 	
-	id selBgImage = [self valueForKey:@"selectedBackgroundImage"];
-	if (selBgImage!=nil)
-	{
-		NSURL *url = [TiUtils toURL:selBgImage proxy:(TiProxy*)table.proxy];
-		UIImage *image = [[ImageLoader sharedLoader] loadImmediateStretchableImage:url withLeftCap:leftCap topCap:topCap];
-		if ([cell.selectedBackgroundView isKindOfClass:[UIImageView class]]==NO)
-		{
-			UIImageView *view_ = [[[UIImageView alloc] initWithFrame:CGRectZero] autorelease];
-			cell.selectedBackgroundView = view_;
-		}
-		if (image!=((UIImageView*)cell.selectedBackgroundView).image)
-		{
-			((UIImageView*)cell.selectedBackgroundView).image = image;
-		}
-	}
-	else if (selBgColor==nil && cell.selectedBackgroundView!=nil && [cell.selectedBackgroundView isKindOfClass:[UIImageView class]] && ((UIImageView*)cell.selectedBackgroundView).image!=nil)
-	{
-		cell.selectedBackgroundView = nil;
-	}
-	
-	if (selBgImage==nil && (selBgColor!=nil || [[table tableView] style]==UITableViewStyleGrouped))
-	{
-		if (selBgColor==nil)
-		{
-			// if we have a grouped view with no selected background color, we 
-			// need to setup a cell and force the color otherwise you'll get
-			// square corners on a rounded row
-			if ([cell selectionStyle]==UITableViewCellSelectionStyleBlue)
-			{
-				selBgColor = @"#0272ed";
-			}
-			else if ([cell selectionStyle]==UITableViewCellSelectionStyleGray)
-			{
-				selBgColor = @"#bbb";
-			}
-			else 
-			{
-				selBgColor = @"#fff";
-			}
-		}
-		if (cell.selectedBackgroundView == nil || [cell.selectedBackgroundView isKindOfClass:[TiSelectedCellBackgroundView class]]==NO)
-		{								
-			cell.selectedBackgroundView = [[[TiSelectedCellBackgroundView alloc] initWithFrame:CGRectZero] autorelease];
-		}
-		TiSelectedCellBackgroundView *selectedBGView = (TiSelectedCellBackgroundView*)cell.selectedBackgroundView;
-		int count = [section rowCount];
-		if (count == 1)
-		{
-			selectedBGView.position = TiCellBackgroundViewPositionSingleLine;
-		}
-		else 
-		{
-			if (row == 0)
-			{
-				selectedBGView.position = TiCellBackgroundViewPositionTop;
-			}
-			else if (row == count-1)
-			{
-				selectedBGView.position = TiCellBackgroundViewPositionBottom;
-			}
-			else 
-			{
-				selectedBGView.position = TiCellBackgroundViewPositionMiddle;
-			}
-		}
-		selectedBGView.fillColor = [Webcolor webColorNamed:selBgColor];	
-		selectedBGView.grouped = [[table tableView] style]==UITableViewStyleGrouped;
-	}
-	else if (cell.selectedBackgroundView!=nil)
-	{
-		cell.selectedBackgroundView.backgroundColor = nil;
-	}
+    id selBgImage = [self valueForKey:@"selectedBackgroundImage"];
+    if (selBgImage!=nil) {
+        NSURL *url = [TiUtils toURL:selBgImage proxy:(TiProxy*)table.proxy];
+        UIImage *image = [[ImageLoader sharedLoader] loadImmediateStretchableImage:url withLeftCap:leftCap topCap:topCap];
+        if ([cell.selectedBackgroundView isKindOfClass:[UIImageView class]]==NO) {
+            UIImageView *view_ = [[[UIImageView alloc] initWithFrame:CGRectZero] autorelease];
+            cell.selectedBackgroundView = view_;
+        }
+        if (image!=((UIImageView*)cell.selectedBackgroundView).image) {
+            ((UIImageView*)cell.selectedBackgroundView).image = image;
+        }
+        
+        UIColor* theColor = [Webcolor webColorNamed:selBgColor];
+        cell.selectedBackgroundView.backgroundColor = ((theColor == nil)?[UIColor clearColor]:theColor);
+    } else {
+        if (![cell.selectedBackgroundView isKindOfClass:[TiSelectedCellBackgroundView class]]) {
+            cell.selectedBackgroundView = [[[TiSelectedCellBackgroundView alloc] initWithFrame:CGRectZero] autorelease];
+        }
+        TiSelectedCellBackgroundView *selectedBGView = (TiSelectedCellBackgroundView*)cell.selectedBackgroundView;
+        selectedBGView.grouped = [[table tableView] style]==UITableViewStyleGrouped;
+        UIColor* theColor = [Webcolor webColorNamed:selBgColor];
+        if (theColor == nil) {
+            switch (cell.selectionStyle) {
+                case UITableViewCellSelectionStyleGray:theColor = [Webcolor webColorNamed:@"#bbb"];break;
+                case UITableViewCellSelectionStyleNone:theColor = [UIColor clearColor];break;
+                case UITableViewCellSelectionStyleBlue:theColor = [Webcolor webColorNamed:@"#0272ed"];break;
+                default:theColor = [TiUtils isIOS7OrGreater] ? [Webcolor webColorNamed:@"#e0e0e0"] : [Webcolor webColorNamed:@"#0272ed"];break;
+            }
+        }
+        selectedBGView.fillColor = theColor;
+        int count = [section rowCount];
+        if (count == 1) {
+            selectedBGView.position = TiCellBackgroundViewPositionSingleLine;
+        }
+        else {
+            if (row == 0) {
+                selectedBGView.position = TiCellBackgroundViewPositionTop;
+            }
+            else if (row == count-1) {
+                selectedBGView.position = TiCellBackgroundViewPositionBottom;
+            }
+            else {
+                selectedBGView.position = TiCellBackgroundViewPositionMiddle;
+            }
+        }
+    }
 }
 
 -(void)configureLeftSide:(UITableViewCell*)cell
@@ -674,7 +665,24 @@ TiProxy * DeepScanForProxyOfViewContainingPoint(UIView * targetView, CGPoint poi
 {
 	return nil;
 }
+
+//Private method : For internal use only
+-(UIView*) currentRowContainerView
+{
+    return rowContainerView;
+}
+//Private method :For internal use only. Called from layoutSubviews of the cell.
+-(void)triggerLayout
+{
+    if (modifyingRow) {
+        return;
+    }
+    modifyingRow = YES;
+    [TiLayoutQueue layoutProxy:self];
+    modifyingRow = NO;
     
+}
+
 - (void)prepareTableRowForReuse
 {
 	if (!self.reusable) {
@@ -710,7 +718,7 @@ TiProxy * DeepScanForProxyOfViewContainingPoint(UIView * targetView, CGPoint poi
 	// this method is called when the cell is initially created
 	// to be initialized. on subsequent repaints of a re-used
 	// table cell, the updateChildren below will be called instead
-	configuredChildren = YES;
+	configuredChildren = NO;
 	if ([[self children] count] > 0)
 	{
 		UIView *contentView = cell.contentView;
@@ -778,8 +786,8 @@ TiProxy * DeepScanForProxyOfViewContainingPoint(UIView * targetView, CGPoint poi
 					[proxy setSandboxBounds:rect];
 				}
 				[proxy windowWillOpen];
-				[uiview transferProxy:proxy deep:YES];
 				[proxy setReproxying:YES];
+				[uiview transferProxy:proxy deep:YES];
 				[self redelegateViews:proxy toView:contentView];
 				if (uiview == nil) {
 					[rowContainerView addSubview:[proxy view]];
@@ -787,6 +795,9 @@ TiProxy * DeepScanForProxyOfViewContainingPoint(UIView * targetView, CGPoint poi
 				[proxy setReproxying:NO];
 			}];
 		} else {
+			[[self children] enumerateObjectsUsingBlock:^(TiViewProxy *proxy, NSUInteger idx, BOOL *stop) {
+				[self redelegateViews:proxy toView:contentView];
+			}];
 			[rowContainerView setFrame:rect];
 			[contentView addSubview:rowContainerView];
 		}
@@ -845,7 +856,7 @@ TiProxy * DeepScanForProxyOfViewContainingPoint(UIView * targetView, CGPoint poi
 
 -(void)triggerRowUpdate
 {	
-	if ([self isAttached] && !modifyingRow && !attaching)
+	if ([self isAttached] && self.viewAttached && !modifyingRow && !attaching)
 	{
 		if (OSAtomicTestAndSetBarrier(NEEDS_UPDATE_ROW, &dirtyRowFlags)) {
 			return;
@@ -920,7 +931,8 @@ TiProxy * DeepScanForProxyOfViewContainingPoint(UIView * targetView, CGPoint poi
 	return dict;
 }
 
--(void)fireEvent:(NSString *)type withObject:(id)obj withSource:(id)source propagate:(BOOL)propagate
+//TODO: Remove when deprication is done.
+-(void)fireEvent:(NSString*)type withObject:(id)obj withSource:(id)source propagate:(BOOL)propagate reportSuccess:(BOOL)report errorCode:(int)code message:(NSString*)message;
 {
 	// merge in any row level properties for the event
 	if (source!=self)
@@ -928,7 +940,13 @@ TiProxy * DeepScanForProxyOfViewContainingPoint(UIView * targetView, CGPoint poi
 		obj = [self createEventObject:obj];
 	}
 	[callbackCell handleEvent:type];
-	[super fireEvent:type withObject:obj withSource:source propagate:propagate];
+	[super fireEvent:type withObject:obj withSource:source propagate:propagate reportSuccess:report errorCode:code message:message];
+}
+
+-(void)fireEvent:(NSString*)type withObject:(id)obj propagate:(BOOL)propagate reportSuccess:(BOOL)report errorCode:(int)code message:(NSString*)message;
+{
+	[callbackCell handleEvent:type];
+	[super fireEvent:type withObject:obj propagate:propagate reportSuccess:report errorCode:code message:message];
 }
 
 -(void)setSelectedBackgroundColor:(id)arg

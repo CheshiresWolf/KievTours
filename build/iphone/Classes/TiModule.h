@@ -6,6 +6,7 @@
  * 
  * WARNING: This is generated code. Modify at your own risk and without support.
  */
+#import "TiProxy.h"
 #import "TiUtils.h"
 #import "TiEvaluator.h"
 

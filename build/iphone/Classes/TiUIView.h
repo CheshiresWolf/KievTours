@@ -62,6 +62,7 @@ void ModifyScrollViewForKeyboardHeightAndContentHeightWithResponderRect(UIScroll
 	BOOL touchEnabled;
 
 	unsigned int animationDelayGuard;
+	unsigned int animationDelayGuardForLayout;
 	
 	// Touch detection
     BOOL changedInteraction;
@@ -136,9 +137,13 @@ void ModifyScrollViewForKeyboardHeightAndContentHeightWithResponderRect(UIScroll
 - (UIGestureRecognizer *)gestureRecognizerForEvent:(NSString *)event;
 
 /**
- Returns CA layer for the background of the view.
+ Returns CA layer for the background image of the view.
  */
 -(CALayer *)backgroundImageLayer;
+/**
+ Returns CA layer for the background gradient of the view.
+ */
+-(CALayer *)gradientLayer;
 
 /**
  Tells the view to start specified animation.
@@ -238,6 +243,8 @@ void ModifyScrollViewForKeyboardHeightAndContentHeightWithResponderRect(UIScroll
 -(void)handleControlEvents:(UIControlEvents)events;
 
 -(void)setVisible_:(id)visible;
+
+-(void)setBackgroundImage_:(id)value;
 
 -(UIView *)gradientWrapperView;
 -(void)checkBounds;

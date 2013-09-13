@@ -105,7 +105,7 @@
 	*imageIdiom = UIUserInterfaceIdiomPhone;
 	// Default
     image = nil;
-    if ([[UIScreen mainScreen] bounds].size.height == 568) {
+    if ([TiUtils isRetinaFourInch]) {
         image = [UIImage imageNamed:@"Default-568h.png"];
         if (image!=nil) {
             return image;
@@ -259,6 +259,8 @@
 		[nc addObserver:self selector:@selector(keyboardDidShow:) name:UIKeyboardDidShowNotification object:nil];
 		[nc addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 		[nc addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+
+		[TiUtils configureController:self withObject:nil];
 	}
 	return self;
 }
@@ -651,6 +653,7 @@
         if ([modalvc isKindOfClass:[UINavigationController class]] && 
             ![modalvc isKindOfClass:[MFMailComposeViewController class]] &&
             ![modalvc isKindOfClass:[ABPeoplePickerNavigationController class]] &&
+            ![modalvc isKindOfClass:[UIImagePickerController class]] &&
             modalFlag == YES )
         {
             //Since this is a window opened from inside a modalviewcontroller we need
@@ -989,7 +992,14 @@
 
 	[window setParentOrientationController:self];
 	[windowProxies addObject:window];
-	[window parentWillShow];
+	
+    //TIMOB-12924 Native implement for JS workaround. This should be replaced with something better.
+    if ([windowProxies count] == 1) {
+        BOOL hidden = [[UIApplication sharedApplication] isStatusBarHidden];
+        [[UIApplication sharedApplication] setStatusBarHidden:hidden withAnimation:UIStatusBarAnimationNone];
+    }
+    
+    [window parentWillShow];
 	//Todo: Move all the root-attaching logic here.
 
 	[self childOrientationControllerChangedFlags:window];

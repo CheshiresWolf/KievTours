@@ -12,6 +12,7 @@
 #import "TiUtils.h"
 #import "TiFile.h"
 #import "TiMediaAudioSession.h"
+#import "TiFilesystemFileProxy.h"
 
 @implementation TiMediaAudioRecorderProxy
 
@@ -150,7 +151,7 @@
 			recorder->StopRecord();
 			[[TiMediaAudioSession sharedSession] stopAudioSession];
 		}
-		return file;
+		return [[[TiFilesystemFileProxy alloc] initWithFile:[file path]] autorelease];
 	}
 	
 	return nil;
