@@ -26,7 +26,7 @@ function tour() {
 	var isDownloaded = false;
 };
 tour.prototype.set = function(img, title, text, size, dots, length, background, price) {
-  	this.img = img
+  	this.img = img;
 	this.title = title;
 	this.text = text;
 	this.size = size;
@@ -76,9 +76,9 @@ tours.push(tour2);
 
 Alloy.Globals.getTours = function() {
 	return tours;
-}
+};
 
-Alloy.createController('index').getView().open()
+Alloy.createController('index').getView().open();
 
 //===========================================
 //Ti.API.info("alloy.js open");

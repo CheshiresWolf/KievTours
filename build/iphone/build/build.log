@@ -1,0 +1,80 @@
+================================================================================
+Appcelerator Titanium Diagnostics Build Log
+The contents of this file are useful to send to Appcelerator Support if
+reporting an issue to help us understand your environment, build settings
+and aid in debugging. Please attach this log to any issue that you report.
+================================================================================
+
+Starting build at 09/13/13 17:16
+
+Build details:
+
+   timestamp=12/12/12 18:49
+   module_apiversion=2
+   version=3.0.0
+   githash=a5894b3
+
+
+Script arguments:
+   /Users/admin/Library/Application Support/Titanium/mobilesdk/osx/3.0.0.GA/iphone/builder.py
+   simulator
+   6.1
+   /Users/admin/Documents/GitHub/KievTours
+   com.ipublisher.kievtours
+   KievTours
+   universal
+   iphone
+   192.168.0.14:52949
+
+Building from: /Users/admin/Library/Application Support/Titanium/mobilesdk/osx/3.0.0.GA/iphone
+Platform: Darwin Kernel Version 12.2.0: Sat Aug 25 00:48:52 PDT 2012; root:xnu-2050.18.24~1/RELEASE_X86_64
+
+Xcode path is: /Applications/Xcode.app/Contents/Developer
+
+
+githash=a5894b3, existing_git_hash=None
+forcing rebuild since libhash (None) not matching (6b039db50f01934ab31311c911af38db)
+Performing full rebuild
+Generated the following stylecode code:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>classes</key>
+		<dict>
+</dict>
+
+		<key>classes_density</key>
+		<dict>
+</dict>
+
+		<key>ids</key>
+		<dict>
+</dict>
+
+		<key>ids_density</key>
+		<dict>
+</dict>
+
+		<key>tags</key>
+		<dict>
+</dict>
+
+		<key>tags_density</key>
+		<dict>
+</dict>
+
+	</dict>
+</plist>
++ Detected plugin: ti.alloy/1.0
++ Loading compiler plugin at /Users/admin/Documents/GitHub/KievTours/plugins/ti.alloy/plugin.py
+
+Exception detected in script:
+Traceback (most recent call last):
+  File "/Users/admin/Library/Application Support/Titanium/mobilesdk/osx/3.0.0.GA/iphone/builder.py", line 1129, in main
+    p.compile(compiler_config)
+  File "/Users/admin/Documents/GitHub/KievTours/plugins/ti.alloy/plugin.py", line 115, in compile
+    print ex.output
+  File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/codecs.py", line 351, in write
+UnicodeDecodeError: 'ascii' codec can't decode byte 0xc2 in position 3474: ordinal not in range(128)

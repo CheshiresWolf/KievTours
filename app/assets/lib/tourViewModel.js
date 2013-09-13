@@ -100,4 +100,4 @@ exports.showTours = function(scrollView) {
 		//show View
 		scrollView.addView(tours[i].controller.getView());
 	}
-}
+};

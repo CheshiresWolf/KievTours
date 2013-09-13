@@ -1,0 +1,9 @@
+<Alloy>
+	<View id="buttons">
+		<ImageView id="buttonTours"></ImageView>
+		<ImageView id="buttonDiscover"></ImageView>
+		<ImageView id="buttonTips"></ImageView>
+		<ImageView id="buttonMore"></ImageView>
+	</View>
+</Alloy>
+
