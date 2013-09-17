@@ -3,10 +3,11 @@
 		<ImageView id="background"></ImageView>
 		<ImageView id="smallPicture"></ImageView>
 		<ImageView id="bigPicture">
-			<Label id="title"></Label>
-			<Label id="text"></Label>
-			<ImageView id="button"></ImageView>
-		</ImageView>
-		
+			<View id="tourContent">
+				<Label id="title"></Label>
+				<Label id="text"></Label>
+				<ImageView id="button"></ImageView>
+			</View>
+		</ImageView>	
 	</View>
 </Alloy>

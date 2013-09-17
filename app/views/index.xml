@@ -2,6 +2,12 @@
 	<Window id="window">
 		<ImageView id="logo"></ImageView>
 		<ScrollableView id="scrollView"></ScrollableView>
-		<ImageView id="menu"></ImageView>
+		<View id="menu">
+			<ImageView id="buttonTours"></ImageView>
+			<ImageView id="buttonDiscover"></ImageView>
+			<ImageView id="buttonTips"></ImageView>
+			<ImageView id="buttonMore"></ImageView>
+		</View>
+		<View id="paging"></View>
 	</Window>
 </Alloy>

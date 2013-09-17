@@ -1,9 +1,5 @@
 "#bigPicture": {
-	image: "images/BigSircle.png",
-	zIndex: 3
-},
-"#smallPicture": {
-	zIndex: 5
+	image: "images/BigSircle.png"
 },
 "#background": {
 	top: 0,

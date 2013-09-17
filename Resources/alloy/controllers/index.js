@@ -27,46 +27,139 @@ function Controller() {
         id: "scrollView"
     });
     $.__views.window.add($.__views.scrollView);
-    $.__views.menu = Ti.UI.createImageView({
+    $.__views.menu = Ti.UI.createView({
         left: 0,
-        bottom: 0,
-        image: "images/Menu_closed.png",
         width: Titanium.Platform.displayCaps.platformWidth,
-        height: 30,
+        height: 80,
         zIndex: 7,
         id: "menu"
     });
     $.__views.window.add($.__views.menu);
+    $.__views.buttonTours = Ti.UI.createImageView({
+        image: "images/Menu_icon_tour.png",
+        width: 50,
+        height: 50,
+        bottom: 5,
+        left: 10,
+        id: "buttonTours"
+    });
+    $.__views.menu.add($.__views.buttonTours);
+    $.__views.buttonDiscover = Ti.UI.createImageView({
+        image: "images/Menu_icon_discover.png",
+        width: 50,
+        height: 50,
+        bottom: 5,
+        left: 75,
+        id: "buttonDiscover"
+    });
+    $.__views.menu.add($.__views.buttonDiscover);
+    $.__views.buttonTips = Ti.UI.createImageView({
+        image: "images/Menu_icon_sityTrips.png",
+        width: 50,
+        height: 50,
+        bottom: 5,
+        left: 140,
+        id: "buttonTips"
+    });
+    $.__views.menu.add($.__views.buttonTips);
+    $.__views.buttonMore = Ti.UI.createImageView({
+        image: "images/Menu_icon_more.png",
+        width: 50,
+        height: 50,
+        bottom: 5,
+        left: 205,
+        id: "buttonMore"
+    });
+    $.__views.menu.add($.__views.buttonMore);
+    $.__views.paging = Ti.UI.createView({
+        id: "paging"
+    });
+    $.__views.window.add($.__views.paging);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var buttonView = Alloy.createController("buttonView").getView();
-    $.scrollView.addEventListener("scrollend", function(e) {
-        Ti.API.info("scrollend | " + e.type);
+    var tours = Alloy.Globals.getTours(), toursLength = tours.length, pagingArray = [];
+    var currentPage = 0;
+    $.menu.applyProperties({
+        backgroundImage: "images/Menu_close_large.png",
+        bottom: -55
+    });
+    for (var i = 0; toursLength > i; i++) {
+        pagingArray.push(Ti.UI.createImageView({
+            width: 5,
+            height: 5,
+            left: 10 * i,
+            image: "images/Radio_bullets_off.png"
+        }));
+        $.paging.add(pagingArray[i]);
+    }
+    $.paging.applyProperties({
+        bottom: 50,
+        left: (Titanium.Platform.displayCaps.platformWidth - $.paging.toImage().width) / 2,
+        height: 5,
+        width: 10 * pagingArray.length,
+        zIndex: 4
+    });
+    pagingArray[0].applyProperties({
+        image: "images/Radio_bullets_on.png"
+    });
+    $.scrollView.addEventListener("scrollend", function() {
+        var bufIndex = $.scrollView.getCurrentPage();
+        if (currentPage !== bufIndex) {
+            var children = $.scrollView.getViews(), loadedPages = [], bufPos = 1;
+            loadedPages = [];
+            if (bufIndex > currentPage) {
+                0 === currentPage && (bufPos = 0);
+                loadedPages.push(children[bufPos]);
+                loadedPages.push(children[bufPos + 1]);
+                tours.length > bufIndex + 1 && loadedPages.push(tourProcedures.makeTourView(tours[bufIndex + 1]));
+                $.scrollView.setViews(loadedPages);
+                $.scrollView.setCurrentPage(1);
+                currentPage = bufIndex;
+                Ti.API.info("[ --> ]: globalPage = " + currentPage + " | localPage = " + bufPos + " | childrensLength = " + $.scrollView.getViews().length);
+                pagingArray[currentPage - 1].applyProperties({
+                    image: "images/Radio_bullets_off.png"
+                });
+                pagingArray[currentPage].applyProperties({
+                    image: "images/Radio_bullets_on.png"
+                });
+            } else {
+                bufIndex - 1 >= 0 ? loadedPages.push(tourProcedures.makeTourView(tours[bufIndex - 1])) : bufPos = 0;
+                loadedPages.push(children[0]);
+                loadedPages.push(children[1]);
+                $.scrollView.setViews(loadedPages);
+                $.scrollView.setCurrentPage(bufPos);
+                currentPage = bufIndex;
+                Ti.API.info("[ <-- ]: globalPage = " + currentPage + " | localPage = " + bufPos + " | childrensLength = " + $.scrollView.getViews().length);
+                pagingArray[currentPage + 1].applyProperties({
+                    image: "images/Radio_bullets_off.png"
+                });
+                pagingArray[currentPage].applyProperties({
+                    image: "images/Radio_bullets_on.png"
+                });
+            }
+        }
     });
     $.window.addEventListener("swipe", function(e) {
         Ti.API.info("swipe" + e.direction);
-        if ("up" === e.direction) {
-            $.menu.applyProperties({
-                image: "images/Menu_open.png"
-            });
-            $.menu.animate({
-                height: 60
-            }, function() {
-                $.menu.add(buttonView);
-            });
-        }
-        "down" === e.direction && $.menu.animate({
-            height: 15
+        "up" === e.direction && $.menu.animate({
+            bottom: 0
         }, function() {
-            $.menu.remove(buttonView);
             $.menu.applyProperties({
-                height: 30,
-                image: "images/Menu_closed.png"
+                backgroundImage: "images/Menu_open_large.png"
+            });
+        });
+        "down" === e.direction && $.menu.animate({
+            bottom: -55
+        }, function() {
+            $.menu.applyProperties({
+                backgroundImage: "images/Menu_close_large.png"
             });
         });
     });
-    var tour = require("lib/tourViewModel");
-    tour.showTours($.scrollView);
+    var tourProcedures = require("lib/tourViewModel");
+    $.scrollView.addView(tourProcedures.makeTourView(tours[0]));
+    $.scrollView.addView(tourProcedures.makeTourView(tours[1]));
+    Ti.API.info("index.js open");
     _.extend($, exports);
 }
 

@@ -11,22 +11,14 @@
 // Alloy.Globals.someGlobalFunction = function(){};
 
 //===========================================
-//Ti.API.info("alloy.js start");
+Ti.API.info("alloy.js start");
 //===========================================
 
-function tour() {
-	var img = "";
-	var title = "";
-	var text = "";
-	var size = 0;
-	var dots = {};
-	var length = 0;
-	var background = "";
-	var price = 0;
-	var isDownloaded = false;
-};
+function Tour() {
+	var img = "", title = "", text = "", size = 0, dots = {}, length = 0, background = "", price = 0, isDownloaded = false;
+}
 
-tour.prototype.set = function(img, title, text, size, dots, length, background, price) {
+Tour.prototype.set = function(img, title, text, size, dots, length, background, price) {
 	this.img = img;
 	this.title = title;
 	this.text = text;
@@ -37,7 +29,7 @@ tour.prototype.set = function(img, title, text, size, dots, length, background, 
 	this.price = price;
 };
 
-tour.prototype.download = function() {
+Tour.prototype.download = function() {
 	//downloading
 	//...
 	
@@ -48,10 +40,10 @@ var tours = [];
 
 //load tours from somwere and cast it to array
 //function load(url) {
-var tour1 = new tour();
+var tour1 = new Tour();
 tour1.set(
 	"images/SmallSircle.png",
-	"O_o",
+	"1",
 	"Run FULS!",
 	125,
 	null,
@@ -61,10 +53,10 @@ tour1.set(
 	);
 tours.push(tour1);
 
-var tour2 = new tour();
+var tour2 = new Tour();
 tour2.set(
 	"images/SmallSircleBuf.png",
-	"O_o",
+	"2",
 	"Abir Abi rWald ffffffff fffffff fffff ffff fffffff",
 	125,
 	null,
@@ -74,7 +66,32 @@ tour2.set(
 	);
 tour2.download();
 tours.push(tour2);
-//};
+
+var tour3 = new Tour();
+tour3.set(
+	"images/SmallSircle.png",
+	"3",
+	"Run FULS!",
+	125,
+	null,
+	"2:10",
+	"images/APP_Kiev_background.png",
+	9.99
+	);
+tours.push(tour3);
+
+var tour4 = new Tour();
+tour4.set(
+	"images/SmallSircle.png",
+	"4",
+	"Run FULS!",
+	125,
+	null,
+	"2:10",
+	"images/APP_Kiev_background.png",
+	9.99
+	);
+tours.push(tour4);
 
 Alloy.Globals.getTours = function() {
 	return tours;

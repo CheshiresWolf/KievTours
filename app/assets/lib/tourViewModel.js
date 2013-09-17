@@ -7,81 +7,82 @@ var buttonImgPath;
 
 var smallImgSize = bigImgSize / 3;
 
-var tours = Alloy.Globals.getTours();
 
 var bigImageStyle = {
 	width: bigImgSize,
 	height: bigImgSize,
 	left: leftOffset,
-	top: topOffset
+	top: topOffset,
+	zIndex: 3
 };
 
 var smallImageStyle = {
 	width: smallImgSize,
 	height: smallImgSize,
-	right: leftOffset,
-	top: topOffset - smallImgSize / 2
+	left: Titanium.Platform.displayCaps.platformWidth - (leftOffset + smallImgSize),
+	top: topOffset - smallImgSize / 2,
+	zIndex: 5
 };
 
 Alloy.Globals.smallImageStyle = smallImageStyle;
 Alloy.Globals.bigImageStyle = bigImageStyle;
 
-exports.showTours = function(scrollView) {
+exports.makeTourView = function(tour) {
 	//Read data about tours and create views
-	for (i = 0; i < tours.length; i++) {
+	//for (i = 0; i < tours.length; i++) {
 		//===========================================
 		//Ti.API.info("index.js loop");
 		//===========================================
 		
-		tours[i].controller = Alloy.createController("tourView");
+		var controller = Alloy.createController("tourView");
 		
 		//bigPicture
-		tours[i].controller.getView("bigPicture").applyProperties(bigImageStyle);
+		controller.getView("bigPicture").applyProperties(bigImageStyle);
 		
 		//smallPicture
-		smallImageStyle.image = tours[i].img;
-		tours[i].controller.getView("smallPicture").applyProperties(smallImageStyle);
+		smallImageStyle.image = tour.img;
+		controller.getView("smallPicture").applyProperties(smallImageStyle);
 		
 		//background
-		tours[i].controller.getView("background").applyProperties({image: tours[i].background});
+		controller.getView("background").applyProperties({image: tour.background});
 		
 		//title
-		tours[i].controller.getView("title").text = tours[i].title;
+		controller.getView("title").text = tour.title;
 		
-		textWidth = tours[i].controller.getView("title").toImage().width;
+		textWidth = controller.getView("title").toImage().width;
 		if (textWidth > (bigImgSize * 7 / 10)) {
 			textWidth = bigImgSize * (7 / 10);
 		}
 	
-		tours[i].controller.getView("title").applyProperties({
+		controller.getView("title").applyProperties({
 			top: bigImgSize / 6,
 			width: textWidth
 		});
 		
 		//text
-		tours[i].controller.getView("text").text = tours[i].text;
+		controller.getView("text").text = tour.text;
 		
-		textWidth = tours[i].controller.getView("text").toImage().width;
+		textWidth = controller.getView("text").toImage().width;
 		if (textWidth > (bigImgSize * 8 / 10)) {
 			textWidth = bigImgSize * (8 / 10);
 		}
 	
-		tours[i].controller.getView("text").applyProperties({
-			top: bigImgSize / 6 + 10 + tours[i].controller.getView("title").toImage().height,
+		controller.getView("text").applyProperties({
+			top: bigImgSize / 6 + 10 + controller.getView("title").toImage().height,
 			width: textWidth
 		});
 		
 		//button
-		if (tours[i].price != 0) {
+		if (tour.price !== 0) {
 			buttonImgPath = "images/Buy_Button.png";
 		} else {
-			if (tours[i].isDownloaded) {
+			if (tour.isDownloaded) {
 				buttonImgPath = "images/Play_Button.png";
 			} else {
 				buttonImgPath = "images/Download_Button.png";
 			}
 		}
-		tours[i].controller.getView("button").applyProperties({
+		controller.getView("button").applyProperties({
 			width: 92,
 			height: 25,
 			bottom: 10,
@@ -90,6 +91,6 @@ exports.showTours = function(scrollView) {
 		});
 		
 		//show View
-		scrollView.addView(tours[i].controller.getView());
-	}
+		return controller.getView();
+	//}
 };

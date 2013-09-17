@@ -1,0 +1,1 @@
+/Users/vladislavzhovtiy/KievTours/Resources/iphone/alloy/CFG.js

@@ -1,0 +1,81 @@
+================================================================================
+Appcelerator Titanium Diagnostics Build Log
+The contents of this file are useful to send to Appcelerator Support if
+reporting an issue to help us understand your environment, build settings
+and aid in debugging. Please attach this log to any issue that you report.
+================================================================================
+
+Starting build at 09/17/13 17:56
+
+Build details:
+
+   timestamp=08/14/13 12:45
+   module_apiversion=2
+   version=3.1.2
+   githash=5ceaff8
+
+
+Script arguments:
+   /Users/vladislavzhovtiy/Library/Application Support/Titanium/mobilesdk/osx/3.1.2.GA/iphone/builder.py
+   simulator
+   6.1
+   /Users/vladislavzhovtiy/KievTours
+   com.ipublisher.kievtours
+   KievTours
+   universal
+   iphone
+
+Building from: /Users/vladislavzhovtiy/Library/Application Support/Titanium/mobilesdk/osx/3.1.2.GA/iphone
+Platform: Darwin Kernel Version 12.2.0: Sat Aug 25 00:48:52 PDT 2012; root:xnu-2050.18.24~1/RELEASE_X86_64
+
+Xcode path is: /Applications/Xcode.app/Contents/Developer
+
+
+githash=5ceaff8, existing_git_hash=5ceaff8
+writing contents of /Users/vladislavzhovtiy/KievTours/build/iphone/project.xcconfig:
+
+TI_VERSION=3.1.2.GA
+TI_SDK_DIR=/Users/vladislavzhovtiy/Library/Application Support/Titanium/mobilesdk/osx/$(TI_VERSION)/iphone
+TI_APPID=com.ipublisher.kievtours
+OTHER_LDFLAGS[sdk=iphoneos*]=$(inherited) -weak_framework iAd
+OTHER_LDFLAGS[sdk=iphonesimulator*]=$(inherited) -weak_framework iAd
+#include "module"
+
+old contents
+
+
+Generated the following stylecode code:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>classes</key>
+		<dict>
+</dict>
+
+		<key>classes_density</key>
+		<dict>
+</dict>
+
+		<key>ids</key>
+		<dict>
+</dict>
+
+		<key>ids_density</key>
+		<dict>
+</dict>
+
+		<key>tags</key>
+		<dict>
+</dict>
+
+		<key>tags_density</key>
+		<dict>
+</dict>
+
+	</dict>
+</plist>
++ Detected plugin: ti.alloy/1.0
++ Loading compiler plugin at /Users/vladislavzhovtiy/KievTours/plugins/ti.alloy/plugin.py
+Finishing build
