@@ -62,9 +62,7 @@ tours.push(new Tour(
 	9.99
 ));
 
-//tours.push(tour1);
-
-var tourBuf = new Tour(
+tours.push(new Tour(
 	"images/SmallSircleBuf.png",
 	"TWO TwO tWo two 2",
 	"Abir Abi rWald ffffffff fffffff fffff ffff fffffff asjdfk adjhfasbv bcbvb fbvusybv vjbsnc chvs jvb",
@@ -73,9 +71,7 @@ var tourBuf = new Tour(
 	"0:15",
 	"images/APP_Kiev_background_Buf.png",
 	5
-	);
-tourBuf.download();
-tours.push(tourBuf);
+));
 
 tours.push(new Tour(
 	"images/SmallSircle.png",
@@ -88,8 +84,6 @@ tours.push(new Tour(
 	9.99
 ));
 
-//tours.push(tour3);
-
 tours.push(new Tour(
 	"images/SmallSircle.png",
 	"4",
@@ -100,13 +94,15 @@ tours.push(new Tour(
 	"images/APP_Kiev_background.png",
 	9.99
 ));
-//tours.push(tour4);
 
 Alloy.Globals.getTours = function() {
 	return tours;
 };
 
-Alloy.createController('index').getView().open();
+var index = Alloy.createController("index");
+var tourViewProcedures = require("lib/tourViewProcedures");
+index.getView().open();
+tourViewProcedures.initTourViews(index);
 
 //===========================================
 //Ti.API.info("alloy.js open");

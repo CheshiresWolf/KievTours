@@ -1,8 +1,7 @@
 var bigImgSize = Titanium.Platform.displayCaps.platformWidth * (18 / 20); //90% of screen size
 var leftOffset = (Titanium.Platform.displayCaps.platformWidth - bigImgSize) / 2; //5%
 var topOffset = Titanium.Platform.displayCaps.platformHeight / 2 - bigImgSize / 2;
-var textWidth;
-var buttonImgPath;
+var textWidth, buttonImgPath;
 var smallImgSize = bigImgSize / 3;
 
 var bigImageStyle = {
@@ -40,8 +39,91 @@ function downloadButtonEventListener(tour, view) {
 }
 
 function playButtonEventListener() {
-	Ti.API.info("PLAAAAAY");
+	var newWindow = Alloy.createController("index");
+	newWindow.getView("window").applyProperties({backgroundColor: "#336699"});
+	newWindow.getView().open();
 }
+
+exports.initTourViews = function(index) {
+	var tours = Alloy.Globals.getTours(), toursLength = tours.length, pagingArray = [];
+	var currentPage = 0, oldIndex = 0;
+	
+	var paging = index.getView("paging"), scrollView = index.getView("scrollView");
+	
+	//init paging
+	for (var i = 0; i < toursLength; i++) {
+		pagingArray.push(Ti.UI.createImageView({
+			width : 5,
+			height : 5,
+			left : 10 * i,
+			image : "images/Radio_bullets_off.png"
+		}));
+		paging.add(pagingArray[i]);
+	}
+	paging.applyProperties({
+		bottom: 50,
+		height: 5,
+		width: pagingArray.length * 10,
+		zIndex: 4
+	});
+	pagingArray[0].applyProperties({image: "images/Radio_bullets_on.png"});
+	
+	scrollView.addEventListener("scrollend", function(e) {
+		
+		var newIndex = scrollView.getCurrentPage();
+		
+		//if we turn page
+		if (oldIndex !== newIndex) {
+			var children = scrollView.getViews(), loadedPages = [];
+			
+			//if we turn right -->
+			if (newIndex > oldIndex) {			
+				//save pos
+				currentPage++;
+					
+				loadedPages.push(children[oldIndex]);
+				loadedPages.push(children[oldIndex + 1]);
+				
+				//if there are another tour left
+				if (currentPage + 1 < tours.length) {
+					loadedPages.push(makeTourView(tours[currentPage + 1]));
+					oldIndex = 1;
+				}
+				
+				scrollView.setViews(loadedPages);
+				scrollView.setCurrentPage(1);			
+				
+				pagingArray[currentPage - 1].applyProperties({image: "images/Radio_bullets_off.png"});
+				pagingArray[currentPage].applyProperties({image: "images/Radio_bullets_on.png"});
+			} else {
+				
+				//save pos
+				currentPage--;
+				
+				//if there are another tour left
+				if (currentPage - 1 >= 0) {
+					loadedPages.push(makeTourView(tours[currentPage - 1]));
+					oldIndex = 1;
+				} else {
+					oldIndex = 0;
+				}
+				
+				loadedPages.push(children[0]);
+				loadedPages.push(children[1]);
+				
+				scrollView.setViews(loadedPages);
+				scrollView.setCurrentPage(oldIndex);			
+				
+				pagingArray[currentPage + 1].applyProperties({image: "images/Radio_bullets_off.png"});
+				pagingArray[currentPage].applyProperties({image: "images/Radio_bullets_on.png"});
+			}
+		}
+	});
+
+	scrollView.addView(makeTourView(tours[0]));
+	scrollView.addView(makeTourView(tours[1]));
+
+};
 
 exports.getBigImageStyle = function() {
 	return bigImageStyle;
@@ -51,7 +133,7 @@ exports.getSmallImageStyle = function() {
 	return smallImageStyle;
 };
 
-exports.makeTourView = function(tour) {
+function makeTourView (tour) {
 	
 	var controller = Alloy.createController("tourView");
 	

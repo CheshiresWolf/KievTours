@@ -27,11 +27,7 @@ var tours = [];
 
 tours.push(new Tour("images/SmallSircle.png", "1", "Run FULS!", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99));
 
-var tourBuf = new Tour("images/SmallSircleBuf.png", "TWO TwO tWo two 2", "Abir Abi rWald ffffffff fffffff fffff ffff fffffff asjdfk adjhfasbv bcbvb fbvusybv vjbsnc chvs jvb", 111, null, "0:15", "images/APP_Kiev_background_Buf.png", 5);
-
-tourBuf.download();
-
-tours.push(tourBuf);
+tours.push(new Tour("images/SmallSircleBuf.png", "TWO TwO tWo two 2", "Abir Abi rWald ffffffff fffffff fffff ffff fffffff asjdfk adjhfasbv bcbvb fbvusybv vjbsnc chvs jvb", 111, null, "0:15", "images/APP_Kiev_background_Buf.png", 5));
 
 tours.push(new Tour("images/SmallSircle.png", "3", "Run FULS!", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99));
 
@@ -41,6 +37,12 @@ Alloy.Globals.getTours = function() {
     return tours;
 };
 
-Alloy.createController("index").getView().open();
+var index = Alloy.createController("index");
+
+var tourViewProcedures = require("lib/tourViewProcedures");
+
+index.getView().open();
+
+tourViewProcedures.initTourViews(index);
 
 Alloy.createController("index");
