@@ -8,6 +8,75 @@
 	height: "auto",
 	zIndex: 0
 },
+"#title": {
+	textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+	font: {
+        fontSize: '16dp'    
+    }
+},
+"#text": {
+	textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+	font: {
+        fontSize: '14dp'    
+    }
+},
+"#icons": {
+	width: 290,
+	zIndex: 4
+},
+".topIco": {
+	top: 0,
+	height: 25,
+	width: 25,
+	textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+	font: {
+        fontSize: '12dp'    
+    }
+},
+".bottomIco": {
+	top: 30,
+	height: 25,
+	width: 25,
+	textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+	font: {
+        fontSize: '10dp'    
+    }
+},
+"#sizeMb": {
+	left: 0
+},
+"#mb": {
+	left: 0
+},
+"#dotIco": {
+	image: "images/tourView/Icon_marker.png",
+	left: 35
+},
+"#dotAmount": {
+	left: 35
+},
+"#timeIco": {
+	image: "images/tourView/Icon_clock.png",
+	left: 70
+},
+"#time": {
+	left: 70
+},
+"#audioIco": {
+	image: "images/tourView/Icon_audio.png",
+	left: 105
+},
+"#audio": {
+	left: 105
+},
+"#price": {
+	color: "#0aaaaa",
+	width: 40,
+	left: 140
+},
 "#button": {
+	width: 92,
+	height: 25,
+	bottom: 10,
 	zIndex: 4
 }

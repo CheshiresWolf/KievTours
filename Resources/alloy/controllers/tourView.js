@@ -33,34 +33,172 @@ function Controller() {
     });
     $.__views.bigPicture.add($.__views.tourContent);
     $.__views.title = Ti.UI.createLabel({
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "16dp"
+        },
         id: "title"
     });
     $.__views.tourContent.add($.__views.title);
     $.__views.text = Ti.UI.createLabel({
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "14dp"
+        },
         id: "text"
     });
     $.__views.tourContent.add($.__views.text);
+    $.__views.icons = Ti.UI.createView({
+        width: 290,
+        zIndex: 4,
+        id: "icons"
+    });
+    $.__views.tourContent.add($.__views.icons);
+    $.__views.sizeMb = Ti.UI.createLabel({
+        top: 0,
+        height: 25,
+        width: 25,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "12dp"
+        },
+        left: 0,
+        id: "sizeMb"
+    });
+    $.__views.icons.add($.__views.sizeMb);
+    $.__views.mb = Ti.UI.createLabel({
+        top: 30,
+        height: 25,
+        width: 25,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "10dp"
+        },
+        left: 0,
+        text: "Mb",
+        id: "mb"
+    });
+    $.__views.icons.add($.__views.mb);
+    $.__views.dotIco = Ti.UI.createImageView({
+        top: 0,
+        height: 25,
+        width: 25,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "12dp"
+        },
+        image: "images/tourView/Icon_marker.png",
+        left: 35,
+        id: "dotIco"
+    });
+    $.__views.icons.add($.__views.dotIco);
+    $.__views.dotAmount = Ti.UI.createLabel({
+        top: 30,
+        height: 25,
+        width: 25,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "10dp"
+        },
+        left: 35,
+        id: "dotAmount"
+    });
+    $.__views.icons.add($.__views.dotAmount);
+    $.__views.timeIco = Ti.UI.createImageView({
+        top: 0,
+        height: 25,
+        width: 25,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "12dp"
+        },
+        image: "images/tourView/Icon_clock.png",
+        left: 70,
+        id: "timeIco"
+    });
+    $.__views.icons.add($.__views.timeIco);
+    $.__views.time = Ti.UI.createLabel({
+        top: 30,
+        height: 25,
+        width: 25,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "10dp"
+        },
+        left: 70,
+        id: "time"
+    });
+    $.__views.icons.add($.__views.time);
+    $.__views.audioIco = Ti.UI.createImageView({
+        top: 0,
+        height: 25,
+        width: 25,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "12dp"
+        },
+        image: "images/tourView/Icon_audio.png",
+        left: 105,
+        id: "audioIco"
+    });
+    $.__views.icons.add($.__views.audioIco);
+    $.__views.audio = Ti.UI.createLabel({
+        top: 30,
+        height: 25,
+        width: 25,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "10dp"
+        },
+        left: 105,
+        text: "audio",
+        id: "audio"
+    });
+    $.__views.icons.add($.__views.audio);
+    $.__views.price = Ti.UI.createLabel({
+        top: 0,
+        height: 25,
+        width: 40,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        font: {
+            fontSize: "12dp"
+        },
+        color: "#0aaaaa",
+        left: 140,
+        id: "price"
+    });
+    $.__views.icons.add($.__views.price);
     $.__views.button = Ti.UI.createImageView({
+        width: 92,
+        height: 25,
+        bottom: 10,
         zIndex: 4,
         id: "button"
     });
     $.__views.tourContent.add($.__views.button);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    var tourProcedures = require("lib/tourViewProcedures");
     var swapDirection = false;
     $.smallPicture.addEventListener("click", function() {
         if (!swapDirection) {
-            $.bigPicture.animate(Alloy.Globals.smallImageStyle);
             $.tourContent.setVisible(false);
-            $.smallPicture.animate(Alloy.Globals.bigImageStyle);
+            $.bigPicture.animate(tourProcedures.getSmallImageStyle());
+            $.smallPicture.animate(tourProcedures.getBigImageStyle());
+            $.bigPicture.applyProperties({
+                image: "images/SmallSircleInfo.png"
+            });
             swapDirection = true;
         }
     });
     $.bigPicture.addEventListener("click", function() {
         if (swapDirection) {
-            $.bigPicture.animate(Alloy.Globals.bigImageStyle);
+            $.bigPicture.applyProperties({
+                image: "images/BigSircle.png"
+            });
+            $.bigPicture.animate(tourProcedures.getBigImageStyle());
+            $.smallPicture.animate(tourProcedures.getSmallImageStyle());
             $.tourContent.setVisible(true);
-            $.smallPicture.animate(Alloy.Globals.smallImageStyle);
             swapDirection = false;
         }
     });

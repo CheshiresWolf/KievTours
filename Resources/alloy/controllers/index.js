@@ -36,7 +36,7 @@ function Controller() {
     });
     $.__views.window.add($.__views.menu);
     $.__views.buttonTours = Ti.UI.createImageView({
-        image: "images/Menu_icon_tour.png",
+        image: "images/menu/Menu_icon_tour.png",
         width: 50,
         height: 50,
         bottom: 5,
@@ -45,7 +45,7 @@ function Controller() {
     });
     $.__views.menu.add($.__views.buttonTours);
     $.__views.buttonDiscover = Ti.UI.createImageView({
-        image: "images/Menu_icon_discover.png",
+        image: "images/menu/Menu_icon_discover.png",
         width: 50,
         height: 50,
         bottom: 5,
@@ -54,7 +54,7 @@ function Controller() {
     });
     $.__views.menu.add($.__views.buttonDiscover);
     $.__views.buttonTips = Ti.UI.createImageView({
-        image: "images/Menu_icon_sityTrips.png",
+        image: "images/menu/Menu_icon_sityTrips.png",
         width: 50,
         height: 50,
         bottom: 5,
@@ -63,7 +63,7 @@ function Controller() {
     });
     $.__views.menu.add($.__views.buttonTips);
     $.__views.buttonMore = Ti.UI.createImageView({
-        image: "images/Menu_icon_more.png",
+        image: "images/menu/Menu_icon_more.png",
         width: 50,
         height: 50,
         bottom: 5,
@@ -78,9 +78,9 @@ function Controller() {
     exports.destroy = function() {};
     _.extend($, $.__views);
     var tours = Alloy.Globals.getTours(), toursLength = tours.length, pagingArray = [];
-    var currentPage = 0;
+    var currentPage = 0, oldIndex = 0;
     $.menu.applyProperties({
-        backgroundImage: "images/Menu_close_large.png",
+        backgroundImage: "images/menu/Menu_close_large.png",
         bottom: -55
     });
     for (var i = 0; toursLength > i; i++) {
@@ -103,19 +103,19 @@ function Controller() {
         image: "images/Radio_bullets_on.png"
     });
     $.scrollView.addEventListener("scrollend", function() {
-        var bufIndex = $.scrollView.getCurrentPage();
-        if (currentPage !== bufIndex) {
-            var children = $.scrollView.getViews(), loadedPages = [], bufPos = 1;
-            loadedPages = [];
-            if (bufIndex > currentPage) {
-                0 === currentPage && (bufPos = 0);
-                loadedPages.push(children[bufPos]);
-                loadedPages.push(children[bufPos + 1]);
-                tours.length > bufIndex + 1 && loadedPages.push(tourProcedures.makeTourView(tours[bufIndex + 1]));
+        var newIndex = $.scrollView.getCurrentPage();
+        if (oldIndex !== newIndex) {
+            var children = $.scrollView.getViews(), loadedPages = [];
+            if (newIndex > oldIndex) {
+                currentPage++;
+                loadedPages.push(children[oldIndex]);
+                loadedPages.push(children[oldIndex + 1]);
+                if (tours.length > currentPage + 1) {
+                    loadedPages.push(tourProcedures.makeTourView(tours[currentPage + 1]));
+                    oldIndex = 1;
+                }
                 $.scrollView.setViews(loadedPages);
                 $.scrollView.setCurrentPage(1);
-                currentPage = bufIndex;
-                Ti.API.info("[ --> ]: globalPage = " + currentPage + " | localPage = " + bufPos + " | childrensLength = " + $.scrollView.getViews().length);
                 pagingArray[currentPage - 1].applyProperties({
                     image: "images/Radio_bullets_off.png"
                 });
@@ -123,13 +123,15 @@ function Controller() {
                     image: "images/Radio_bullets_on.png"
                 });
             } else {
-                bufIndex - 1 >= 0 ? loadedPages.push(tourProcedures.makeTourView(tours[bufIndex - 1])) : bufPos = 0;
+                currentPage--;
+                if (currentPage - 1 >= 0) {
+                    loadedPages.push(tourProcedures.makeTourView(tours[currentPage - 1]));
+                    oldIndex = 1;
+                } else oldIndex = 0;
                 loadedPages.push(children[0]);
                 loadedPages.push(children[1]);
                 $.scrollView.setViews(loadedPages);
-                $.scrollView.setCurrentPage(bufPos);
-                currentPage = bufIndex;
-                Ti.API.info("[ <-- ]: globalPage = " + currentPage + " | localPage = " + bufPos + " | childrensLength = " + $.scrollView.getViews().length);
+                $.scrollView.setCurrentPage(oldIndex);
                 pagingArray[currentPage + 1].applyProperties({
                     image: "images/Radio_bullets_off.png"
                 });
@@ -145,18 +147,18 @@ function Controller() {
             bottom: 0
         }, function() {
             $.menu.applyProperties({
-                backgroundImage: "images/Menu_open_large.png"
+                backgroundImage: "images/menu/Menu_open_large.png"
             });
         });
         "down" === e.direction && $.menu.animate({
             bottom: -55
         }, function() {
             $.menu.applyProperties({
-                backgroundImage: "images/Menu_close_large.png"
+                backgroundImage: "images/menu/Menu_close_large.png"
             });
         });
     });
-    var tourProcedures = require("lib/tourViewModel");
+    var tourProcedures = require("lib/tourViewProcedures");
     $.scrollView.addView(tourProcedures.makeTourView(tours[0]));
     $.scrollView.addView(tourProcedures.makeTourView(tours[1]));
     Ti.API.info("index.js open");

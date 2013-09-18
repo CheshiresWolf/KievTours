@@ -14,19 +14,30 @@
 Ti.API.info("alloy.js start");
 //===========================================
 
-function Tour() {
-	var img = "", title = "", text = "", size = 0, dots = {}, length = 0, background = "", price = 0, isDownloaded = false;
+function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, backgroundImage, tourPrice) {
+	this.img = tourImage;
+	this.title = tourTitle;
+	this.text = tourText;
+	this.size = fileSize;
+	this.dots = {};
+	this.time = timeLength;
+	this.background = backgroundImage;
+	this.price = tourPrice;
+	
+	if (tourPrice !== 0) {
+		this.isBuyed = false;
+	} else {
+		this.isBuyed = true;
+	}
+	
+	this.isDownloaded = false;
 }
 
-Tour.prototype.set = function(img, title, text, size, dots, length, background, price) {
-	this.img = img;
-	this.title = title;
-	this.text = text;
-	this.size = size;
-	this.dots = dots;
-	this.length = length;
-	this.background = background;
-	this.price = price;
+Tour.prototype.buy = function() {
+	//buying
+	//...
+	
+	this.isBuyed = true;
 };
 
 Tour.prototype.download = function() {
@@ -40,8 +51,7 @@ var tours = [];
 
 //load tours from somwere and cast it to array
 //function load(url) {
-var tour1 = new Tour();
-tour1.set(
+tours.push(new Tour(
 	"images/SmallSircle.png",
 	"1",
 	"Run FULS!",
@@ -50,25 +60,24 @@ tour1.set(
 	"2:10",
 	"images/APP_Kiev_background.png",
 	9.99
-	);
-tours.push(tour1);
+));
 
-var tour2 = new Tour();
-tour2.set(
+//tours.push(tour1);
+
+var tourBuf = new Tour(
 	"images/SmallSircleBuf.png",
-	"2",
-	"Abir Abi rWald ffffffff fffffff fffff ffff fffffff",
-	125,
+	"TWO TwO tWo two 2",
+	"Abir Abi rWald ffffffff fffffff fffff ffff fffffff asjdfk adjhfasbv bcbvb fbvusybv vjbsnc chvs jvb",
+	111,
 	null,
-	"2:10",
+	"0:15",
 	"images/APP_Kiev_background_Buf.png",
-	0
+	5
 	);
-tour2.download();
-tours.push(tour2);
+tourBuf.download();
+tours.push(tourBuf);
 
-var tour3 = new Tour();
-tour3.set(
+tours.push(new Tour(
 	"images/SmallSircle.png",
 	"3",
 	"Run FULS!",
@@ -77,21 +86,21 @@ tour3.set(
 	"2:10",
 	"images/APP_Kiev_background.png",
 	9.99
-	);
-tours.push(tour3);
+));
 
-var tour4 = new Tour();
-tour4.set(
+//tours.push(tour3);
+
+tours.push(new Tour(
 	"images/SmallSircle.png",
 	"4",
 	"Run FULS!",
-	125,
+	95,
 	null,
 	"2:10",
 	"images/APP_Kiev_background.png",
 	9.99
-	);
-tours.push(tour4);
+));
+//tours.push(tour4);
 
 Alloy.Globals.getTours = function() {
 	return tours;

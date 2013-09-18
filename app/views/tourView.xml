@@ -6,6 +6,17 @@
 			<View id="tourContent">
 				<Label id="title"></Label>
 				<Label id="text"></Label>
+				<View id="icons">
+					<Label id="sizeMb" class="topIco"></Label>
+					<Label id="mb" class="bottomIco">Mb</Label>
+					<ImageView id="dotIco" class="topIco"></ImageView>
+					<Label id="dotAmount" class="bottomIco"></Label>
+					<ImageView id="timeIco" class="topIco"></ImageView>
+					<Label id="time" class="bottomIco"></Label>
+					<ImageView id="audioIco" class="topIco"></ImageView>
+					<Label id="audio" class="bottomIco">audio</Label>
+					<Label id="price" class="topIco"></Label>
+				</View>
 				<ImageView id="button"></ImageView>
 			</View>
 		</ImageView>	

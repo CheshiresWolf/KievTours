@@ -16,28 +16,28 @@
 	zIndex: 7
 },
 "#buttonTours": {
-	image:"images/Menu_icon_tour.png",
+	image:"images/menu/Menu_icon_tour.png",
 	width: 50,
 	height: 50,
 	bottom: 5,
 	left: 10
 },
 "#buttonDiscover": {
-	image:"images/Menu_icon_discover.png",
+	image:"images/menu/Menu_icon_discover.png",
 	width: 50,
 	height: 50,
 	bottom: 5,
 	left: 75
 },
 "#buttonTips": {
-	image:"images/Menu_icon_sityTrips.png",
+	image:"images/menu/Menu_icon_sityTrips.png",
 	width: 50,
 	height: 50,
 	bottom: 5,
 	left: 140
 },
 "#buttonMore": {
-	image:"images/Menu_icon_more.png",
+	image:"images/menu/Menu_icon_more.png",
 	width: 50,
 	height: 50,
 	bottom: 5,
