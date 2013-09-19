@@ -21,11 +21,16 @@ function downloadButtonEventListener(tour, view) {
 }
 
 function playButtonEventListener() {
-    var newWindow = Alloy.createController("index");
-    newWindow.getView("window").applyProperties({
-        backgroundColor: "#336699"
-    });
-    newWindow.getView().open();
+    if (!isInsideTourWindowOpen) {
+        var newWindow = Alloy.createController("index");
+        newWindow.getView("buttonTours").addEventListener("click", function() {
+            newWindow.getView().close();
+            isInsideTourWindowOpen = false;
+        });
+        insideTourProcedures.setController(newWindow);
+        insideTourProcedures.initDotsView();
+        isInsideTourWindowOpen = true;
+    }
 }
 
 function makeTourView(tour) {
@@ -83,15 +88,19 @@ function makeTourView(tour) {
     return controller.getView();
 }
 
-var bigImgSize = .9 * Titanium.Platform.displayCaps.platformWidth;
+var platformWidth = Titanium.Platform.displayCaps.platformWidth;
 
-var leftOffset = (Titanium.Platform.displayCaps.platformWidth - bigImgSize) / 2;
+var bigImgSize = .9 * platformWidth;
 
-var topOffset = Titanium.Platform.displayCaps.platformHeight / 2 - bigImgSize / 2;
+var leftOffset = .05 * platformWidth;
+
+var topOffset = (Titanium.Platform.displayCaps.platformHeight - bigImgSize) / 2;
 
 var textWidth, buttonImgPath;
 
 var smallImgSize = bigImgSize / 3;
+
+var insideTourProcedures = require("lib/insideTourProcedures");
 
 var bigImageStyle = {
     width: bigImgSize,
@@ -104,10 +113,12 @@ var bigImageStyle = {
 var smallImageStyle = {
     width: smallImgSize,
     height: smallImgSize,
-    left: Titanium.Platform.displayCaps.platformWidth - (leftOffset + smallImgSize),
+    left: platformWidth - (leftOffset + smallImgSize),
     top: topOffset - smallImgSize / 2,
     zIndex: 5
 };
+
+var isInsideTourWindowOpen = false;
 
 exports.initTourViews = function(index) {
     var tours = Alloy.Globals.getTours(), toursLength = tours.length, pagingArray = [];

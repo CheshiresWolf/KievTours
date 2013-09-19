@@ -1,0 +1,9 @@
+<Alloy>
+	<View id="container">
+		<ImageView id="bigPicture"></ImageView>
+		<ImageView id="smallPicturePhoto" class="index"></ImageView>
+		<ImageView id="smallPictureAudio" class="index"></ImageView>
+		<ImageView id="smallPictureList" class="index"></ImageView>
+		<ImageView id="smallPictureCenter" class="index"></ImageView>
+	</View>
+</Alloy>

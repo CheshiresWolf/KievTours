@@ -1,8 +1,11 @@
-var bigImgSize = Titanium.Platform.displayCaps.platformWidth * (18 / 20); //90% of screen size
-var leftOffset = (Titanium.Platform.displayCaps.platformWidth - bigImgSize) / 2; //5%
-var topOffset = Titanium.Platform.displayCaps.platformHeight / 2 - bigImgSize / 2;
+var platformWidth = Titanium.Platform.displayCaps.platformWidth;
+var bigImgSize = platformWidth * 0.9; //90% of screen size
+var leftOffset = platformWidth * 0.05; //5%
+var topOffset = (Titanium.Platform.displayCaps.platformHeight - bigImgSize) / 2;
 var textWidth, buttonImgPath;
 var smallImgSize = bigImgSize / 3;
+
+var insideTourProcedures = require("lib/insideTourProcedures");
 
 var bigImageStyle = {
 	width: bigImgSize,
@@ -15,10 +18,13 @@ var bigImageStyle = {
 var smallImageStyle = {
 	width: smallImgSize,
 	height: smallImgSize,
-	left: Titanium.Platform.displayCaps.platformWidth - (leftOffset + smallImgSize),
+	left: platformWidth - (leftOffset + smallImgSize),
 	top: topOffset - smallImgSize / 2,
 	zIndex: 5
 };
+
+//Prevent creating over 5 windows on single click by button (playButtonEventListener)
+var isInsideTourWindowOpen = false;
 
 function buyButtonEventListener(tour, view) {
 	tour.buy();
@@ -39,9 +45,19 @@ function downloadButtonEventListener(tour, view) {
 }
 
 function playButtonEventListener() {
-	var newWindow = Alloy.createController("index");
-	newWindow.getView("window").applyProperties({backgroundColor: "#336699"});
-	newWindow.getView().open();
+	
+	if (!isInsideTourWindowOpen) {
+		var newWindow = Alloy.createController("index");
+		
+		newWindow.getView("buttonTours").addEventListener("click", function () {
+			newWindow.getView().close();
+			isInsideTourWindowOpen = false;
+		});
+		
+		insideTourProcedures.setController(newWindow);
+		insideTourProcedures.initDotsView();
+		isInsideTourWindowOpen = true;
+	}
 }
 
 exports.initTourViews = function(index) {

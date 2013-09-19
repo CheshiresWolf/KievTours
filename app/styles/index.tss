@@ -42,7 +42,4 @@
 	height: 50,
 	bottom: 5,
 	left: 205
-},
-"#paging": {
-	
 }
