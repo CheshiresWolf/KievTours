@@ -1,0 +1,12 @@
+<Alloy>
+	<View id="container">
+		<Label id="timePassed"></Label>
+		<ProgressBar id="progressBar"></ProgressBar>
+		<Label id="timeLeft"></Label>
+		<ImageView id="buttonBack"></ImageView>
+		<ImageView id="buttonPlay"></ImageView>
+		<ImageView id="buttonForward"></ImageView>
+		<ImageView id="audioIconMin"></ImageView>
+		<ImageView id="audioIconMax"></ImageView>
+	</View>
+</Alloy>

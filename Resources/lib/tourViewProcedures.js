@@ -27,7 +27,7 @@ function playButtonEventListener() {
             newWindow.getView().close();
             isInsideTourWindowOpen = false;
         });
-        insideTourProcedures.setController(newWindow);
+        insideTourProcedures.setData(newWindow, tours[currentPage]);
         insideTourProcedures.initDotsView();
         isInsideTourWindowOpen = true;
     }
@@ -81,7 +81,7 @@ function makeTourView(tour) {
             buyButtonEventListener(tour, buttonView);
         });
     }
-    controller.getView("button").applyProperties({
+    buttonView.applyProperties({
         left: bigImgSize / 2 - 46,
         image: buttonImgPath
     });
@@ -99,6 +99,10 @@ var topOffset = (Titanium.Platform.displayCaps.platformHeight - bigImgSize) / 2;
 var textWidth, buttonImgPath;
 
 var smallImgSize = bigImgSize / 3;
+
+var currentPage = 0;
+
+var tours = Alloy.Globals.getTours();
 
 var insideTourProcedures = require("lib/insideTourProcedures");
 
@@ -121,10 +125,10 @@ var smallImageStyle = {
 var isInsideTourWindowOpen = false;
 
 exports.initTourViews = function(index) {
-    var tours = Alloy.Globals.getTours(), toursLength = tours.length, pagingArray = [];
-    var currentPage = 0, oldIndex = 0;
+    var toursLength = tours.length, pagingArray = [], oldIndex = 0;
     var paging = index.getView("paging"), scrollView = index.getView("scrollView");
     for (var i = 0; toursLength > i; i++) {
+        Ti.API.info("O_o");
         pagingArray.push(Ti.UI.createImageView({
             width: 5,
             height: 5,

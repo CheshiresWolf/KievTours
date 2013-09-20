@@ -6,41 +6,58 @@ function Controller() {
     arguments[0] ? arguments[0]["__itemTemplate"] : null;
     var $ = this;
     var exports = {};
-    $.__views.container = Ti.UI.createView({
-        top: 0,
-        left: 0,
-        width: "auto",
-        height: "auto",
-        id: "container"
+    $.__views.dotContainer = Ti.UI.createView({
+        id: "dotContainer"
     });
-    $.__views.container && $.addTopLevelView($.__views.container);
+    $.__views.dotContainer && $.addTopLevelView($.__views.dotContainer);
     $.__views.bigPicture = Ti.UI.createImageView({
-        zIndex: 1,
         id: "bigPicture"
     });
-    $.__views.container.add($.__views.bigPicture);
+    $.__views.dotContainer.add($.__views.bigPicture);
     $.__views.smallPicturePhoto = Ti.UI.createImageView({
-        zIndex: 2,
         id: "smallPicturePhoto"
     });
-    $.__views.container.add($.__views.smallPicturePhoto);
+    $.__views.dotContainer.add($.__views.smallPicturePhoto);
     $.__views.smallPictureAudio = Ti.UI.createImageView({
-        zIndex: 2,
         id: "smallPictureAudio"
     });
-    $.__views.container.add($.__views.smallPictureAudio);
+    $.__views.dotContainer.add($.__views.smallPictureAudio);
     $.__views.smallPictureList = Ti.UI.createImageView({
-        zIndex: 2,
         id: "smallPictureList"
     });
-    $.__views.container.add($.__views.smallPictureList);
+    $.__views.dotContainer.add($.__views.smallPictureList);
     $.__views.smallPictureCenter = Ti.UI.createImageView({
-        zIndex: 2,
         id: "smallPictureCenter"
     });
-    $.__views.container.add($.__views.smallPictureCenter);
+    $.__views.dotContainer.add($.__views.smallPictureCenter);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    var insideTourProcedures = require("lib/insideTourProcedures");
+    Ti.API.info("dotView.js");
+    $.bigPicture.addEventListener("click", function() {
+        $.bigPicture.animate(insideTourProcedures.getBigImageStyle());
+        $.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
+        $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
+        $.bigPicture.applyProperties({
+            image: "images/BigSircle.png"
+        });
+    });
+    $.smallPicturePhoto.addEventListener("click", function() {
+        $.bigPicture.animate(insideTourProcedures.getSmallImagePhotoStyle());
+        $.smallPicturePhoto.animate(insideTourProcedures.getBigImageStyle());
+        $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
+        $.bigPicture.applyProperties({
+            image: "images/SmallSircleMap.png"
+        });
+    });
+    $.smallPictureAudio.addEventListener("click", function() {
+        $.bigPicture.animate(insideTourProcedures.getSmallImageAudioStyle());
+        $.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
+        $.smallPictureAudio.animate(insideTourProcedures.getBigImageStyle());
+        $.bigPicture.applyProperties({
+            image: "images/SmallSircleMap.png"
+        });
+    });
     _.extend($, exports);
 }
 

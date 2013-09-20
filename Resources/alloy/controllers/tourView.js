@@ -180,17 +180,6 @@ function Controller() {
     _.extend($, $.__views);
     var tourProcedures = require("lib/tourViewProcedures");
     var swapDirection = false;
-    $.smallPicture.addEventListener("click", function() {
-        if (!swapDirection) {
-            $.tourContent.setVisible(false);
-            $.bigPicture.animate(tourProcedures.getSmallImageStyle());
-            $.smallPicture.animate(tourProcedures.getBigImageStyle());
-            $.bigPicture.applyProperties({
-                image: "images/SmallSircleInfo.png"
-            });
-            swapDirection = true;
-        }
-    });
     $.bigPicture.addEventListener("click", function() {
         if (swapDirection) {
             $.bigPicture.applyProperties({
@@ -200,6 +189,17 @@ function Controller() {
             $.smallPicture.animate(tourProcedures.getSmallImageStyle());
             $.tourContent.setVisible(true);
             swapDirection = false;
+        }
+    });
+    $.smallPicture.addEventListener("click", function() {
+        if (!swapDirection) {
+            $.tourContent.setVisible(false);
+            $.bigPicture.animate(tourProcedures.getSmallImageStyle());
+            $.smallPicture.animate(tourProcedures.getBigImageStyle());
+            $.bigPicture.applyProperties({
+                image: "images/SmallSircleInfo.png"
+            });
+            swapDirection = true;
         }
     });
     _.extend($, exports);

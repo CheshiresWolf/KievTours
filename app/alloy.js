@@ -19,7 +19,7 @@ function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, ba
 	this.title = tourTitle;
 	this.text = tourText;
 	this.size = fileSize;
-	this.dots = {};
+	this.dots = [];
 	this.time = timeLength;
 	this.background = backgroundImage;
 	this.price = tourPrice;
@@ -51,7 +51,7 @@ var tours = [];
 
 //load tours from somwere and cast it to array
 //function load(url) {
-tours.push(new Tour(
+var buf = new Tour(
 	"images/SmallSircle.png",
 	"1",
 	"Run FULS!",
@@ -60,7 +60,12 @@ tours.push(new Tour(
 	"2:10",
 	"images/APP_Kiev_background.png",
 	9.99
-));
+);
+buf.dots.push(0);
+buf.dots.push(0);
+buf.dots.push(0);
+buf.dots.push(0);
+tours.push(buf);
 
 tours.push(new Tour(
 	"images/SmallSircleBuf.png",
@@ -98,12 +103,17 @@ tours.push(new Tour(
 Alloy.Globals.getTours = function() {
 	return tours;
 };
-
+///*
 var index = Alloy.createController("index");
 var tourViewProcedures = require("lib/tourViewProcedures");
 index.getView().open();
 tourViewProcedures.initTourViews(index);
-
+//*/
+/*
+var insideTourProcedures = require("lib/insideTourProcedures");
+insideTourProcedures.setData(Alloy.createController("index"), tours[0]);
+insideTourProcedures.initDotsView();
+*/
 //===========================================
 //Ti.API.info("alloy.js open");
 //===========================================

@@ -3,7 +3,7 @@ function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, ba
     this.title = tourTitle;
     this.text = tourText;
     this.size = fileSize;
-    this.dots = {};
+    this.dots = [];
     this.time = timeLength;
     this.background = backgroundImage;
     this.price = tourPrice;
@@ -25,7 +25,17 @@ Tour.prototype.download = function() {
 
 var tours = [];
 
-tours.push(new Tour("images/SmallSircle.png", "1", "Run FULS!", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99));
+var buf = new Tour("images/SmallSircle.png", "1", "Run FULS!", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99);
+
+buf.dots.push(0);
+
+buf.dots.push(0);
+
+buf.dots.push(0);
+
+buf.dots.push(0);
+
+tours.push(buf);
 
 tours.push(new Tour("images/SmallSircleBuf.png", "TWO TwO tWo two 2", "Abir Abi rWald ffffffff fffffff fffff ffff fffffff asjdfk adjhfasbv bcbvb fbvusybv vjbsnc chvs jvb", 111, null, "0:15", "images/APP_Kiev_background_Buf.png", 5));
 

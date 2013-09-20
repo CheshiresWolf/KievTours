@@ -1,5 +1,5 @@
 <Alloy>
-	<View id="container">
+	<View id="dotContainer">
 		<ImageView id="bigPicture"></ImageView>
 		<ImageView id="smallPicturePhoto" class="index"></ImageView>
 		<ImageView id="smallPictureAudio" class="index"></ImageView>

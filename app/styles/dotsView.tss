@@ -1,12 +1,1 @@
-"#container": {
-	top: 0,
-	left: 0,
-	width: "auto",
-	height: "auto"
-},
-"#bigPicture": {
-	zIndex: 1
-},
-".index": {
-	zIndex: 2
-}
+

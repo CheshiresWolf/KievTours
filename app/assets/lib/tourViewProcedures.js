@@ -5,6 +5,9 @@ var topOffset = (Titanium.Platform.displayCaps.platformHeight - bigImgSize) / 2;
 var textWidth, buttonImgPath;
 var smallImgSize = bigImgSize / 3;
 
+var currentPage = 0;
+var tours = Alloy.Globals.getTours();
+
 var insideTourProcedures = require("lib/insideTourProcedures");
 
 var bigImageStyle = {
@@ -54,20 +57,106 @@ function playButtonEventListener() {
 			isInsideTourWindowOpen = false;
 		});
 		
-		insideTourProcedures.setController(newWindow);
+		insideTourProcedures.setData(newWindow, tours[currentPage]);
 		insideTourProcedures.initDotsView();
 		isInsideTourWindowOpen = true;
 	}
 }
 
+
+function makeTourView (tour) {
+	
+	var controller = Alloy.createController("tourView");
+	
+	//bigPicture
+	controller.getView("bigPicture").applyProperties(bigImageStyle);
+	
+	//smallPicture
+	smallImageStyle.image = tour.img;
+	controller.getView("smallPicture").applyProperties(smallImageStyle);
+	
+	//background
+	controller.getView("background").applyProperties({image: tour.background});
+	
+	//title
+	controller.getView("title").text = tour.title;
+	
+	textWidth = controller.getView("title").toImage().width;
+	if (textWidth > (bigImgSize * 7 / 10)) {
+		textWidth = bigImgSize * (7 / 10);
+	}
+
+	controller.getView("title").applyProperties({
+		top: bigImgSize / 6,
+		width: textWidth
+	});
+	
+	//text
+	controller.getView("text").text = tour.text;
+	
+	textWidth = controller.getView("text").toImage().width;
+	if (textWidth > (bigImgSize * 8 / 10)) {
+		textWidth = bigImgSize * (8 / 10);
+	}
+
+	controller.getView("text").applyProperties({
+		top: bigImgSize / 6 + 10 + controller.getView("title").toImage().height,
+		width: textWidth
+	});
+	
+	//icons
+	controller.getView("icons").applyProperties({top: bigImgSize * 4 / 6, left: bigImgSize / 2 - 90});
+	controller.getView("sizeMb").text = tour.size;
+	
+	//++++++++++++++++++++++++++++++++++++++++++ DOT FORGET TO FIX IT ++++++++++++++++++++++++++++++++++++++++++
+	controller.getView("dotAmount").text = 31;
+	//++++++++++++++++++++++++++++++++++++++++++ DOT FORGET TO FIX IT ++++++++++++++++++++++++++++++++++++++++++
+	
+	controller.getView("time").text = tour.time;
+	if (tour.price === 0) {
+		controller.getView("price").text = "FREE";
+	} else {
+		controller.getView("price").text = "$" + tour.price;
+	}
+	
+	var buttonView = controller.getView("button");
+	buttonView.currentTour = tour;
+	//button
+	if (!tour.isBuyed) {
+		buttonImgPath = "images/tourView/Buy_Button.png";
+		buttonView.addEventListener("click", function() {
+			buyButtonEventListener(tour, buttonView);
+		});
+	} else {
+		if (tour.isDownloaded) {
+			buttonImgPath = "images/tourView/Play_Button.png";
+			buttonView.addEventListener("click", function() {
+				playButtonEventListener();
+			});
+		} else {
+			buttonImgPath = "images/tourView/Download_Button.png";
+			buttonView.addEventListener("click", function() {
+				downloadButtonEventListener(tour, buttonView);
+			});
+		}
+	}
+	buttonView.applyProperties({
+		left: bigImgSize / 2 - 46,
+		image: buttonImgPath
+	});
+	
+	//show View
+	return controller.getView();
+}
+
 exports.initTourViews = function(index) {
-	var tours = Alloy.Globals.getTours(), toursLength = tours.length, pagingArray = [];
-	var currentPage = 0, oldIndex = 0;
+	var toursLength = tours.length, pagingArray = [], oldIndex = 0;
 	
 	var paging = index.getView("paging"), scrollView = index.getView("scrollView");
 	
 	//init paging
 	for (var i = 0; i < toursLength; i++) {
+		Ti.API.info("O_o");
 		pagingArray.push(Ti.UI.createImageView({
 			width : 5,
 			height : 5,
@@ -149,87 +238,3 @@ exports.getSmallImageStyle = function() {
 	return smallImageStyle;
 };
 
-function makeTourView (tour) {
-	
-	var controller = Alloy.createController("tourView");
-	
-	//bigPicture
-	controller.getView("bigPicture").applyProperties(bigImageStyle);
-	
-	//smallPicture
-	smallImageStyle.image = tour.img;
-	controller.getView("smallPicture").applyProperties(smallImageStyle);
-	
-	//background
-	controller.getView("background").applyProperties({image: tour.background});
-	
-	//title
-	controller.getView("title").text = tour.title;
-	
-	textWidth = controller.getView("title").toImage().width;
-	if (textWidth > (bigImgSize * 7 / 10)) {
-		textWidth = bigImgSize * (7 / 10);
-	}
-
-	controller.getView("title").applyProperties({
-		top: bigImgSize / 6,
-		width: textWidth
-	});
-	
-	//text
-	controller.getView("text").text = tour.text;
-	
-	textWidth = controller.getView("text").toImage().width;
-	if (textWidth > (bigImgSize * 8 / 10)) {
-		textWidth = bigImgSize * (8 / 10);
-	}
-
-	controller.getView("text").applyProperties({
-		top: bigImgSize / 6 + 10 + controller.getView("title").toImage().height,
-		width: textWidth
-	});
-	
-	//icons
-	controller.getView("icons").applyProperties({top: bigImgSize * 4 / 6, left: bigImgSize / 2 - 90});
-	controller.getView("sizeMb").text = tour.size;
-	
-	//++++++++++++++++++++++++++++++++++++++++++ DOT FORGET TO FIX IT ++++++++++++++++++++++++++++++++++++++++++
-	controller.getView("dotAmount").text = 31;
-	//++++++++++++++++++++++++++++++++++++++++++ DOT FORGET TO FIX IT ++++++++++++++++++++++++++++++++++++++++++
-	
-	controller.getView("time").text = tour.time;
-	if (tour.price === 0) {
-		controller.getView("price").text = "FREE";
-	} else {
-		controller.getView("price").text = "$" + tour.price;
-	}
-	
-	var buttonView = controller.getView("button");
-	buttonView.currentTour = tour;
-	//button
-	if (!tour.isBuyed) {
-		buttonImgPath = "images/tourView/Buy_Button.png";
-		buttonView.addEventListener("click", function() {
-			buyButtonEventListener(tour, buttonView);
-		});
-	} else {
-		if (tour.isDownloaded) {
-			buttonImgPath = "images/tourView/Play_Button.png";
-			buttonView.addEventListener("click", function() {
-				playButtonEventListener();
-			});
-		} else {
-			buttonImgPath = "images/tourView/Download_Button.png";
-			buttonView.addEventListener("click", function() {
-				downloadButtonEventListener(tour, buttonView);
-			});
-		}
-	}
-	controller.getView("button").applyProperties({
-		left: bigImgSize / 2 - 46,
-		image: buttonImgPath
-	});
-	
-	//show View
-	return controller.getView();
-};
