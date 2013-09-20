@@ -12,7 +12,7 @@ var leftOffsetSmall = platformWidth - (leftOffsetBig + bigSircleSize / 4);
 var topOffsetBig = (Titanium.Platform.displayCaps.platformHeight - bigSircleSize) / 2;
 
 var bigSircleStyle = {
-	image: "images/BigSircle.png",
+	image: "images/Map.png",
 	width: bigSircleSize,
 	height: bigSircleSize,
 	top: topOffsetBig,
@@ -76,10 +76,10 @@ function resetScrollableView() {
 }
 
 exports.initDotsView = function() {
-	controller.getView("window").applyProperties({backgroundColor: "blue"});
+	controller.getView("window").applyProperties({backgroundColor: "white"});
 	controller.getView("logo").applyProperties({image: "images/APP_Kiev_logo_green.png"});
 	scrollView = controller.getView("scrollView");
-	scrollView.applyProperties({backgroundColor: "red"});
+	//scrollView.applyProperties({backgroundColor: "red"});
 	
 	resetScrollableView();
 	

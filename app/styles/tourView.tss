@@ -15,7 +15,7 @@
     }
 },
 "#text": {
-	textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+	textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
 	font: {
         fontSize: '14dp'    
     }

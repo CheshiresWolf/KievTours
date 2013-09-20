@@ -156,7 +156,6 @@ exports.initTourViews = function(index) {
 	
 	//init paging
 	for (var i = 0; i < toursLength; i++) {
-		Ti.API.info("O_o");
 		pagingArray.push(Ti.UI.createImageView({
 			width : 5,
 			height : 5,
@@ -186,25 +185,28 @@ exports.initTourViews = function(index) {
 				//save pos
 				currentPage++;
 					
-				loadedPages.push(children[oldIndex]);
-				loadedPages.push(children[oldIndex + 1]);
+				//loadedPages.push(children[oldIndex]);
+				//loadedPages.push(children[oldIndex + 1]);
 				
 				//if there are another tour left
+				//if (currentPage + 1 < tours.length) {
+				//	loadedPages.push(makeTourView(tours[currentPage + 1]));
+				//	oldIndex = 1;
+				//}
 				if (currentPage + 1 < tours.length) {
-					loadedPages.push(makeTourView(tours[currentPage + 1]));
-					oldIndex = 1;
+					scrollView.addView(makeTourView(tours[currentPage + 1]));
 				}
+				//scrollView.setViews(loadedPages);
+				//scrollView.setCurrentPage(1);			
 				
-				scrollView.setViews(loadedPages);
-				scrollView.setCurrentPage(1);			
-				
-				pagingArray[currentPage - 1].applyProperties({image: "images/Radio_bullets_off.png"});
-				pagingArray[currentPage].applyProperties({image: "images/Radio_bullets_on.png"});
+					pagingArray[currentPage - 1].applyProperties({image: "images/Radio_bullets_off.png"});
+					pagingArray[currentPage].applyProperties({image: "images/Radio_bullets_on.png"});
+				oldIndex = newIndex;
 			} else {
 				
 				//save pos
 				currentPage--;
-				
+				/*
 				//if there are another tour left
 				if (currentPage - 1 >= 0) {
 					loadedPages.push(makeTourView(tours[currentPage - 1]));
@@ -218,9 +220,13 @@ exports.initTourViews = function(index) {
 				
 				scrollView.setViews(loadedPages);
 				scrollView.setCurrentPage(oldIndex);			
+				*/
+				if (currentPage >= 0) {
+					pagingArray[currentPage + 1].applyProperties({image: "images/Radio_bullets_off.png"});
+					pagingArray[currentPage].applyProperties({image: "images/Radio_bullets_on.png"});
+				}
 				
-				pagingArray[currentPage + 1].applyProperties({image: "images/Radio_bullets_off.png"});
-				pagingArray[currentPage].applyProperties({image: "images/Radio_bullets_on.png"});
+				oldIndex = newIndex;
 			}
 		}
 	});

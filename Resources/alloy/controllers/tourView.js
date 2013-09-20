@@ -41,7 +41,7 @@ function Controller() {
     });
     $.__views.tourContent.add($.__views.title);
     $.__views.text = Ti.UI.createLabel({
-        textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,
+        textAlign: Ti.UI.TEXT_ALIGNMENT_LEFT,
         font: {
             fontSize: "14dp"
         },

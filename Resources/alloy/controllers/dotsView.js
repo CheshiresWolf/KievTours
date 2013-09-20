@@ -39,7 +39,7 @@ function Controller() {
         $.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
         $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
         $.bigPicture.applyProperties({
-            image: "images/BigSircle.png"
+            image: "images/Map.png"
         });
     });
     $.smallPicturePhoto.addEventListener("click", function() {
@@ -56,6 +56,18 @@ function Controller() {
         $.smallPictureAudio.animate(insideTourProcedures.getBigImageStyle());
         $.bigPicture.applyProperties({
             image: "images/SmallSircleMap.png"
+        });
+    });
+    $.smallPictureList.addEventListener("click", function() {
+        var list = Alloy.createController("dotsList");
+        list.getView().open();
+    });
+    $.smallPictureCenter.addEventListener("click", function() {
+        $.bigPicture.animate(insideTourProcedures.getBigImageStyle());
+        $.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
+        $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
+        $.bigPicture.applyProperties({
+            image: "images/Map.png"
         });
     });
     _.extend($, exports);

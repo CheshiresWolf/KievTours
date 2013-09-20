@@ -14,6 +14,10 @@ function Controller() {
         id: "timePassed"
     });
     $.__views.container.add($.__views.timePassed);
+    $.__views.progressBar = Ti.UI.createProgressBar({
+        id: "progressBar"
+    });
+    $.__views.container.add($.__views.progressBar);
     $.__views.timeLeft = Ti.UI.createLabel({
         id: "timeLeft"
     });

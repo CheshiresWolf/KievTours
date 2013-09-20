@@ -4,26 +4,17 @@ var insideTourProcedures = require("lib/insideTourProcedures");
 Ti.API.info("dotView.js");
 
 $.bigPicture.addEventListener("click", function(e) {
-	//Ti.API.info("bigPicture click 0");
-	//if (swapDirection) {
-		//Ti.API.info("bigPicture click 1");
-		$.bigPicture.animate(insideTourProcedures.getBigImageStyle());
-		$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-		$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
-		$.bigPicture.applyProperties({image: "images/BigSircle.png"});
-	//}
+	$.bigPicture.animate(insideTourProcedures.getBigImageStyle());
+	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
+	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
+	$.bigPicture.applyProperties({image: "images/Map.png"});
 });
 
 $.smallPicturePhoto.addEventListener("click", function(e) {
-	//Ti.API.info("smallPicturePhoto click 0");
-	//if (!swapDirection) {
-		//Ti.API.info("smallPicturePhoto click 1");
-		$.bigPicture.animate(insideTourProcedures.getSmallImagePhotoStyle());
-		$.smallPicturePhoto.animate(insideTourProcedures.getBigImageStyle());
-		$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
-		$.bigPicture.applyProperties({image: "images/SmallSircleMap.png"});
-		//swapDirection = true;
-	//}
+	$.bigPicture.animate(insideTourProcedures.getSmallImagePhotoStyle());
+	$.smallPicturePhoto.animate(insideTourProcedures.getBigImageStyle());
+	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
+	$.bigPicture.applyProperties({image: "images/SmallSircleMap.png"});
 });
 
 $.smallPictureAudio.addEventListener("click", function(e) {
@@ -31,6 +22,18 @@ $.smallPictureAudio.addEventListener("click", function(e) {
 	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
 	$.smallPictureAudio.animate(insideTourProcedures.getBigImageStyle());
 	$.bigPicture.applyProperties({image: "images/SmallSircleMap.png"});
+});
+
+$.smallPictureList.addEventListener("click", function(e) {
+	var list = Alloy.createController("dotsList");
+	list.getView().open();
+});
+
+$.smallPictureCenter.addEventListener("click", function(e) {
+	$.bigPicture.animate(insideTourProcedures.getBigImageStyle());
+	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
+	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
+	$.bigPicture.applyProperties({image: "images/Map.png"});
 });
 
 
