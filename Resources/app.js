@@ -37,9 +37,9 @@ buf.dots.push(0);
 
 tours.push(buf);
 
-tours.push(new Tour("images/SmallSircle.png", "3", "Run FULS!", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99));
+tours.push(new Tour("images/SmallSircle.png", "Жемчужины Печерска", "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99));
 
-tours.push(new Tour("images/SmallSircle.png", "4", "Run FULS!", 95, null, "2:10", "images/APP_Kiev_background.png", 9.99));
+tours.push(new Tour("images/SmallSircle.png", "Жемчужины Печерска", "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.", 95, null, "2:10", "images/APP_Kiev_background.png", 9.99));
 
 Alloy.Globals.getTours = function() {
     return tours;
