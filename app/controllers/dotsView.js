@@ -4,24 +4,31 @@ var insideTourProcedures = require("lib/insideTourProcedures");
 Ti.API.info("dotView.js");
 
 $.bigPicture.addEventListener("click", function(e) {
-	$.bigPicture.animate(insideTourProcedures.getBigImageStyle());
 	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
-	$.bigPicture.applyProperties({image: "images/Map.png"});
+	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle(), function() {
+		playerShow(false);
+	});
+	$.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {
+		bigPictureShow(true);
+		insideTourProcedures.centering($.map);
+	});
 });
 
 $.smallPicturePhoto.addEventListener("click", function(e) {
+	
+	bigPictureShow(false);
 	$.bigPicture.animate(insideTourProcedures.getSmallImagePhotoStyle());
 	$.smallPicturePhoto.animate(insideTourProcedures.getBigImageStyle());
 	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
-	$.bigPicture.applyProperties({image: "images/SmallSircleMap.png"});
 });
 
 $.smallPictureAudio.addEventListener("click", function(e) {
+	bigPictureShow(false);
 	$.bigPicture.animate(insideTourProcedures.getSmallImageAudioStyle());
 	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-	$.smallPictureAudio.animate(insideTourProcedures.getBigImageStyle());
-	$.bigPicture.applyProperties({image: "images/SmallSircleMap.png"});
+	$.smallPictureAudio.animate(insideTourProcedures.getBigImageStyle(), function() {
+		playerShow(false);
+	});
 });
 
 $.smallPictureList.addEventListener("click", function(e) {
@@ -30,10 +37,29 @@ $.smallPictureList.addEventListener("click", function(e) {
 });
 
 $.smallPictureCenter.addEventListener("click", function(e) {
-	$.bigPicture.animate(insideTourProcedures.getBigImageStyle());
 	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
 	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
-	$.bigPicture.applyProperties({image: "images/Map.png"});
+	$.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {	
+		bigPictureShow(true);
+		insideTourProcedures.centering($.map);
+	});
 });
 
+function bigPictureShow(flag) {
+	var img = "";
+	
+	if (!flag) img = "images/SmallSircleMap.png";
+	
+	$.bigPicture.applyProperties({backgroundImage: img});
+	$.mapMask.setVisible(flag);
+	$.map.setVisible(flag);
+}
 
+function playerShow(flag) {
+	var img = "";
+	
+	if (!flag) img = "images/dotsView/SmallPictureAudio.png";
+	
+	$.bigPicture.applyProperties({backgroundImage: img});
+	$.player.setVisible(flag);
+}

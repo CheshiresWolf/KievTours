@@ -1,1 +1,1 @@
-module.exports = [];
+module.exports = [{"isId":true,"priority":100000.0022,"key":"dotContainer","style":{backgroundColor:"white",}},{"isId":true,"priority":100000.0023,"key":"map","style":{width:"auto",height:"auto",top:0,left:0,zIndex:3,}},{"isId":true,"priority":100000.0024,"key":"mapMask","style":{touchEnabled:false,}},{"isId":true,"priority":100000.0025,"key":"player","style":{visible:false,}}];

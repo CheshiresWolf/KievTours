@@ -1,9 +1,31 @@
 function createDotView() {
-    var dotsView = Alloy.createController("dotsView");
+    var i = 0;
+    dotsView = Alloy.createController("dotsView");
+    audioView = Alloy.createController("audioPlayer");
     dotsView.getView("bigPicture").applyProperties(bigSircleStyle);
+    dotsView.getView("map").addEventListener("complete", function() {
+        if (!isComplete) {
+            centeringMap(dotsView.getView("map"));
+            for (i = 0; currentTour.dots.length > i; i++) dotsView.getView("map").addAnnotation(Titanium.Map.createAnnotation({
+                latitude: currentTour.dots[i].latitude,
+                longitude: currentTour.dots[i].longitude,
+                myid: i
+            }));
+            isComplete = true;
+        }
+    });
+    dotsView.getView("mapMask").applyProperties({
+        image: "images/dotsView/MapMask.png",
+        width: bigSircleSize,
+        height: bigSircleSize,
+        top: 0,
+        left: 0,
+        zIndex: 4
+    });
     smallSirclePhotoStyle.image = currentTour.img;
     dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
     dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);
+    dotsView.getView("player").add(audioView.getView());
     dotsView.getView("smallPictureList").applyProperties(smallSircleListStyle);
     dotsView.getView("smallPictureCenter").applyProperties(smallSircleCenterStyle);
     return dotsView.getView();
@@ -15,11 +37,24 @@ function resetScrollableView() {
     controller.getView("window").add(scrollView);
 }
 
+function centeringMap(map) {
+    map.region = {
+        latitude: currentTour.dots[0].latitude,
+        longitude: currentTour.dots[0].longitude,
+        latitudeDelta: .01,
+        longitudeDelta: .01
+    };
+}
+
 var controller;
 
 var currentTour;
 
+var dotsView, audioView;
+
 var scrollView;
+
+var isComplete;
 
 var platformWidth = Titanium.Platform.displayCaps.platformWidth;
 
@@ -32,7 +67,6 @@ var leftOffsetSmall = platformWidth - (leftOffsetBig + bigSircleSize / 4);
 var topOffsetBig = (Titanium.Platform.displayCaps.platformHeight - bigSircleSize) / 2;
 
 var bigSircleStyle = {
-    image: "images/Map.png",
     width: bigSircleSize,
     height: bigSircleSize,
     top: topOffsetBig,
@@ -49,7 +83,7 @@ var smallSirclePhotoStyle = {
 };
 
 var smallSircleAudioStyle = {
-    image: "images/dotsView/SmallPictureAudio.png",
+    backgroundImage: "images/dotsView/SmallPictureAudio.png",
     width: bigSircleSize / 4.5,
     height: bigSircleSize / 4.5,
     top: topOffsetBig - 5 + bigSircleSize / 4,
@@ -76,9 +110,7 @@ var smallSircleCenterStyle = {
 };
 
 exports.initDotsView = function() {
-    controller.getView("window").applyProperties({
-        backgroundColor: "white"
-    });
+    isComplete = false;
     controller.getView("logo").applyProperties({
         image: "images/APP_Kiev_logo_green.png"
     });
@@ -122,4 +154,8 @@ exports.getSmallImagePhotoStyle = function() {
 
 exports.getSmallImageAudioStyle = function() {
     return smallSircleAudioStyle;
+};
+
+exports.centering = function(map) {
+    centeringMap(map);
 };

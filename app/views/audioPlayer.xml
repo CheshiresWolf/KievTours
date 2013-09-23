@@ -1,12 +1,13 @@
 <Alloy>
 	<View id="container">
-		<Label id="timePassed"></Label>
-		<ProgressBar id="progressBar"></ProgressBar>
-		<Label id="timeLeft"></Label>
-		<ImageView id="buttonBack"></ImageView>
-		<ImageView id="buttonPlay"></ImageView>
-		<ImageView id="buttonForward"></ImageView>
-		<ImageView id="audioIconMin"></ImageView>
-		<ImageView id="audioIconMax"></ImageView>
+		<Label id="timePassed" class="index"></Label>
+		<ProgressBar id="progressBar" class="index"></ProgressBar>
+		<Label id="timeLeft" class="index"></Label>
+		<ImageView id="buttonBack" class="index"></ImageView>
+		<ImageView id="buttonPlay" class="index"></ImageView>
+		<ImageView id="buttonForward" class="index"></ImageView>
+		<ImageView id="audioIconMin" class="index"></ImageView>
+		<Slider id="slider" class="index" onChange="changeVolume"></Slider>
+		<ImageView id="audioIconMax" class="index"></ImageView>
 	</View>
 </Alloy>

@@ -1,8 +1,9 @@
 var controller;
 var currentTour;
-
+var dotsView, audioView;
 var scrollView;
-
+//Prevent multiple event calls
+var isComplete;
 var platformWidth = Titanium.Platform.displayCaps.platformWidth;
 var bigSircleSize = platformWidth * 0.9; //90%
 
@@ -12,7 +13,6 @@ var leftOffsetSmall = platformWidth - (leftOffsetBig + bigSircleSize / 4);
 var topOffsetBig = (Titanium.Platform.displayCaps.platformHeight - bigSircleSize) / 2;
 
 var bigSircleStyle = {
-	image: "images/Map.png",
 	width: bigSircleSize,
 	height: bigSircleSize,
 	top: topOffsetBig,
@@ -29,7 +29,7 @@ var smallSirclePhotoStyle = {
 };
 
 var smallSircleAudioStyle = {
-	image: "images/dotsView/SmallPictureAudio.png",
+	backgroundImage: "images/dotsView/SmallPictureAudio.png",
 	width: bigSircleSize / 4.5,
 	height: bigSircleSize / 4.5,
 	top: topOffsetBig - 5 + bigSircleSize / 4,
@@ -56,12 +56,47 @@ var smallSircleCenterStyle = {
 };
 
 function createDotView() {
-	var dotsView = Alloy.createController("dotsView");
+	var i = 0;
+	
+	dotsView = Alloy.createController("dotsView");
+	audioView = Alloy.createController("audioPlayer");
 	
 	dotsView.getView("bigPicture").applyProperties(bigSircleStyle);
+	
+	/*
+	dotsView.getView("bigPicture").addEventListener('click', function(e) {
+
+	    Ti.API.info("MAAAAAAAAAAAAP");
+	});*/
+	
+	dotsView.getView("map").addEventListener("complete", function() {
+		if (!isComplete) {
+			centeringMap(dotsView.getView("map"));
+			
+			for (i = 0; i < currentTour.dots.length; i++) {
+				dotsView.getView("map").addAnnotation(Titanium.Map.createAnnotation({
+					latitude: currentTour.dots[i].latitude,
+					longitude: currentTour.dots[i].longitude,
+					myid: i
+				}));
+			}
+			isComplete = true;
+		}
+	});
+	
+	dotsView.getView("mapMask").applyProperties({
+		image: "images/dotsView/MapMask.png",
+		width: bigSircleSize,
+		height: bigSircleSize,
+		top: 0,
+		left: 0,
+		zIndex: 4
+	});
+	
 	smallSirclePhotoStyle.image = currentTour.img;
 	dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
 	dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);
+	dotsView.getView("player").add(audioView.getView());
 	dotsView.getView("smallPictureList").applyProperties(smallSircleListStyle);
 	dotsView.getView("smallPictureCenter").applyProperties(smallSircleCenterStyle);
 	
@@ -75,11 +110,21 @@ function resetScrollableView() {
 	controller.getView("window").add(scrollView);
 }
 
+//===============DON'T FORGET TO FIX IT=================================================
+function centeringMap(map) {
+	map.region = {
+		latitude: currentTour.dots[0].latitude,
+		longitude: currentTour.dots[0].longitude,
+		latitudeDelta: 0.01,
+		longitudeDelta: 0.01
+	};
+}
+
 exports.initDotsView = function() {
-	controller.getView("window").applyProperties({backgroundColor: "white"});
+	isComplete = false;
+	//controller.getView("window").applyProperties({backgroundColor: "white"});
 	controller.getView("logo").applyProperties({image: "images/APP_Kiev_logo_green.png"});
 	scrollView = controller.getView("scrollView");
-	//scrollView.applyProperties({backgroundColor: "red"});
 	
 	resetScrollableView();
 	
@@ -123,4 +168,8 @@ exports.getSmallImagePhotoStyle = function() {
 
 exports.getSmallImageAudioStyle = function() {
 	return smallSircleAudioStyle;
+};
+
+exports.centering = function(map) {
+	centeringMap(map);
 };

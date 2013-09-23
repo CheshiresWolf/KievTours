@@ -5,7 +5,8 @@ var topOffset = (Titanium.Platform.displayCaps.platformHeight - bigImgSize) / 2;
 var textWidth, buttonImgPath;
 var smallImgSize = bigImgSize / 3;
 
-var currentPage = 0;
+//Old page index
+var oldIndex = 0;
 var tours = Alloy.Globals.getTours();
 
 var insideTourProcedures = require("lib/insideTourProcedures");
@@ -57,7 +58,7 @@ function playButtonEventListener() {
 			isInsideTourWindowOpen = false;
 		});
 		
-		insideTourProcedures.setData(newWindow, tours[currentPage]);
+		insideTourProcedures.setData(newWindow, tours[oldIndex]);
 		insideTourProcedures.initDotsView();
 		isInsideTourWindowOpen = true;
 	}
@@ -150,7 +151,7 @@ function makeTourView (tour) {
 }
 
 exports.initTourViews = function(index) {
-	var toursLength = tours.length, pagingArray = [], oldIndex = 0;
+	var toursLength = tours.length, pagingArray = [];
 	
 	var paging = index.getView("paging"), scrollView = index.getView("scrollView");
 	
@@ -180,50 +181,27 @@ exports.initTourViews = function(index) {
 		if (oldIndex !== newIndex) {
 			var children = scrollView.getViews(), loadedPages = [];
 			
+			Ti.API.info("[old|new] : [" + oldIndex + "|" + newIndex + "]; ch.l = " + children.length);
+			
 			//if we turn right -->
-			if (newIndex > oldIndex) {			
-				//save pos
-				currentPage++;
+			if (newIndex > oldIndex) {	
 					
-				//loadedPages.push(children[oldIndex]);
-				//loadedPages.push(children[oldIndex + 1]);
-				
-				//if there are another tour left
-				//if (currentPage + 1 < tours.length) {
-				//	loadedPages.push(makeTourView(tours[currentPage + 1]));
-				//	oldIndex = 1;
-				//}
-				if (currentPage + 1 < tours.length) {
-					scrollView.addView(makeTourView(tours[currentPage + 1]));
+				if (newIndex == children.length - 1) {
+					if (newIndex + 1 < tours.length) {
+						scrollView.addView(makeTourView(tours[newIndex + 1]));
+					}	
 				}
-				//scrollView.setViews(loadedPages);
-				//scrollView.setCurrentPage(1);			
+					
 				
-					pagingArray[currentPage - 1].applyProperties({image: "images/Radio_bullets_off.png"});
-					pagingArray[currentPage].applyProperties({image: "images/Radio_bullets_on.png"});
+				pagingArray[oldIndex].applyProperties({image: "images/Radio_bullets_off.png"});
+				pagingArray[newIndex].applyProperties({image: "images/Radio_bullets_on.png"});
+				
 				oldIndex = newIndex;
 			} else {
 				
-				//save pos
-				currentPage--;
-				/*
-				//if there are another tour left
-				if (currentPage - 1 >= 0) {
-					loadedPages.push(makeTourView(tours[currentPage - 1]));
-					oldIndex = 1;
-				} else {
-					oldIndex = 0;
-				}
-				
-				loadedPages.push(children[0]);
-				loadedPages.push(children[1]);
-				
-				scrollView.setViews(loadedPages);
-				scrollView.setCurrentPage(oldIndex);			
-				*/
-				if (currentPage >= 0) {
-					pagingArray[currentPage + 1].applyProperties({image: "images/Radio_bullets_off.png"});
-					pagingArray[currentPage].applyProperties({image: "images/Radio_bullets_on.png"});
+				if (newIndex >= 0) {
+					pagingArray[oldIndex].applyProperties({image: "images/Radio_bullets_off.png"});
+					pagingArray[newIndex].applyProperties({image: "images/Radio_bullets_on.png"});
 				}
 				
 				oldIndex = newIndex;

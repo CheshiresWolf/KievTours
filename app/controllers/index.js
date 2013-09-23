@@ -4,7 +4,7 @@ $.menu.applyProperties({
 	bottom : -55
 });
 
-$.window.addEventListener("swipe", function(e) {
+$.menuSwipeListener.addEventListener("swipe", function(e) {
 	//Ti.API.info("swipe" + e.direction);
 	
 	if (e.direction === "up") {

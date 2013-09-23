@@ -19,7 +19,7 @@ function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, ba
 	this.title = tourTitle;
 	this.text = tourText;
 	this.size = fileSize;
-	this.dots = [1];
+	this.dots = [];
 	this.time = timeLength;
 	this.background = backgroundImage;
 	this.price = tourPrice;
@@ -61,10 +61,22 @@ var buf = new Tour(
 	"images/APP_Kiev_background.png",
 	9.99
 );
-buf.dots.push(0);
-buf.dots.push(0);
-buf.dots.push(0);
-buf.dots.push(0);
+buf.dots.push({
+	latitude: 50.4635,//37.390749,
+	longitude: 30.3718
+});
+buf.dots.push({
+	latitude: 50.466,//37.390749,
+	longitude: 30.3718
+});
+buf.dots.push({
+	latitude: 50.47,//37.390749,
+	longitude: 30.3718
+});
+buf.dots.push({
+	latitude: 50.46,//37.390749,
+	longitude: 30.3718
+});
 tours.push(buf);
 
 tours.push(new Tour(
@@ -77,7 +89,7 @@ tours.push(new Tour(
 	"images/APP_Kiev_background.png",
 	9.99
 ));
-
+/*
 tours.push(new Tour(
 	"images/SmallSircle.png",
 	"Жемчужины Печерска",
@@ -88,6 +100,7 @@ tours.push(new Tour(
 	"images/APP_Kiev_background.png",
 	9.99
 ));
+*/
 
 Alloy.Globals.getTours = function() {
 	return tours;

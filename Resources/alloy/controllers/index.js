@@ -21,12 +21,21 @@ function Controller() {
         id: "logo"
     });
     $.__views.window.add($.__views.logo);
-    var __alloyId0 = [];
+    var __alloyId1 = [];
     $.__views.scrollView = Ti.UI.createScrollableView({
-        views: __alloyId0,
+        views: __alloyId1,
         id: "scrollView"
     });
     $.__views.window.add($.__views.scrollView);
+    $.__views.menuSwipeListener = Ti.UI.createView({
+        right: 0,
+        bottom: 0,
+        width: 60,
+        height: 60,
+        zIndex: 8,
+        id: "menuSwipeListener"
+    });
+    $.__views.window.add($.__views.menuSwipeListener);
     $.__views.menu = Ti.UI.createView({
         left: 0,
         width: Titanium.Platform.displayCaps.platformWidth,
@@ -81,7 +90,7 @@ function Controller() {
         backgroundImage: "images/menu/Menu_close_large.png",
         bottom: -55
     });
-    $.window.addEventListener("swipe", function(e) {
+    $.menuSwipeListener.addEventListener("swipe", function(e) {
         "up" === e.direction && $.menu.animate({
             bottom: 0
         }, function() {

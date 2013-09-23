@@ -1,0 +1,63 @@
+//<Label id="timePassed"></Label>
+//<ProgressBar id="progressBar"></ProgressBar>
+//<Label id="timeLeft"></Label>
+//<ImageView id="buttonBack"></ImageView>
+//<ImageView id="buttonPlay"></ImageView>
+//<ImageView id="buttonForward"></ImageView>
+//<ImageView id="audioIconMin"></ImageView>
+//<Slider id="slider" min="0" max="100" value="50" onChange="updateLabel"></Slider>
+//<ImageView id="audioIconMax"></ImageView>
+".index": {
+	zIndex: 4
+},
+"#timePassed": {
+	top: 0,
+	left: 0,
+	width: 20,
+	height: 20
+},
+"#progressBar": {
+	top: 0,
+	left: 20,
+	height: 20
+},
+"#timeLeft": {
+	top: 0,
+	right: 0,
+	width: 20,
+	height: 20
+},
+"#buttonBack": {
+	top: 25,
+	width: 20,
+	height: 20
+},
+"#buttonPlay": {
+	top: 25,
+	width: 20,
+	height: 20
+},
+"#buttonForward": {
+	top: 25,
+	width: 20,
+	height: 20
+},
+"#audioIconMin": {
+	bottom: 0,
+	right: 0,
+	width: 20,
+	height: 20
+},
+"#slider": {
+	bottom: 0,
+	left: 20,
+	min: 0,
+	max: 100,
+	value: 50 
+},
+"#audioIconMax": {
+	bottom: 0,
+	left: 0,
+	width: 20,
+	height: 20
+}
