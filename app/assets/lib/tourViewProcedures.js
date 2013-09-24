@@ -83,8 +83,8 @@ function makeTourView (tour) {
 	controller.getView("title").text = tour.title;
 	
 	textWidth = controller.getView("title").toImage().width;
-	if (textWidth > (bigImgSize * 7 / 10)) {
-		textWidth = bigImgSize * (7 / 10);
+	if (textWidth > (bigImgSize * 0.7)) {
+		textWidth = bigImgSize * 0.7;
 	}
 
 	controller.getView("title").applyProperties({
@@ -96,8 +96,8 @@ function makeTourView (tour) {
 	controller.getView("text").text = tour.text;
 	
 	textWidth = controller.getView("text").toImage().width;
-	if (textWidth > (bigImgSize * 8 / 10)) {
-		textWidth = bigImgSize * (8 / 10);
+	if (textWidth > (bigImgSize * 0.8)) {
+		textWidth = bigImgSize * (0.8);
 	}
 
 	controller.getView("text").applyProperties({
@@ -181,7 +181,7 @@ exports.initTourViews = function(index) {
 		if (oldIndex !== newIndex) {
 			var children = scrollView.getViews(), loadedPages = [];
 			
-			Ti.API.info("[old|new] : [" + oldIndex + "|" + newIndex + "]; ch.l = " + children.length);
+			//Ti.API.info("[old|new] : [" + oldIndex + "|" + newIndex + "]; ch.l = " + children.length);
 			
 			//if we turn right -->
 			if (newIndex > oldIndex) {	

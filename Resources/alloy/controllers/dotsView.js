@@ -9,9 +9,9 @@ function Controller() {
         $.map.setVisible(flag);
     }
     function playerShow(flag) {
-        var img = "";
+        var img = "images/dotsView/audioBackground.png";
         flag || (img = "images/dotsView/SmallPictureAudio.png");
-        $.bigPicture.applyProperties({
+        $.smallPictureAudio.applyProperties({
             backgroundImage: img
         });
         $.player.setVisible(flag);
@@ -75,10 +75,9 @@ function Controller() {
     var insideTourProcedures = require("lib/insideTourProcedures");
     Ti.API.info("dotView.js");
     $.bigPicture.addEventListener("click", function() {
+        playerShow(false);
         $.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-        $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle(), function() {
-            playerShow(false);
-        });
+        $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
         $.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {
             bigPictureShow(true);
             insideTourProcedures.centering($.map);
@@ -86,6 +85,7 @@ function Controller() {
     });
     $.smallPicturePhoto.addEventListener("click", function() {
         bigPictureShow(false);
+        playerShow(false);
         $.bigPicture.animate(insideTourProcedures.getSmallImagePhotoStyle());
         $.smallPicturePhoto.animate(insideTourProcedures.getBigImageStyle());
         $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
@@ -95,16 +95,19 @@ function Controller() {
         $.bigPicture.animate(insideTourProcedures.getSmallImageAudioStyle());
         $.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
         $.smallPictureAudio.animate(insideTourProcedures.getBigImageStyle(), function() {
-            playerShow(false);
+            playerShow(true);
         });
     });
     $.smallPictureList.addEventListener("click", function() {
         var list = Alloy.createController("dotsList");
+        list.fillTable(insideTourProcedures.getDots());
         list.getView().open();
     });
     $.smallPictureCenter.addEventListener("click", function() {
         $.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-        $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
+        $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle(), function() {
+            playerShow(false);
+        });
         $.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {
             bigPictureShow(true);
             insideTourProcedures.centering($.map);

@@ -28,21 +28,25 @@ var tours = [];
 var buf = new Tour("images/SmallSircle.png", "Жемчужины Печерска", "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99);
 
 buf.dots.push({
+    name: "Особняк по ул. Шелковичная 19",
     latitude: 50.4635,
     longitude: 30.3718
 });
 
 buf.dots.push({
+    name: "Мост благородных девиц",
     latitude: 50.466,
     longitude: 30.3718
 });
 
 buf.dots.push({
+    name: "Мариинский парк и его достопримечательности",
     latitude: 50.47,
     longitude: 30.3718
 });
 
 buf.dots.push({
+    name: "Пряничный домик",
     latitude: 50.46,
     longitude: 30.3718
 });
@@ -55,12 +59,10 @@ Alloy.Globals.getTours = function() {
     return tours;
 };
 
-var index = Alloy.createController("index");
+var insideTourProcedures = require("lib/insideTourProcedures");
 
-var tourViewProcedures = require("lib/tourViewProcedures");
+insideTourProcedures.setData(Alloy.createController("index"), tours[0]);
 
-index.getView().open();
-
-tourViewProcedures.initTourViews(index);
+insideTourProcedures.initDotsView();
 
 Alloy.createController("index");

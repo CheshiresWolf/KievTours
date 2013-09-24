@@ -62,18 +62,22 @@ var buf = new Tour(
 	9.99
 );
 buf.dots.push({
+	name: "Особняк по ул. Шелковичная 19",
 	latitude: 50.4635,//37.390749,
 	longitude: 30.3718
 });
 buf.dots.push({
+	name: "Мост благородных девиц",
 	latitude: 50.466,//37.390749,
 	longitude: 30.3718
 });
 buf.dots.push({
+	name: "Мариинский парк и его достопримечательности",
 	latitude: 50.47,//37.390749,
 	longitude: 30.3718
 });
 buf.dots.push({
+	name: "Пряничный домик",
 	latitude: 50.46,//37.390749,
 	longitude: 30.3718
 });
@@ -105,17 +109,17 @@ tours.push(new Tour(
 Alloy.Globals.getTours = function() {
 	return tours;
 };
-///*
+/*
 var index = Alloy.createController("index");
 var tourViewProcedures = require("lib/tourViewProcedures");
 index.getView().open();
 tourViewProcedures.initTourViews(index);
-//*/
-/*
+*/
+///*
 var insideTourProcedures = require("lib/insideTourProcedures");
 insideTourProcedures.setData(Alloy.createController("index"), tours[0]);
 insideTourProcedures.initDotsView();
-*/
+//*/
 //===========================================
 //Ti.API.info("alloy.js open");
 //===========================================

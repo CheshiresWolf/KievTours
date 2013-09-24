@@ -43,14 +43,14 @@ function makeTourView(tour) {
     });
     controller.getView("title").text = tour.title;
     textWidth = controller.getView("title").toImage().width;
-    textWidth > 7 * bigImgSize / 10 && (textWidth = .7 * bigImgSize);
+    textWidth > .7 * bigImgSize && (textWidth = .7 * bigImgSize);
     controller.getView("title").applyProperties({
         top: bigImgSize / 6,
         width: textWidth
     });
     controller.getView("text").text = tour.text;
     textWidth = controller.getView("text").toImage().width;
-    textWidth > 8 * bigImgSize / 10 && (textWidth = .8 * bigImgSize);
+    textWidth > .8 * bigImgSize && (textWidth = .8 * bigImgSize);
     controller.getView("text").applyProperties({
         top: bigImgSize / 6 + 10 + controller.getView("title").toImage().height,
         width: textWidth
@@ -149,7 +149,6 @@ exports.initTourViews = function(index) {
         var newIndex = scrollView.getCurrentPage();
         if (oldIndex !== newIndex) {
             var children = scrollView.getViews();
-            Ti.API.info("[old|new] : [" + oldIndex + "|" + newIndex + "]; ch.l = " + children.length);
             if (newIndex > oldIndex) {
                 newIndex == children.length - 1 && tours.length > newIndex + 1 && scrollView.addView(makeTourView(tours[newIndex + 1]));
                 pagingArray[oldIndex].applyProperties({

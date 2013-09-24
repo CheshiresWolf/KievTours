@@ -2,7 +2,7 @@
 	<Window id="window">
 		<View id="topPanel">
 			<ImageView id="backButton"></ImageView>
-			<Label id="title"></Label>
+			<Label id="title">ИСТОРИИ КИЕВСКИХ АРИСТОКРАТОВ</Label>
 			<ImageView id="logo"></ImageView>
 		</View>
 		<TableView id="table"></TableView>

@@ -4,10 +4,9 @@ var insideTourProcedures = require("lib/insideTourProcedures");
 Ti.API.info("dotView.js");
 
 $.bigPicture.addEventListener("click", function(e) {
+	playerShow(false);
 	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle(), function() {
-		playerShow(false);
-	});
+	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
 	$.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {
 		bigPictureShow(true);
 		insideTourProcedures.centering($.map);
@@ -17,6 +16,7 @@ $.bigPicture.addEventListener("click", function(e) {
 $.smallPicturePhoto.addEventListener("click", function(e) {
 	
 	bigPictureShow(false);
+	playerShow(false);
 	$.bigPicture.animate(insideTourProcedures.getSmallImagePhotoStyle());
 	$.smallPicturePhoto.animate(insideTourProcedures.getBigImageStyle());
 	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
@@ -27,18 +27,21 @@ $.smallPictureAudio.addEventListener("click", function(e) {
 	$.bigPicture.animate(insideTourProcedures.getSmallImageAudioStyle());
 	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
 	$.smallPictureAudio.animate(insideTourProcedures.getBigImageStyle(), function() {
-		playerShow(false);
+		playerShow(true);
 	});
 });
 
 $.smallPictureList.addEventListener("click", function(e) {
 	var list = Alloy.createController("dotsList");
+	list.fillTable(insideTourProcedures.getDots());
 	list.getView().open();
 });
 
 $.smallPictureCenter.addEventListener("click", function(e) {
 	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
+	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle(), function() {	
+		playerShow(false);
+	});
 	$.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {	
 		bigPictureShow(true);
 		insideTourProcedures.centering($.map);
@@ -56,10 +59,10 @@ function bigPictureShow(flag) {
 }
 
 function playerShow(flag) {
-	var img = "";
+	var img = "images/dotsView/audioBackground.png";
 	
 	if (!flag) img = "images/dotsView/SmallPictureAudio.png";
 	
-	$.bigPicture.applyProperties({backgroundImage: img});
+	$.smallPictureAudio.applyProperties({backgroundImage: img});
 	$.player.setVisible(flag);
 }

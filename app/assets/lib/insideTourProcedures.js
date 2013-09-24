@@ -60,14 +60,9 @@ function createDotView() {
 	
 	dotsView = Alloy.createController("dotsView");
 	audioView = Alloy.createController("audioPlayer");
+	audioView.initPlayer(bigSircleSize);
 	
 	dotsView.getView("bigPicture").applyProperties(bigSircleStyle);
-	
-	/*
-	dotsView.getView("bigPicture").addEventListener('click', function(e) {
-
-	    Ti.API.info("MAAAAAAAAAAAAP");
-	});*/
 	
 	dotsView.getView("map").addEventListener("complete", function() {
 		if (!isComplete) {
@@ -82,8 +77,7 @@ function createDotView() {
 			}
 			isComplete = true;
 		}
-	});
-	
+	});	
 	dotsView.getView("mapMask").applyProperties({
 		image: "images/dotsView/MapMask.png",
 		width: bigSircleSize,
@@ -95,9 +89,13 @@ function createDotView() {
 	
 	smallSirclePhotoStyle.image = currentTour.img;
 	dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
+	
 	dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);
+	
 	dotsView.getView("player").add(audioView.getView());
+	
 	dotsView.getView("smallPictureList").applyProperties(smallSircleListStyle);
+	
 	dotsView.getView("smallPictureCenter").applyProperties(smallSircleCenterStyle);
 	
 	return dotsView.getView();
@@ -172,4 +170,8 @@ exports.getSmallImageAudioStyle = function() {
 
 exports.centering = function(map) {
 	centeringMap(map);
+};
+exports.getDots = function() {
+	Ti.API.info('dots length = ' + currentTour.dots.length);
+	return currentTour.dots;
 };

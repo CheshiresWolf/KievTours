@@ -2,6 +2,7 @@ function createDotView() {
     var i = 0;
     dotsView = Alloy.createController("dotsView");
     audioView = Alloy.createController("audioPlayer");
+    audioView.initPlayer(bigSircleSize);
     dotsView.getView("bigPicture").applyProperties(bigSircleStyle);
     dotsView.getView("map").addEventListener("complete", function() {
         if (!isComplete) {
@@ -158,4 +159,9 @@ exports.getSmallImageAudioStyle = function() {
 
 exports.centering = function(map) {
     centeringMap(map);
+};
+
+exports.getDots = function() {
+    Ti.API.info("dots length = " + currentTour.dots.length);
+    return currentTour.dots;
 };

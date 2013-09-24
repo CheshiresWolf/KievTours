@@ -14,50 +14,75 @@
 	top: 0,
 	left: 0,
 	width: 20,
-	height: 20
+	height: 20,
+	font: {
+        fontSize: '10dp'    
+    }
 },
-"#progressBar": {
+"#sliderSong": {
 	top: 0,
 	left: 20,
-	height: 20
+	height: 5,
+	min : 0,
+    max : 100,
+    value: 20,
+	thumbImage: "images/dotsView/slider/SliderSongCenter.png",
+	highlightedThumbImage: "images/dotsView/slider/SliderSongCenter.png",
+	rightTrackImage: "images/dotsView/slider/SliderVolumeRight.png",
+	leftTrackImage: "images/dotsView/slider/SliderVolumeLeft.png"
 },
 "#timeLeft": {
 	top: 0,
 	right: 0,
 	width: 20,
-	height: 20
+	height: 20,
+	font: {
+        fontSize: '10dp'    
+    }
 },
 "#buttonBack": {
-	top: 25,
-	width: 20,
-	height: 20
+	image: "images/dotsView/audioPlayerButtonBack.png",
+	//top: 25,
+	left:  20,
+	width: 15,
+	height: 15
 },
 "#buttonPlay": {
-	top: 25,
-	width: 20,
-	height: 20
+	image: "images/dotsView/audioPlayerButtonPlay.png",
+	//top: 25,
+	width: 15,
+	height: 15
 },
 "#buttonForward": {
-	top: 25,
-	width: 20,
-	height: 20
+	image: "images/dotsView/audioPlayerButtonForward.png",
+	//top: 25,
+	right: 20,
+	width: 15,
+	height: 15
 },
 "#audioIconMin": {
-	bottom: 0,
-	right: 0,
-	width: 20,
-	height: 20
+	image: "images/dotsView/audioPlayerVolumeMin.png",
+	bottom: 2,
+	left: 0,
+	width: 15,
+	height: 15
 },
-"#slider": {
+"#sliderVolume": {
 	bottom: 0,
 	left: 20,
-	min: 0,
-	max: 100,
-	value: 50 
+	height: 5,
+	min : 0,
+    max : 100,
+    value: 50,
+	thumbImage: "images/dotsView/slider/SliderVolumeCenter_small.png",
+	highlightedThumbImage: "images/dotsView/slider/SliderVolumeCenter_small.png",
+	rightTrackImage: "images/dotsView/slider/SliderVolumeRight.png",
+	leftTrackImage: "images/dotsView/slider/SliderVolumeLeft.png"
 },
 "#audioIconMax": {
-	bottom: 0,
-	left: 0,
-	width: 20,
-	height: 20
+	image: "images/dotsView/audioPlayerVolumeMax.png",
+	bottom: 3,
+	right: 0,
+	width: 15,
+	height: 15
 }
