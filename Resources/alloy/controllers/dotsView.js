@@ -1,4 +1,8 @@
 function Controller() {
+    function galleryShow(flag) {
+        $.galleryLeft.setVisible(flag);
+        $.galleryRight.setVisible(flag);
+    }
     function bigPictureShow(flag) {
         var img = "";
         flag || (img = "images/SmallSircleMap.png");
@@ -78,20 +82,45 @@ function Controller() {
         id: "smallPictureCenter"
     });
     $.__views.dotContainer.add($.__views.smallPictureCenter);
+    $.__views.galleryLeft = Ti.UI.createImageView({
+        image: "images/dotsView/galleryControlsLeft.png",
+        bottom: 80,
+        left: 10,
+        width: 10,
+        height: 30,
+        zIndex: 5,
+        visible: false,
+        id: "galleryLeft"
+    });
+    $.__views.dotContainer.add($.__views.galleryLeft);
+    $.__views.galleryRight = Ti.UI.createImageView({
+        image: "images/dotsView/galleryControlsRight.png",
+        bottom: 80,
+        right: 10,
+        width: 10,
+        height: 30,
+        zIndex: 5,
+        visible: false,
+        id: "galleryRight"
+    });
+    $.__views.dotContainer.add($.__views.galleryRight);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    require("lib/insideTourProcedures");
-    var controller, currentTour;
+    var controller, currentTour, currentDot;
     var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
+    var galleryIndex = 0;
     $.bigPicture.addEventListener("click", function() {
+        galleryShow(false);
         playerShow(false);
         $.smallPicturePhoto.animate(smallImagePhotoStyle);
         $.smallPictureAudio.animate(smallImageAudioStyle);
         $.bigPicture.animate(bigImageStyle, function() {
             bigPictureShow(true);
+            centeringMap();
         });
     });
     $.smallPicturePhoto.addEventListener("click", function() {
+        galleryShow(true);
         bigPictureShow(false);
         playerShow(false);
         $.bigPicture.animate(smallImagePhotoStyle);
@@ -99,6 +128,7 @@ function Controller() {
         $.smallPictureAudio.animate(smallImageAudioStyle);
     });
     $.smallPictureAudio.addEventListener("click", function() {
+        galleryShow(false);
         bigPictureShow(false);
         $.bigPicture.animate(smallImageAudioStyle);
         $.smallPicturePhoto.animate(smallImagePhotoStyle);
@@ -119,6 +149,7 @@ function Controller() {
         list.getView().open();
     });
     $.smallPictureCenter.addEventListener("click", function() {
+        galleryShow(false);
         $.smallPicturePhoto.animate(smallImagePhotoStyle);
         $.smallPictureAudio.animate(smallImageAudioStyle, function() {
             playerShow(false);
@@ -128,6 +159,26 @@ function Controller() {
             centeringMap();
         });
     });
+    $.galleryLeft.addEventListener("click", function() {
+        Ti.API.info("left");
+        if (galleryIndex > 0) {
+            Ti.API.info("left in");
+            galleryIndex--;
+            $.smallPicturePhoto.applyProperties({
+                image: currentTour.dots[0].gallery[galleryIndex]
+            });
+        }
+    });
+    $.galleryRight.addEventListener("click", function() {
+        Ti.API.info("right l = " + currentTour.dots[0].gallery.length);
+        if (currentTour.dots[0].gallery.length - 1 > galleryIndex) {
+            Ti.API.info("right in");
+            galleryIndex++;
+            $.smallPicturePhoto.applyProperties({
+                image: currentTour.dots[0].gallery[galleryIndex]
+            });
+        }
+    });
     exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
         bigImageStyle = bigStyle;
         smallImagePhotoStyle = smallPhotoStyle;
@@ -136,6 +187,7 @@ function Controller() {
     exports.setController = function(tourController, tour) {
         controller = tourController;
         currentTour = tour;
+        currentDot = currentTour.dots[0];
     };
     _.extend($, exports);
 }

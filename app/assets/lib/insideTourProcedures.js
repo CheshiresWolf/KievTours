@@ -95,7 +95,7 @@ function createDotView() {
 	});
 	currentDot = currentTour.dots[0];
 	
-	smallSirclePhotoStyle.image = currentTour.img;
+	smallSirclePhotoStyle.image = currentTour.dots[0].gallery[0];
 	dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
 	
 	dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);

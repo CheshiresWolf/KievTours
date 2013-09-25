@@ -51,6 +51,13 @@ var tours = [];
 
 //load tours from somwere and cast it to array
 //function load(url) {
+var gallery = [];
+gallery.push("images/bufGallery/SmallSircle.png");
+gallery.push("images/bufGallery/SmallSircleBuf.png");
+gallery.push("images/bufGallery/SmallSircleBuf2.png");
+gallery.push("images/bufGallery/SmallSircleBuf3.png");
+gallery.push("images/bufGallery/SmallSircleBuf4.png");
+
 var buf = new Tour(
 	"images/SmallSircle.png",
 	"Жемчужины Печерска",
@@ -63,21 +70,25 @@ var buf = new Tour(
 );
 buf.dots.push({
 	name: "Особняк по ул. Шелковичная 19",
+	gallery: gallery,
 	latitude: 50.4635,//37.390749,
 	longitude: 30.3718
 });
 buf.dots.push({
 	name: "Мост благородных девиц",
+	gallery: gallery,
 	latitude: 50.466,//37.390749,
 	longitude: 30.3718
 });
 buf.dots.push({
 	name: "Мариинский парк и его достопримечательности",
+	gallery: gallery,
 	latitude: 50.47,//37.390749,
 	longitude: 30.3718
 });
 buf.dots.push({
 	name: "Пряничный домик",
+	gallery: gallery,
 	latitude: 50.46,//37.390749,
 	longitude: 30.3718
 });

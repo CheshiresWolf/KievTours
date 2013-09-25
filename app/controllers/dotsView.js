@@ -1,8 +1,10 @@
-var insideTourProcedures = require("lib/insideTourProcedures");
 var controller, currentTour, currentDot;
 var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
 
+var galleryIndex = 0;
+
 $.bigPicture.addEventListener("click", function(e) {
+	galleryShow(false);
 	playerShow(false);
 	$.smallPicturePhoto.animate(smallImagePhotoStyle);
 	$.smallPictureAudio.animate(smallImageAudioStyle);
@@ -13,7 +15,7 @@ $.bigPicture.addEventListener("click", function(e) {
 });
 
 $.smallPicturePhoto.addEventListener("click", function(e) {
-	
+	galleryShow(true);
 	bigPictureShow(false);
 	playerShow(false);
 	$.bigPicture.animate(smallImagePhotoStyle);
@@ -22,6 +24,7 @@ $.smallPicturePhoto.addEventListener("click", function(e) {
 });
 
 $.smallPictureAudio.addEventListener("click", function(e) {
+	galleryShow(false);
 	bigPictureShow(false);
 	$.bigPicture.animate(smallImageAudioStyle);
 	$.smallPicturePhoto.animate(smallImagePhotoStyle);
@@ -44,6 +47,7 @@ $.smallPictureList.addEventListener("click", function(e) {
 });
 
 $.smallPictureCenter.addEventListener("click", function(e) {
+	galleryShow(false);
 	$.smallPicturePhoto.animate(smallImagePhotoStyle);
 	$.smallPictureAudio.animate(smallImageAudioStyle, function() {	
 		playerShow(false);
@@ -53,6 +57,25 @@ $.smallPictureCenter.addEventListener("click", function(e) {
 		centeringMap();
 	});
 });
+
+$.galleryLeft.addEventListener("click", function(e) {
+	if (galleryIndex > 0) {
+		galleryIndex--;
+		$.smallPicturePhoto.applyProperties({image: currentTour.dots[0].gallery[galleryIndex]});
+	}
+});
+
+$.galleryRight.addEventListener("click", function(e) {
+	if (galleryIndex < currentTour.dots[0].gallery.length - 1) {
+		galleryIndex++;
+		$.smallPicturePhoto.applyProperties({image: currentTour.dots[0].gallery[galleryIndex]});
+	}
+});
+
+function galleryShow(flag) {
+	$.galleryLeft.setVisible(flag);
+	$.galleryRight.setVisible(flag);
+}
 
 function bigPictureShow(flag) {
 	var img = "";
@@ -93,4 +116,8 @@ exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
 exports.setController = function (tourController, tour) {
 	controller = tourController;
 	currentTour = tour;
+	
+	//temporary FIX ==================================================
+	currentDot = currentTour.dots[0];
+	//================================================================
 };
