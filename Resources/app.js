@@ -59,10 +59,12 @@ Alloy.Globals.getTours = function() {
     return tours;
 };
 
-var insideTourProcedures = require("lib/insideTourProcedures");
+var index = Alloy.createController("index");
 
-insideTourProcedures.setData(Alloy.createController("index"), tours[0]);
+var tourViewProcedures = require("lib/tourViewProcedures");
 
-insideTourProcedures.initDotsView();
+index.getView().open();
+
+tourViewProcedures.initTourViews(index);
 
 Alloy.createController("index");

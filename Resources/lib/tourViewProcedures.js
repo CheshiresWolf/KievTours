@@ -1,91 +1,52 @@
-function buyButtonEventListener(tour, view) {
-    tour.buy();
-    view.applyProperties({
-        image: "images/tourView/Download_Button.png"
-    });
-    view.removeEventListener("click", function() {});
-    view.addEventListener("click", function() {
-        downloadButtonEventListener(tour, view);
-    });
-}
-
-function downloadButtonEventListener(tour, view) {
-    tour.download();
-    view.applyProperties({
-        image: "images/tourView/Play_Button.png"
-    });
-    view.removeEventListener("click", function() {});
-    view.addEventListener("click", function() {
-        playButtonEventListener();
-    });
-}
-
-function playButtonEventListener() {
-    if (!isInsideTourWindowOpen) {
-        var newWindow = Alloy.createController("index");
-        newWindow.getView("buttonTours").addEventListener("click", function() {
-            newWindow.getView().close();
-            isInsideTourWindowOpen = false;
-        });
-        insideTourProcedures.setData(newWindow, tours[oldIndex]);
-        insideTourProcedures.initDotsView();
-        isInsideTourWindowOpen = true;
-    }
-}
-
 function makeTourView(tour) {
-    var controller = Alloy.createController("tourView");
-    controller.getView("bigPicture").applyProperties(bigImageStyle);
+    var tourView = Alloy.createController("tourView");
+    tourView.setStyles(bigImageStyle, smallImageStyle);
+    tourView.setTour(tour);
+    tourView.getView("bigPicture").applyProperties(bigImageStyle);
     smallImageStyle.image = tour.img;
-    controller.getView("smallPicture").applyProperties(smallImageStyle);
-    controller.getView("background").applyProperties({
+    tourView.getView("smallPicture").applyProperties(smallImageStyle);
+    tourView.getView("background").applyProperties({
         image: tour.background
     });
-    controller.getView("title").text = tour.title;
-    textWidth = controller.getView("title").toImage().width;
+    tourView.getView("title").text = tour.title;
+    textWidth = tourView.getView("title").toImage().width;
     textWidth > .7 * bigImgSize && (textWidth = .7 * bigImgSize);
-    controller.getView("title").applyProperties({
+    tourView.getView("title").applyProperties({
         top: bigImgSize / 6,
         width: textWidth
     });
-    controller.getView("text").text = tour.text;
-    textWidth = controller.getView("text").toImage().width;
+    tourView.getView("text").text = tour.text;
+    textWidth = tourView.getView("text").toImage().width;
     textWidth > .8 * bigImgSize && (textWidth = .8 * bigImgSize);
-    controller.getView("text").applyProperties({
-        top: bigImgSize / 6 + 10 + controller.getView("title").toImage().height,
+    tourView.getView("text").applyProperties({
+        top: bigImgSize / 6 + 10 + tourView.getView("title").toImage().height,
         width: textWidth
     });
-    controller.getView("icons").applyProperties({
+    tourView.getView("icons").applyProperties({
         top: 4 * bigImgSize / 6,
         left: bigImgSize / 2 - 90
     });
-    controller.getView("sizeMb").text = tour.size;
-    controller.getView("dotAmount").text = 31;
-    controller.getView("time").text = tour.time;
-    controller.getView("price").text = 0 === tour.price ? "FREE" : "$" + tour.price;
-    var buttonView = controller.getView("button");
+    tourView.getView("sizeMb").text = tour.size;
+    tourView.getView("dotAmount").text = tour.dots.length;
+    tourView.getView("time").text = tour.time;
+    tourView.getView("price").text = 0 === tour.price ? "FREE" : "$" + tour.price;
+    var buttonView = tourView.getView("button");
     buttonView.currentTour = tour;
     if (tour.isBuyed) if (tour.isDownloaded) {
         buttonImgPath = "images/tourView/Play_Button.png";
-        buttonView.addEventListener("click", function() {
-            playButtonEventListener();
-        });
+        tourView.setListenerFlag(2);
     } else {
         buttonImgPath = "images/tourView/Download_Button.png";
-        buttonView.addEventListener("click", function() {
-            downloadButtonEventListener(tour, buttonView);
-        });
+        tourView.setListenerFlag(1);
     } else {
         buttonImgPath = "images/tourView/Buy_Button.png";
-        buttonView.addEventListener("click", function() {
-            buyButtonEventListener(tour, buttonView);
-        });
+        tourView.setListenerFlag(0);
     }
     buttonView.applyProperties({
         left: bigImgSize / 2 - 46,
         image: buttonImgPath
     });
-    return controller.getView();
+    return tourView.getView();
 }
 
 var platformWidth = Titanium.Platform.displayCaps.platformWidth;
@@ -100,11 +61,13 @@ var textWidth, buttonImgPath;
 
 var smallImgSize = bigImgSize / 3;
 
+var controller;
+
+var listenerBuf;
+
 var oldIndex = 0;
 
 var tours = Alloy.Globals.getTours();
-
-var insideTourProcedures = require("lib/insideTourProcedures");
 
 var bigImageStyle = {
     width: bigImgSize,
@@ -125,8 +88,9 @@ var smallImageStyle = {
 var isInsideTourWindowOpen = false;
 
 exports.initTourViews = function(index) {
+    controller = index;
     var toursLength = tours.length, pagingArray = [];
-    var paging = index.getView("paging"), scrollView = index.getView("scrollView");
+    var paging = controller.getView("paging"), scrollView = controller.getView("scrollView");
     for (var i = 0; toursLength > i; i++) {
         pagingArray.push(Ti.UI.createImageView({
             width: 5,

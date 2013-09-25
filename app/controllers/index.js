@@ -1,24 +1,28 @@
+var menuFlag = false;
+
 //init menu
 $.menu.applyProperties({
 	backgroundImage: "images/menu/Menu_close_large.png",
 	bottom : -55
 });
 
-$.menuSwipeListener.addEventListener("swipe", function(e) {
-	//Ti.API.info("swipe" + e.direction);
+$.menuSwipeListener.addEventListener("click", function(e) {
 	
-	if (e.direction === "up") {
+	if (menuFlag === false) {
 		$.menu.animate({
 			bottom : 0
 		}, function() {
 			$.menu.applyProperties({backgroundImage: "images/menu/Menu_open_large.png"});
 		});
-	}
-	if (e.direction === "down") {
+		
+		menuFlag = true;
+	} else {
 		$.menu.animate({
 			bottom : -55
 		}, function() {
 			$.menu.applyProperties({backgroundImage: "images/menu/Menu_close_large.png"});
 		});
+			
+		menuFlag = false;
 	}
 });

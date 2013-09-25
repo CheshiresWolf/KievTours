@@ -1,5 +1,6 @@
 function createDotView() {
     var i = 0;
+    var isComplete;
     dotsView = Alloy.createController("dotsView");
     audioView = Alloy.createController("audioPlayer");
     audioView.initPlayer(bigSircleSize);
@@ -23,6 +24,7 @@ function createDotView() {
         left: 0,
         zIndex: 4
     });
+    currentDot = currentTour.dots[0];
     smallSirclePhotoStyle.image = currentTour.img;
     dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
     dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);
@@ -32,16 +34,10 @@ function createDotView() {
     return dotsView.getView();
 }
 
-function resetScrollableView() {
-    controller.getView("window").remove(scrollView);
-    scrollView = Ti.UI.createScrollableView();
-    controller.getView("window").add(scrollView);
-}
-
-function centeringMap(map) {
-    map.region = {
-        latitude: currentTour.dots[0].latitude,
-        longitude: currentTour.dots[0].longitude,
+function centeringMap() {
+    dotsView.getView("map").region = {
+        latitude: currentDot.latitude,
+        longitude: currentDot.longitude,
         latitudeDelta: .01,
         longitudeDelta: .01
     };
@@ -49,13 +45,9 @@ function centeringMap(map) {
 
 var controller;
 
-var currentTour;
+var currentTour, currentDot;
 
-var dotsView, audioView;
-
-var scrollView;
-
-var isComplete;
+var dotsView, audioView, scrollView;
 
 var platformWidth = Titanium.Platform.displayCaps.platformWidth;
 
@@ -111,13 +103,10 @@ var smallSircleCenterStyle = {
 };
 
 exports.initDotsView = function() {
-    isComplete = false;
     controller.getView("logo").applyProperties({
         image: "images/APP_Kiev_logo_green.png"
     });
-    scrollView = controller.getView("scrollView");
-    resetScrollableView();
-    scrollView.addView(createDotView());
+    controller.getView("window").add(createDotView());
     var pagingArray = [], paging = controller.getView("paging"), dotsLength = currentTour.dots.length;
     for (var i = 0; dotsLength > i; i++) {
         pagingArray.push(Ti.UI.createImageView({

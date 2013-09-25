@@ -110,7 +110,7 @@ function Controller() {
         });
         $.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {
             bigPictureShow(true);
-            insideTourProcedures.centering($.map);
+            insideTourProcedures.centering();
         });
     });
     _.extend($, exports);

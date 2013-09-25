@@ -44,7 +44,7 @@ $.smallPictureCenter.addEventListener("click", function(e) {
 	});
 	$.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {	
 		bigPictureShow(true);
-		insideTourProcedures.centering($.map);
+		insideTourProcedures.centering();
 	});
 });
 

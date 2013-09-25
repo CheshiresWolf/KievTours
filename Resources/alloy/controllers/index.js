@@ -86,25 +86,31 @@ function Controller() {
     $.__views.window.add($.__views.paging);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    var menuFlag = false;
     $.menu.applyProperties({
         backgroundImage: "images/menu/Menu_close_large.png",
         bottom: -55
     });
-    $.menuSwipeListener.addEventListener("swipe", function(e) {
-        "up" === e.direction && $.menu.animate({
-            bottom: 0
-        }, function() {
-            $.menu.applyProperties({
-                backgroundImage: "images/menu/Menu_open_large.png"
+    $.menuSwipeListener.addEventListener("click", function() {
+        if (false === menuFlag) {
+            $.menu.animate({
+                bottom: 0
+            }, function() {
+                $.menu.applyProperties({
+                    backgroundImage: "images/menu/Menu_open_large.png"
+                });
             });
-        });
-        "down" === e.direction && $.menu.animate({
-            bottom: -55
-        }, function() {
-            $.menu.applyProperties({
-                backgroundImage: "images/menu/Menu_close_large.png"
+            menuFlag = true;
+        } else {
+            $.menu.animate({
+                bottom: -55
+            }, function() {
+                $.menu.applyProperties({
+                    backgroundImage: "images/menu/Menu_close_large.png"
+                });
             });
-        });
+            menuFlag = false;
+        }
     });
     _.extend($, exports);
 }

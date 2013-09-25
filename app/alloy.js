@@ -109,17 +109,17 @@ tours.push(new Tour(
 Alloy.Globals.getTours = function() {
 	return tours;
 };
-/*
+///*
 var index = Alloy.createController("index");
 var tourViewProcedures = require("lib/tourViewProcedures");
 index.getView().open();
 tourViewProcedures.initTourViews(index);
-*/
-///*
+//*/
+/*
 var insideTourProcedures = require("lib/insideTourProcedures");
 insideTourProcedures.setData(Alloy.createController("index"), tours[0]);
 insideTourProcedures.initDotsView();
-//*/
+*/
 //===========================================
 //Ti.API.info("alloy.js open");
 //===========================================

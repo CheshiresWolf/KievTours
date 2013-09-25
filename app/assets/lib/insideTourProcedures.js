@@ -1,9 +1,7 @@
 var controller;
-var currentTour;
-var dotsView, audioView;
-var scrollView;
-//Prevent multiple event calls
-var isComplete;
+var currentTour, currentDot;
+var dotsView, audioView, scrollView;
+
 var platformWidth = Titanium.Platform.displayCaps.platformWidth;
 var bigSircleSize = platformWidth * 0.9; //90%
 
@@ -57,6 +55,8 @@ var smallSircleCenterStyle = {
 
 function createDotView() {
 	var i = 0;
+	//Prevent multiple event calls
+	var isComplete;
 	
 	dotsView = Alloy.createController("dotsView");
 	audioView = Alloy.createController("audioPlayer");
@@ -86,6 +86,7 @@ function createDotView() {
 		left: 0,
 		zIndex: 4
 	});
+	currentDot = currentTour.dots[0];
 	
 	smallSirclePhotoStyle.image = currentTour.img;
 	dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
@@ -101,32 +102,26 @@ function createDotView() {
 	return dotsView.getView();
 }
 
-//for some reasons ScrollableView from xml crashed
-function resetScrollableView() {
-	controller.getView("window").remove(scrollView);
-	scrollView = Ti.UI.createScrollableView();
-	controller.getView("window").add(scrollView);
-}
-
-//===============DON'T FORGET TO FIX IT=================================================
-function centeringMap(map) {
-	map.region = {
-		latitude: currentTour.dots[0].latitude,
-		longitude: currentTour.dots[0].longitude,
+function centeringMap() {
+	dotsView.getView("map").region = {
+		latitude: currentDot.latitude,
+		longitude: currentDot.longitude,
 		latitudeDelta: 0.01,
 		longitudeDelta: 0.01
 	};
 }
 
 exports.initDotsView = function() {
-	isComplete = false;
+	//isComplete = false;
 	//controller.getView("window").applyProperties({backgroundColor: "white"});
 	controller.getView("logo").applyProperties({image: "images/APP_Kiev_logo_green.png"});
-	scrollView = controller.getView("scrollView");
+	//scrollView = controller.getView("scrollView");
 	
-	resetScrollableView();
+	//resetScrollableView();
 	
-	scrollView.addView(createDotView());
+	//scrollView.addView(createDotView());
+	
+	controller.getView("window").add(createDotView());
 	
 	var pagingArray = [], paging = controller.getView("paging"), dotsLength = currentTour.dots.length;
 	
