@@ -1,5 +1,5 @@
 var controller;
-var currentTour, currentDot;
+var currentTour;
 var dotsView, audioView, scrollView;
 
 var platformWidth = Titanium.Platform.displayCaps.platformWidth;
@@ -59,6 +59,8 @@ function createDotView() {
 	var isComplete;
 	
 	dotsView = Alloy.createController("dotsView");
+	dotsView.setStyles(bigSircleStyle, smallSirclePhotoStyle, smallSircleAudioStyle);
+	dotsView.setController(controller, currentTour);
 	audioView = Alloy.createController("audioPlayer");
 	audioView.initPlayer(bigSircleSize);
 	
@@ -66,7 +68,12 @@ function createDotView() {
 	
 	dotsView.getView("map").addEventListener("complete", function() {
 		if (!isComplete) {
-			centeringMap(dotsView.getView("map"));
+			dotsView.getView("map").region = {
+				latitude: currentTour.dots[0].latitude,
+				longitude: currentTour.dots[0].longitude,
+				latitudeDelta: 0.01,
+				longitudeDelta: 0.01
+			};
 			
 			for (i = 0; i < currentTour.dots.length; i++) {
 				dotsView.getView("map").addAnnotation(Titanium.Map.createAnnotation({
@@ -102,24 +109,11 @@ function createDotView() {
 	return dotsView.getView();
 }
 
-function centeringMap() {
-	dotsView.getView("map").region = {
-		latitude: currentDot.latitude,
-		longitude: currentDot.longitude,
-		latitudeDelta: 0.01,
-		longitudeDelta: 0.01
-	};
-}
-
-exports.initDotsView = function() {
-	//isComplete = false;
-	//controller.getView("window").applyProperties({backgroundColor: "white"});
+exports.initDotsView = function(newController, tour) {
+	controller = newController;
+	currentTour = tour;
+	
 	controller.getView("logo").applyProperties({image: "images/APP_Kiev_logo_green.png"});
-	//scrollView = controller.getView("scrollView");
-	
-	//resetScrollableView();
-	
-	//scrollView.addView(createDotView());
 	
 	controller.getView("window").add(createDotView());
 	
@@ -143,10 +137,16 @@ exports.initDotsView = function() {
 	});
 	pagingArray[0].applyProperties({image: "images/Radio_bullets_on.png"});
 		
+	var menu = Alloy.createController("menuView");
+	menu.getView("buttonTours").addEventListener("click", function() {
+		controller.getView().close();
+	});
+	controller.getView("window").add(menu.getView("menuListener"));
+	controller.getView("window").add(menu.getView("menu"));
 	controller.getView().open();
 };
 
-exports.setData = function (newController, tour) {
+/*exports.setData = function (newController, tour) {
 	controller = newController;
 	currentTour = tour;
 };
@@ -163,10 +163,10 @@ exports.getSmallImageAudioStyle = function() {
 	return smallSircleAudioStyle;
 };
 
-exports.centering = function(map) {
-	centeringMap(map);
+exports.centering = function() {
+	centeringMap();
 };
+
 exports.getDots = function() {
-	Ti.API.info('dots length = ' + currentTour.dots.length);
 	return currentTour.dots;
-};
+};*/

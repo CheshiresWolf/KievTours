@@ -2,12 +2,19 @@ function createDotView() {
     var i = 0;
     var isComplete;
     dotsView = Alloy.createController("dotsView");
+    dotsView.setStyles(bigSircleStyle, smallSirclePhotoStyle, smallSircleAudioStyle);
+    dotsView.setController(controller, currentTour);
     audioView = Alloy.createController("audioPlayer");
     audioView.initPlayer(bigSircleSize);
     dotsView.getView("bigPicture").applyProperties(bigSircleStyle);
     dotsView.getView("map").addEventListener("complete", function() {
         if (!isComplete) {
-            centeringMap(dotsView.getView("map"));
+            dotsView.getView("map").region = {
+                latitude: currentTour.dots[0].latitude,
+                longitude: currentTour.dots[0].longitude,
+                latitudeDelta: .01,
+                longitudeDelta: .01
+            };
             for (i = 0; currentTour.dots.length > i; i++) dotsView.getView("map").addAnnotation(Titanium.Map.createAnnotation({
                 latitude: currentTour.dots[i].latitude,
                 longitude: currentTour.dots[i].longitude,
@@ -34,18 +41,9 @@ function createDotView() {
     return dotsView.getView();
 }
 
-function centeringMap() {
-    dotsView.getView("map").region = {
-        latitude: currentDot.latitude,
-        longitude: currentDot.longitude,
-        latitudeDelta: .01,
-        longitudeDelta: .01
-    };
-}
-
 var controller;
 
-var currentTour, currentDot;
+var currentTour;
 
 var dotsView, audioView, scrollView;
 
@@ -102,7 +100,9 @@ var smallSircleCenterStyle = {
     zIndex: 5
 };
 
-exports.initDotsView = function() {
+exports.initDotsView = function(newController, tour) {
+    controller = newController;
+    currentTour = tour;
     controller.getView("logo").applyProperties({
         image: "images/APP_Kiev_logo_green.png"
     });
@@ -126,31 +126,11 @@ exports.initDotsView = function() {
     pagingArray[0].applyProperties({
         image: "images/Radio_bullets_on.png"
     });
+    var menu = Alloy.createController("menuView");
+    menu.getView("buttonTours").addEventListener("click", function() {
+        controller.getView().close();
+    });
+    controller.getView("window").add(menu.getView("menuListener"));
+    controller.getView("window").add(menu.getView("menu"));
     controller.getView().open();
-};
-
-exports.setData = function(newController, tour) {
-    controller = newController;
-    currentTour = tour;
-};
-
-exports.getBigImageStyle = function() {
-    return bigSircleStyle;
-};
-
-exports.getSmallImagePhotoStyle = function() {
-    return smallSirclePhotoStyle;
-};
-
-exports.getSmallImageAudioStyle = function() {
-    return smallSircleAudioStyle;
-};
-
-exports.centering = function(map) {
-    centeringMap(map);
-};
-
-exports.getDots = function() {
-    Ti.API.info("dots length = " + currentTour.dots.length);
-    return currentTour.dots;
 };

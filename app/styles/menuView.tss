@@ -1,0 +1,41 @@
+"#menu": {
+	left: 0,
+	width: Titanium.Platform.displayCaps.platformWidth,
+	height: 80,
+	zIndex: 7
+},
+"#menuListener": {
+	right: 0,
+	bottom: 0,
+	width: 60,
+	height: 60,
+	zIndex: 8
+},
+"#buttonTours": {
+	image:"images/menu/Menu_icon_tour.png",
+	width: 50,
+	height: 50,
+	bottom: 5,
+	left: 10
+},
+"#buttonDiscover": {
+	image:"images/menu/Menu_icon_discover.png",
+	width: 50,
+	height: 50,
+	bottom: 5,
+	left: 75
+},
+"#buttonTips": {
+	image:"images/menu/Menu_icon_sityTrips.png",
+	width: 50,
+	height: 50,
+	bottom: 5,
+	left: 140
+},
+"#buttonMore": {
+	image:"images/menu/Menu_icon_more.png",
+	width: 50,
+	height: 50,
+	bottom: 5,
+	left: 205
+}

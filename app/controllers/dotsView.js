@@ -1,15 +1,14 @@
 var insideTourProcedures = require("lib/insideTourProcedures");
-//var swapDirection = false; // false - swap small with big
-
-Ti.API.info("dotView.js");
+var controller, currentTour, currentDot;
+var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
 
 $.bigPicture.addEventListener("click", function(e) {
 	playerShow(false);
-	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
-	$.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {
+	$.smallPicturePhoto.animate(smallImagePhotoStyle);
+	$.smallPictureAudio.animate(smallImageAudioStyle);
+	$.bigPicture.animate(bigImageStyle, function() {
 		bigPictureShow(true);
-		insideTourProcedures.centering($.map);
+		centeringMap();
 	});
 });
 
@@ -17,34 +16,41 @@ $.smallPicturePhoto.addEventListener("click", function(e) {
 	
 	bigPictureShow(false);
 	playerShow(false);
-	$.bigPicture.animate(insideTourProcedures.getSmallImagePhotoStyle());
-	$.smallPicturePhoto.animate(insideTourProcedures.getBigImageStyle());
-	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
+	$.bigPicture.animate(smallImagePhotoStyle);
+	$.smallPicturePhoto.animate(bigImageStyle);
+	$.smallPictureAudio.animate(smallImageAudioStyle);
 });
 
 $.smallPictureAudio.addEventListener("click", function(e) {
 	bigPictureShow(false);
-	$.bigPicture.animate(insideTourProcedures.getSmallImageAudioStyle());
-	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-	$.smallPictureAudio.animate(insideTourProcedures.getBigImageStyle(), function() {
+	$.bigPicture.animate(smallImageAudioStyle);
+	$.smallPicturePhoto.animate(smallImagePhotoStyle);
+	$.smallPictureAudio.animate(bigImageStyle, function() {
 		playerShow(true);
 	});
 });
 
 $.smallPictureList.addEventListener("click", function(e) {
 	var list = Alloy.createController("dotsList");
-	list.fillTable(insideTourProcedures.getDots());
+	var menu = Alloy.createController("menuView");
+	menu.getView("buttonTours").addEventListener("click", function() {
+		list.getView().close();
+		controller.getView().close();
+	});
+	list.getView("window").add(menu.getView("menuListener"));
+	list.getView("window").add(menu.getView("menu"));
+	list.fillTable(currentTour.dots);
 	list.getView().open();
 });
 
 $.smallPictureCenter.addEventListener("click", function(e) {
-	$.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-	$.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle(), function() {	
+	$.smallPicturePhoto.animate(smallImagePhotoStyle);
+	$.smallPictureAudio.animate(smallImageAudioStyle, function() {	
 		playerShow(false);
 	});
-	$.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {	
+	$.bigPicture.animate(bigImageStyle, function() {	
 		bigPictureShow(true);
-		insideTourProcedures.centering();
+		centeringMap();
 	});
 });
 
@@ -66,3 +72,25 @@ function playerShow(flag) {
 	$.smallPictureAudio.applyProperties({backgroundImage: img});
 	$.player.setVisible(flag);
 }
+
+function centeringMap() {
+	$.map.region = {
+		//temporary FIX ====================================================================
+		latitude: currentTour.dots[0].latitude,
+		longitude: currentTour.dots[0].longitude,
+		//temporary FIX ====================================================================
+		latitudeDelta: 0.01,
+		longitudeDelta: 0.01
+	};
+}
+
+exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
+	bigImageStyle = bigStyle;
+	smallImagePhotoStyle = smallPhotoStyle;
+	smallImageAudioStyle = smallAudioStyle;
+};
+
+exports.setController = function (tourController, tour) {
+	controller = tourController;
+	currentTour = tour;
+};

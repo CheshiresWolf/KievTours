@@ -1,14 +1,7 @@
 <Alloy>
 	<Window id="window">
 		<ImageView id="logo"></ImageView>
-		<ScrollableView id="scrollView"></ScrollableView>
-		<View id="menuSwipeListener"></View>
-		<View id="menu">
-			<ImageView id="buttonTours"></ImageView>
-			<ImageView id="buttonDiscover"></ImageView>
-			<ImageView id="buttonTips"></ImageView>
-			<ImageView id="buttonMore"></ImageView>
-		</View>
+		<!--<ScrollableView id="scrollView"></ScrollableView>-->
 		<View id="paging"></View>
 	</Window>
 </Alloy>

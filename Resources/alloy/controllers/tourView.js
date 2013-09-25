@@ -178,7 +178,6 @@ function Controller() {
     $.__views.tourContent.add($.__views.button);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var insideTourProcedures = require("lib/insideTourProcedures");
     var swapDirection = false;
     var bigImageStyle, smallImageStyle;
     var listenerFlag = 0;
@@ -225,8 +224,8 @@ function Controller() {
 
           case 2:
             var newWindow = Alloy.createController("index");
-            insideTourProcedures.setData(newWindow, currentTour);
-            insideTourProcedures.initDotsView();
+            var insideTourProcedures = require("lib/insideTourProcedures");
+            insideTourProcedures.initDotsView(newWindow, currentTour);
         }
     });
     exports.setListenerFlag = function(listener) {

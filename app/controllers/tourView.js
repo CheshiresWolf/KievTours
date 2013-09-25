@@ -1,4 +1,3 @@
-var insideTourProcedures = require("lib/insideTourProcedures");
 var swapDirection = false; // false - swap small with big
 
 var bigImageStyle, smallImageStyle;
@@ -39,9 +38,9 @@ $.button.addEventListener("click", function () {
 		break;
 		case 2:
 			var newWindow = Alloy.createController("index");
+			var insideTourProcedures = require("lib/insideTourProcedures");
 			
-			insideTourProcedures.setData(newWindow, currentTour);
-			insideTourProcedures.initDotsView();
+			insideTourProcedures.initDotsView(newWindow, currentTour);
 		break;
 	}
 });

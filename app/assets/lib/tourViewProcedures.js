@@ -110,7 +110,7 @@ exports.initTourViews = function(index) {
 	controller = index;
 	
 	var toursLength = tours.length, pagingArray = [];
-	var paging = controller.getView("paging"), scrollView = controller.getView("scrollView");
+	var paging = controller.getView("paging"), scrollView = Ti.UI.createScrollableView();//controller.getView("scrollView");
 	
 	//init paging
 	for (var i = 0; i < toursLength; i++) {
@@ -165,7 +165,14 @@ exports.initTourViews = function(index) {
 
 	scrollView.addView(makeTourView(tours[0]));
 	scrollView.addView(makeTourView(tours[1]));
+	
+	controller.getView("window").add(scrollView);
 
+	var menu = Alloy.createController("menuView");
+	controller.getView("window").add(menu.getView("menuListener"));
+	controller.getView("window").add(menu.getView("menu"));
+		
+	controller.getView().open();
 };
 
 exports.getBigImageStyle = function() {

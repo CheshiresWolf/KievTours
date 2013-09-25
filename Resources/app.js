@@ -63,8 +63,6 @@ var index = Alloy.createController("index");
 
 var tourViewProcedures = require("lib/tourViewProcedures");
 
-index.getView().open();
-
 tourViewProcedures.initTourViews(index);
 
 Alloy.createController("index");

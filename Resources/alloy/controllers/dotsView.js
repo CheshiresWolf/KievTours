@@ -16,6 +16,14 @@ function Controller() {
         });
         $.player.setVisible(flag);
     }
+    function centeringMap() {
+        $.map.region = {
+            latitude: currentTour.dots[0].latitude,
+            longitude: currentTour.dots[0].longitude,
+            latitudeDelta: .01,
+            longitudeDelta: .01
+        };
+    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "dotsView";
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -72,47 +80,63 @@ function Controller() {
     $.__views.dotContainer.add($.__views.smallPictureCenter);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var insideTourProcedures = require("lib/insideTourProcedures");
-    Ti.API.info("dotView.js");
+    require("lib/insideTourProcedures");
+    var controller, currentTour;
+    var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
     $.bigPicture.addEventListener("click", function() {
         playerShow(false);
-        $.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-        $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
-        $.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {
+        $.smallPicturePhoto.animate(smallImagePhotoStyle);
+        $.smallPictureAudio.animate(smallImageAudioStyle);
+        $.bigPicture.animate(bigImageStyle, function() {
             bigPictureShow(true);
-            insideTourProcedures.centering($.map);
         });
     });
     $.smallPicturePhoto.addEventListener("click", function() {
         bigPictureShow(false);
         playerShow(false);
-        $.bigPicture.animate(insideTourProcedures.getSmallImagePhotoStyle());
-        $.smallPicturePhoto.animate(insideTourProcedures.getBigImageStyle());
-        $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle());
+        $.bigPicture.animate(smallImagePhotoStyle);
+        $.smallPicturePhoto.animate(bigImageStyle);
+        $.smallPictureAudio.animate(smallImageAudioStyle);
     });
     $.smallPictureAudio.addEventListener("click", function() {
         bigPictureShow(false);
-        $.bigPicture.animate(insideTourProcedures.getSmallImageAudioStyle());
-        $.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-        $.smallPictureAudio.animate(insideTourProcedures.getBigImageStyle(), function() {
+        $.bigPicture.animate(smallImageAudioStyle);
+        $.smallPicturePhoto.animate(smallImagePhotoStyle);
+        $.smallPictureAudio.animate(bigImageStyle, function() {
             playerShow(true);
         });
     });
     $.smallPictureList.addEventListener("click", function() {
         var list = Alloy.createController("dotsList");
-        list.fillTable(insideTourProcedures.getDots());
+        var menu = Alloy.createController("menuView");
+        menu.getView("buttonTours").addEventListener("click", function() {
+            list.getView().close();
+            controller.getView().close();
+        });
+        list.getView("window").add(menu.getView("menuListener"));
+        list.getView("window").add(menu.getView("menu"));
+        list.fillTable(currentTour.dots);
         list.getView().open();
     });
     $.smallPictureCenter.addEventListener("click", function() {
-        $.smallPicturePhoto.animate(insideTourProcedures.getSmallImagePhotoStyle());
-        $.smallPictureAudio.animate(insideTourProcedures.getSmallImageAudioStyle(), function() {
+        $.smallPicturePhoto.animate(smallImagePhotoStyle);
+        $.smallPictureAudio.animate(smallImageAudioStyle, function() {
             playerShow(false);
         });
-        $.bigPicture.animate(insideTourProcedures.getBigImageStyle(), function() {
+        $.bigPicture.animate(bigImageStyle, function() {
             bigPictureShow(true);
-            insideTourProcedures.centering();
+            centeringMap();
         });
     });
+    exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
+        bigImageStyle = bigStyle;
+        smallImagePhotoStyle = smallPhotoStyle;
+        smallImageAudioStyle = smallAudioStyle;
+    };
+    exports.setController = function(tourController, tour) {
+        controller = tourController;
+        currentTour = tour;
+    };
     _.extend($, exports);
 }
 
