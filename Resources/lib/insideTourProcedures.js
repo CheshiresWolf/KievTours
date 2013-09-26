@@ -1,11 +1,12 @@
 function createDotView() {
     var i = 0;
     var isComplete;
+    currentDot = currentTour.dots[0];
     dotsView = Alloy.createController("dotsView");
     dotsView.setStyles(bigSircleStyle, smallSirclePhotoStyle, smallSircleAudioStyle);
     dotsView.setController(controller, currentTour);
     audioView = Alloy.createController("audioPlayer");
-    audioView.initPlayer(bigSircleSize);
+    audioView.initPlayer(bigSircleSize, currentTour.songPath);
     dotsView.getView("bigPicture").applyProperties(bigSircleStyle);
     dotsView.getView("map").addEventListener("complete", function() {
         if (!isComplete) {
@@ -31,7 +32,6 @@ function createDotView() {
         left: 0,
         zIndex: 4
     });
-    currentDot = currentTour.dots[0];
     smallSirclePhotoStyle.image = currentTour.dots[0].gallery[0];
     dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
     dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);
@@ -128,9 +128,13 @@ exports.initDotsView = function(newController, tour) {
     });
     var menu = Alloy.createController("menuView");
     menu.getView("buttonTours").addEventListener("click", function() {
-        controller.getView().close();
+        controller.close();
     });
     controller.getView("window").add(menu.getView("menuListener"));
     controller.getView("window").add(menu.getView("menu"));
+    controller.close = function() {
+        audioView.closePlayer();
+        controller.getView().close();
+    };
     controller.getView().open();
 };

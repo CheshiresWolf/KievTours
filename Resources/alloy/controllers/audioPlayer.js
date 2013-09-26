@@ -1,6 +1,7 @@
 function Controller() {
-    function changeVolume() {
-        Ti.API.info("changed");
+    function secToString(sec) {
+        var min = (sec / 60).toString();
+        return min[0] + ":" + min[2] + min[3];
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "audioPlayer";
@@ -9,7 +10,6 @@ function Controller() {
     arguments[0] ? arguments[0]["__itemTemplate"] : null;
     var $ = this;
     var exports = {};
-    var __defers = {};
     $.__views.container = Ti.UI.createView({
         id: "container"
     });
@@ -33,16 +33,15 @@ function Controller() {
         left: 20,
         height: 5,
         min: 0,
-        max: 100,
-        value: 20,
+        value: 0,
         thumbImage: "images/dotsView/slider/SliderSongCenter.png",
         highlightedThumbImage: "images/dotsView/slider/SliderSongCenter.png",
         rightTrackImage: "images/dotsView/slider/SliderVolumeRight.png",
         leftTrackImage: "images/dotsView/slider/SliderVolumeLeft.png",
+        touchEnabled: false,
         id: "sliderSong"
     });
     $.__views.container.add($.__views.sliderSong);
-    changeVolume ? $.__views.sliderSong.addEventListener("change", changeVolume) : __defers["$.__views.sliderSong!change!changeVolume"] = true;
     $.__views.timeLeft = Ti.UI.createLabel({
         zIndex: 4,
         top: 0,
@@ -98,8 +97,8 @@ function Controller() {
         left: 20,
         height: 5,
         min: 0,
-        max: 100,
-        value: 50,
+        value: .5,
+        max: 1,
         thumbImage: "images/dotsView/slider/SliderVolumeCenter_small.png",
         highlightedThumbImage: "images/dotsView/slider/SliderVolumeCenter_small.png",
         rightTrackImage: "images/dotsView/slider/SliderVolumeRight.png",
@@ -107,7 +106,6 @@ function Controller() {
         id: "sliderVolume"
     });
     $.__views.container.add($.__views.sliderVolume);
-    changeVolume ? $.__views.sliderVolume.addEventListener("change", changeVolume) : __defers["$.__views.sliderVolume!change!changeVolume"] = true;
     $.__views.audioIconMax = Ti.UI.createImageView({
         zIndex: 4,
         image: "images/dotsView/audioPlayerVolumeMax.png",
@@ -120,20 +118,53 @@ function Controller() {
     $.__views.container.add($.__views.audioIconMax);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    exports.initPlayer = function(width) {
+    var audioPlayer, isPlay = false;
+    setInterval(function() {
+        if (isPlay) {
+            $.sliderSong.value = audioPlayer.time / 1e3;
+            $.timePassed.text = secToString(audioPlayer.time / 1e3);
+        }
+    }, 1e3);
+    $.sliderVolume.addEventListener("change", function(e) {
+        audioPlayer.volume = e.value;
+    });
+    $.buttonPlay.addEventListener("click", function() {
+        if (isPlay) {
+            $.buttonPlay.applyProperties({
+                image: "images/dotsView/audioPlayerButtonPlay.png"
+            });
+            audioPlayer.pause();
+            isPlay = false;
+        } else {
+            $.buttonPlay.applyProperties({
+                image: "images/dotsView/audioPlayerButtonPause.png"
+            });
+            audioPlayer.play();
+            isPlay = true;
+        }
+    });
+    exports.initPlayer = function(width, songPath) {
+        audioPlayer = Ti.Media.createSound({
+            url: songPath,
+            volume: .5,
+            allowBackground: true
+        });
+        $.timeLeft.text = secToString(audioPlayer.duration);
         $.container.applyProperties({
             width: .6 * width,
             height: width / 3
         });
         $.sliderSong.applyProperties({
+            max: audioPlayer.duration,
             width: .6 * width - 40
         });
         $.sliderVolume.applyProperties({
             width: .6 * width - 40
         });
     };
-    __defers["$.__views.sliderSong!change!changeVolume"] && $.__views.sliderSong.addEventListener("change", changeVolume);
-    __defers["$.__views.sliderVolume!change!changeVolume"] && $.__views.sliderVolume.addEventListener("change", changeVolume);
+    exports.closePlayer = function() {
+        audioPlayer.release();
+    };
     _.extend($, exports);
 }
 

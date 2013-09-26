@@ -21,6 +21,29 @@ function createRow(i, dot) {
 	});
 	row.add(kmBlock);
 	
+	var distance = Titanium.UI.createLabel({
+		text: "0.1 km",
+		top: 10,
+		left: 4,
+		width: 20,
+		height: 20,
+		font: {
+			fontSize: 8
+		},
+		textAlign: 'left',
+		zIndex: 4
+	});
+	row.add(distance);
+	
+	var dotNumber =  Titanium.UI.createImageView({
+		image: "images/dotsList/TableNumber_off.png",
+		width: 20,
+		height: 20,
+		left: 30,
+		top: 10
+	});
+	row.add(dotNumber);
+	
 	var dotName = Titanium.UI.createLabel({
 		text: dot.name,
 		font: {
@@ -28,7 +51,7 @@ function createRow(i, dot) {
 		},
 		width: 'auto',
 		textAlign: 'left',
-		left: 40,
+		left: 60,
 		height: 20
 	});
 	row.add(dotName);

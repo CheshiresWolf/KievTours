@@ -24,12 +24,12 @@
 	left: 20,
 	height: 5,
 	min : 0,
-    max : 100,
-    value: 20,
+    value: 0,
 	thumbImage: "images/dotsView/slider/SliderSongCenter.png",
 	highlightedThumbImage: "images/dotsView/slider/SliderSongCenter.png",
 	rightTrackImage: "images/dotsView/slider/SliderVolumeRight.png",
-	leftTrackImage: "images/dotsView/slider/SliderVolumeLeft.png"
+	leftTrackImage: "images/dotsView/slider/SliderVolumeLeft.png",
+	touchEnabled: false
 },
 "#timeLeft": {
 	top: 0,
@@ -72,8 +72,8 @@
 	left: 20,
 	height: 5,
 	min : 0,
-    max : 100,
-    value: 50,
+	value: 0.5,
+	max: 1,
 	thumbImage: "images/dotsView/slider/SliderVolumeCenter_small.png",
 	highlightedThumbImage: "images/dotsView/slider/SliderVolumeCenter_small.png",
 	rightTrackImage: "images/dotsView/slider/SliderVolumeRight.png",

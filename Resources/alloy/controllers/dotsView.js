@@ -141,7 +141,7 @@ function Controller() {
         var menu = Alloy.createController("menuView");
         menu.getView("buttonTours").addEventListener("click", function() {
             list.getView().close();
-            controller.getView().close();
+            controller.close();
         });
         list.getView("window").add(menu.getView("menuListener"));
         list.getView("window").add(menu.getView("menu"));
@@ -160,9 +160,7 @@ function Controller() {
         });
     });
     $.galleryLeft.addEventListener("click", function() {
-        Ti.API.info("left");
         if (galleryIndex > 0) {
-            Ti.API.info("left in");
             galleryIndex--;
             $.smallPicturePhoto.applyProperties({
                 image: currentTour.dots[0].gallery[galleryIndex]
@@ -170,9 +168,7 @@ function Controller() {
         }
     });
     $.galleryRight.addEventListener("click", function() {
-        Ti.API.info("right l = " + currentTour.dots[0].gallery.length);
         if (currentTour.dots[0].gallery.length - 1 > galleryIndex) {
-            Ti.API.info("right in");
             galleryIndex++;
             $.smallPicturePhoto.applyProperties({
                 image: currentTour.dots[0].gallery[galleryIndex]

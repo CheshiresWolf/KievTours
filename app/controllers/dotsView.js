@@ -38,7 +38,7 @@ $.smallPictureList.addEventListener("click", function(e) {
 	var menu = Alloy.createController("menuView");
 	menu.getView("buttonTours").addEventListener("click", function() {
 		list.getView().close();
-		controller.getView().close();
+		controller.close();
 	});
 	list.getView("window").add(menu.getView("menuListener"));
 	list.getView("window").add(menu.getView("menu"));

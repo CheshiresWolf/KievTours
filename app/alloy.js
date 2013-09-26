@@ -14,7 +14,7 @@
 Ti.API.info("alloy.js start");
 //===========================================
 
-function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, backgroundImage, tourPrice) {
+function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, backgroundImage, tourPrice, songPath) {
 	this.img = tourImage;
 	this.title = tourTitle;
 	this.text = tourText;
@@ -23,6 +23,7 @@ function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, ba
 	this.time = timeLength;
 	this.background = backgroundImage;
 	this.price = tourPrice;
+	this.songPath = songPath;
 	
 	if (tourPrice !== 0) {
 		this.isBuyed = false;
@@ -52,11 +53,11 @@ var tours = [];
 //load tours from somwere and cast it to array
 //function load(url) {
 var gallery = [];
-gallery.push("images/bufGallery/SmallSircle.png");
-gallery.push("images/bufGallery/SmallSircleBuf.png");
-gallery.push("images/bufGallery/SmallSircleBuf2.png");
-gallery.push("images/bufGallery/SmallSircleBuf3.png");
-gallery.push("images/bufGallery/SmallSircleBuf4.png");
+gallery.push("bufTour/bufGallery/SmallSircle.png");
+gallery.push("bufTour/bufGallery/SmallSircleBuf.png");
+gallery.push("bufTour/bufGallery/SmallSircleBuf2.png");
+gallery.push("bufTour/bufGallery/SmallSircleBuf3.png");
+gallery.push("bufTour/bufGallery/SmallSircleBuf4.png");
 
 var buf = new Tour(
 	"images/SmallSircle.png",
@@ -66,7 +67,8 @@ var buf = new Tour(
 	null,
 	"2:10",
 	"images/APP_Kiev_background.png",
-	9.99
+	9.99,
+	"bufTour/song.mp3"
 );
 buf.dots.push({
 	name: "Особняк по ул. Шелковичная 19",
@@ -102,7 +104,8 @@ tours.push(new Tour(
 	null,
 	"2:10",
 	"images/APP_Kiev_background.png",
-	9.99
+	9.99,
+	"bufTour/song.mp3"
 ));
 /*
 tours.push(new Tour(

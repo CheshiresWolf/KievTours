@@ -1,4 +1,4 @@
-function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, backgroundImage, tourPrice) {
+function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, backgroundImage, tourPrice, songPath) {
     this.img = tourImage;
     this.title = tourTitle;
     this.text = tourText;
@@ -7,6 +7,7 @@ function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, ba
     this.time = timeLength;
     this.background = backgroundImage;
     this.price = tourPrice;
+    this.songPath = songPath;
     this.isBuyed = 0 !== tourPrice ? false : true;
     this.isDownloaded = false;
 }
@@ -27,17 +28,17 @@ var tours = [];
 
 var gallery = [];
 
-gallery.push("images/bufGallery/SmallSircle.png");
+gallery.push("bufTour/bufGallery/SmallSircle.png");
 
-gallery.push("images/bufGallery/SmallSircleBuf.png");
+gallery.push("bufTour/bufGallery/SmallSircleBuf.png");
 
-gallery.push("images/bufGallery/SmallSircleBuf2.png");
+gallery.push("bufTour/bufGallery/SmallSircleBuf2.png");
 
-gallery.push("images/bufGallery/SmallSircleBuf3.png");
+gallery.push("bufTour/bufGallery/SmallSircleBuf3.png");
 
-gallery.push("images/bufGallery/SmallSircleBuf4.png");
+gallery.push("bufTour/bufGallery/SmallSircleBuf4.png");
 
-var buf = new Tour("images/SmallSircle.png", "Жемчужины Печерска", "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99);
+var buf = new Tour("images/SmallSircle.png", "Жемчужины Печерска", "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99, "bufTour/song.mp3");
 
 buf.dots.push({
     name: "Особняк по ул. Шелковичная 19",
@@ -69,7 +70,7 @@ buf.dots.push({
 
 tours.push(buf);
 
-tours.push(new Tour("images/SmallSircle.png", "Жемчужины Печерска", "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99));
+tours.push(new Tour("images/SmallSircle.png", "Жемчужины Печерска", "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99, "bufTour/song.mp3"));
 
 Alloy.Globals.getTours = function() {
     return tours;
