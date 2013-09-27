@@ -1,5 +1,10 @@
 function Controller() {
     function galleryShow(flag) {
+        var img = currentTour.img;
+        flag && (img = currentDot.gallery[0]);
+        $.smallPicturePhoto.applyProperties({
+            image: img
+        });
         $.galleryLeft.setVisible(flag);
         $.galleryRight.setVisible(flag);
     }
@@ -9,7 +14,6 @@ function Controller() {
         $.bigPicture.applyProperties({
             backgroundImage: img
         });
-        $.mapMask.setVisible(flag);
         $.map.setVisible(flag);
     }
     function playerShow(flag) {
@@ -40,27 +44,52 @@ function Controller() {
         id: "dotContainer"
     });
     $.__views.dotContainer && $.addTopLevelView($.__views.dotContainer);
-    $.__views.bigPicture = Ti.UI.createView({
-        id: "bigPicture"
-    });
-    $.__views.dotContainer.add($.__views.bigPicture);
     var __alloyId0 = [];
     $.__views.map = Ti.Map.createView({
         width: "auto",
         height: "auto",
-        top: 0,
-        left: 0,
         zIndex: 3,
         annotations: __alloyId0,
         id: "map",
-        ns: Ti.Map
+        ns: Ti.Map,
+        mapType: Titanium.Map.STANDARD_TYPE
     });
-    $.__views.bigPicture.add($.__views.map);
-    $.__views.mapMask = Ti.UI.createImageView({
+    $.__views.dotContainer.add($.__views.map);
+    $.__views.maskCenter = Ti.UI.createImageView({
+        image: "images/dotsView/MapMask.png",
         touchEnabled: false,
-        id: "mapMask"
+        zIndex: 4,
+        id: "maskCenter"
     });
-    $.__views.bigPicture.add($.__views.mapMask);
+    $.__views.dotContainer.add($.__views.maskCenter);
+    $.__views.maskTop = Ti.UI.createImageView({
+        backgroundColor: "white",
+        zIndex: 4,
+        id: "maskTop"
+    });
+    $.__views.dotContainer.add($.__views.maskTop);
+    $.__views.maskBottom = Ti.UI.createImageView({
+        backgroundColor: "white",
+        zIndex: 4,
+        id: "maskBottom"
+    });
+    $.__views.dotContainer.add($.__views.maskBottom);
+    $.__views.maskLeft = Ti.UI.createImageView({
+        backgroundColor: "white",
+        zIndex: 4,
+        id: "maskLeft"
+    });
+    $.__views.dotContainer.add($.__views.maskLeft);
+    $.__views.maskRight = Ti.UI.createImageView({
+        backgroundColor: "white",
+        zIndex: 4,
+        id: "maskRight"
+    });
+    $.__views.dotContainer.add($.__views.maskRight);
+    $.__views.bigPicture = Ti.UI.createView({
+        id: "bigPicture"
+    });
+    $.__views.dotContainer.add($.__views.bigPicture);
     $.__views.smallPicturePhoto = Ti.UI.createImageView({
         id: "smallPicturePhoto"
     });
@@ -108,30 +137,43 @@ function Controller() {
     _.extend($, $.__views);
     var controller, currentTour, currentDot;
     var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
+    var userPosition = {
+        latitude: 0,
+        longitude: 0
+    };
     var galleryIndex = 0;
+    Titanium.Geolocation.getCurrentPosition(function(e) {
+        Ti.Geolocation.purpose = "Hello, we need you coordinates to calculate distance.";
+        if (e.error) Ti.API.info("T_T"); else {
+            userPosition.latitude = e.coords.latitude;
+            userPosition.longitude = e.coords.longitude;
+        }
+    });
     $.bigPicture.addEventListener("click", function() {
-        galleryShow(false);
         playerShow(false);
-        $.smallPicturePhoto.animate(smallImagePhotoStyle);
+        $.smallPicturePhoto.animate(smallImagePhotoStyle, function() {
+            galleryShow(false);
+        });
         $.smallPictureAudio.animate(smallImageAudioStyle);
         $.bigPicture.animate(bigImageStyle, function() {
             bigPictureShow(true);
-            centeringMap();
         });
     });
     $.smallPicturePhoto.addEventListener("click", function() {
-        galleryShow(true);
         bigPictureShow(false);
         playerShow(false);
         $.bigPicture.animate(smallImagePhotoStyle);
-        $.smallPicturePhoto.animate(bigImageStyle);
+        $.smallPicturePhoto.animate(bigImageStyle, function() {
+            galleryShow(true);
+        });
         $.smallPictureAudio.animate(smallImageAudioStyle);
     });
     $.smallPictureAudio.addEventListener("click", function() {
-        galleryShow(false);
         bigPictureShow(false);
         $.bigPicture.animate(smallImageAudioStyle);
-        $.smallPicturePhoto.animate(smallImagePhotoStyle);
+        $.smallPicturePhoto.animate(smallImagePhotoStyle, function() {
+            galleryShow(false);
+        });
         $.smallPictureAudio.animate(bigImageStyle, function() {
             playerShow(true);
         });
@@ -145,12 +187,13 @@ function Controller() {
         });
         list.getView("window").add(menu.getView("menuListener"));
         list.getView("window").add(menu.getView("menu"));
-        list.fillTable(currentTour.dots);
+        list.fillTable(currentTour.dots, userPosition);
         list.getView().open();
     });
     $.smallPictureCenter.addEventListener("click", function() {
-        galleryShow(false);
-        $.smallPicturePhoto.animate(smallImagePhotoStyle);
+        $.smallPicturePhoto.animate(smallImagePhotoStyle, function() {
+            galleryShow(false);
+        });
         $.smallPictureAudio.animate(smallImageAudioStyle, function() {
             playerShow(false);
         });
@@ -163,7 +206,7 @@ function Controller() {
         if (galleryIndex > 0) {
             galleryIndex--;
             $.smallPicturePhoto.applyProperties({
-                image: currentTour.dots[0].gallery[galleryIndex]
+                image: currentDot.gallery[galleryIndex]
             });
         }
     });
@@ -171,7 +214,7 @@ function Controller() {
         if (currentTour.dots[0].gallery.length - 1 > galleryIndex) {
             galleryIndex++;
             $.smallPicturePhoto.applyProperties({
-                image: currentTour.dots[0].gallery[galleryIndex]
+                image: currentDot.gallery[galleryIndex]
             });
         }
     });

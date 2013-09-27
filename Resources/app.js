@@ -28,8 +28,6 @@ var tours = [];
 
 var gallery = [];
 
-gallery.push("bufTour/bufGallery/SmallSircle.png");
-
 gallery.push("bufTour/bufGallery/SmallSircleBuf.png");
 
 gallery.push("bufTour/bufGallery/SmallSircleBuf2.png");

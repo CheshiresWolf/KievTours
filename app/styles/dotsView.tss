@@ -4,12 +4,16 @@
 "#map": {
 	width: "auto",
 	height: "auto",
-	top: 0,
-	left: 0,
 	zIndex: 3
 },
-"#mapMask": {
-	touchEnabled: false
+".mask": {
+	backgroundColor: "white",
+	zIndex: 4
+},
+"#maskCenter": {
+	image: "images/dotsView/MapMask.png",
+	touchEnabled: false,
+	zIndex: 4
 },
 "#player": {
 	visible: false

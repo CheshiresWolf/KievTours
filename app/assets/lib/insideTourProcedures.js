@@ -15,7 +15,7 @@ var bigSircleStyle = {
 	height: bigSircleSize,
 	top: topOffsetBig,
 	left: leftOffsetBig,
-	zIndex: 3
+	zIndex: 2
 };
 
 var smallSirclePhotoStyle = {
@@ -53,6 +53,70 @@ var smallSircleCenterStyle = {
 	zIndex: 5
 };
 
+function addAnotation(dot, i) {
+	var annot = Titanium.Map.createAnnotation({
+		title: "OLOLO " + i,
+		latitude: dot.latitude,
+		longitude: dot.longitude,
+		myid: i
+	});
+	
+	annot.addEventListener("click", function(evt) {
+		Ti.API.info('ANNOTATION');
+		
+		Ti.API.info("Annotation " + evt.title + " clicked, id: " + evt.annotation.myid);
+
+		// Check for all of the possible names that clicksouce
+		// can report for the left button/view.
+		if (evt.clicksource == 'leftButton' || evt.clicksource == 'leftPane' ||
+		    evt.clicksource == 'leftView') {
+		    Ti.API.info("Annotation " + evt.title + ", left button clicked.");
+		}
+	});
+	
+	dotsView.getView("map").addAnnotation(annot);
+}
+
+function initMask() {
+	Ti.API.info('INIT');
+	
+	dotsView.getView("maskCenter").applyProperties({
+		width: bigSircleSize,
+		height: bigSircleSize,
+		top: topOffsetBig,
+		left: leftOffsetBig,
+		zIndex: 4
+	});
+	dotsView.getView("maskTop").applyProperties({
+		top: 0,
+		left: 0,
+		width: platformWidth,//"auto",
+		height: topOffsetBig,
+		zIndex: 4
+	});
+	dotsView.getView("maskBottom").applyProperties({
+		top: topOffsetBig + bigSircleSize,
+		left: 0,
+		width: platformWidth,
+		height: topOffsetBig,
+		zIndex: 4
+	});
+	dotsView.getView("maskLeft").applyProperties({
+		top: topOffsetBig,
+		left: 0,
+		width: leftOffsetBig,
+		height: bigSircleSize,
+		zIndex: 4
+	});
+	dotsView.getView("maskRight").applyProperties({
+		top: topOffsetBig,
+		right: 0,
+		width: leftOffsetBig,
+		height: bigSircleSize,
+		zIndex: 4
+	});
+}
+
 function createDotView() {
 	var i = 0;
 	//Prevent multiple event calls
@@ -78,25 +142,15 @@ function createDotView() {
 			};
 			
 			for (i = 0; i < currentTour.dots.length; i++) {
-				dotsView.getView("map").addAnnotation(Titanium.Map.createAnnotation({
-					latitude: currentTour.dots[i].latitude,
-					longitude: currentTour.dots[i].longitude,
-					myid: i
-				}));
+				addAnotation(currentTour.dots[i], i);
 			}
 			isComplete = true;
 		}
-	});	
-	dotsView.getView("mapMask").applyProperties({
-		image: "images/dotsView/MapMask.png",
-		width: bigSircleSize,
-		height: bigSircleSize,
-		top: 0,
-		left: 0,
-		zIndex: 4
 	});
 	
-	smallSirclePhotoStyle.image = currentTour.dots[0].gallery[0];
+	initMask();
+	
+	smallSirclePhotoStyle.image = currentTour.img;
 	dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
 	
 	dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);

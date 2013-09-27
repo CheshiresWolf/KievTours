@@ -1,1 +1,0 @@
-/Users/vladislavzhovtiy/KievTours/Resources/alloy/sync/sql.js

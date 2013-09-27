@@ -1,1 +1,0 @@
-/Users/vladislavzhovtiy/KievTours/Resources/alloy/styles/insideTour.js

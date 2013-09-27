@@ -1,9 +1,12 @@
 <Alloy>
 	<View id="dotContainer">
-		<View id="bigPicture">
-			<View id="map" ns="Ti.Map"></View>
-			<ImageView id="mapMask"></ImageView>
-		</View>
+		<View id="map" ns="Ti.Map" mapType="Titanium.Map.STANDARD_TYPE"></View>
+		<ImageView id="maskCenter"></ImageView>
+		<ImageView id="maskTop" class="mask"></ImageView>
+		<ImageView id="maskBottom" class="mask"></ImageView>
+		<ImageView id="maskLeft" class="mask"></ImageView>
+		<ImageView id="maskRight" class="mask"></ImageView>
+		<View id="bigPicture"></View>
 		<ImageView id="smallPicturePhoto" class="index"></ImageView>
 		<View id="smallPictureAudio" class="index">
 			<View id="player"></View>

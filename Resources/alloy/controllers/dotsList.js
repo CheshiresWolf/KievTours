@@ -1,52 +1,76 @@
 function Controller() {
-    function createRow(i, dot) {
+    function createRow(flag, dot, i, distance) {
         var row = Titanium.UI.createTableViewRow({
             hasChild: true,
             height: 40
         });
         var img = "images/dotsList/TableKmBlock_center.png";
-        0 === i ? img = "images/dotsList/TableKmBlock_top.png" : -1 === i && (img = "images/dotsList/TableKmBlock_bottom.png");
+        0 === i && (img = "images/dotsList/TableKmBlock_top.png");
+        flag && (img = "images/dotsList/TableKmBlock_bottom.png");
         var kmBlock = Titanium.UI.createImageView({
             image: img,
-            width: 20,
+            width: 40,
             height: 40,
             left: 4,
             top: 0
         });
         row.add(kmBlock);
-        var distance = Titanium.UI.createLabel({
-            text: "0.1 km",
-            top: 10,
-            left: 4,
-            width: 20,
-            height: 20,
+        var distanceLabel = Titanium.UI.createLabel({
+            text: distance.toFixed(2) + " km",
+            left: 11,
+            width: 28,
+            height: 30,
             font: {
                 fontSize: 8
             },
-            textAlign: "left",
+            textAlign: "center",
             zIndex: 4
         });
-        row.add(distance);
+        row.add(distanceLabel);
         var dotNumber = Titanium.UI.createImageView({
             image: "images/dotsList/TableNumber_off.png",
             width: 20,
             height: 20,
-            left: 30,
+            left: 50,
             top: 10
         });
         row.add(dotNumber);
+        var dotNameLabel = Titanium.UI.createLabel({
+            text: i,
+            color: "white",
+            font: {
+                fontSize: 8
+            },
+            width: 20,
+            height: 20,
+            left: 50,
+            top: 10,
+            textAlign: "center"
+        });
+        row.add(dotNameLabel);
         var dotName = Titanium.UI.createLabel({
             text: dot.name,
             font: {
                 fontSize: 8
             },
+            left: 80,
             width: "auto",
+            height: 20,
             textAlign: "left",
-            left: 60,
-            height: 20
+            zIndex: 4
         });
         row.add(dotName);
         return row;
+    }
+    function toRad(grad) {
+        return Math.PI * grad / 180;
+    }
+    function distance(dotA, dotB) {
+        var R = 6371;
+        var latA = toRad(dotA.latitude), latB = toRad(dotB.latitude);
+        var lonA = toRad(dotA.longitude), lonB = toRad(dotB.longitude);
+        (lonB - lonA) * Math.cos((latA + latB) / 2);
+        return Math.acos(Math.sin(latA) * Math.sin(latB) + Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA)) * R;
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "dotsList";
@@ -112,11 +136,11 @@ function Controller() {
     $.backButton.addEventListener("click", function() {
         $.window.close();
     });
-    exports.fillTable = function(dots) {
-        var tableData = [], flag = 0;
+    exports.fillTable = function(dots, userPosition) {
+        var tableData = [], flag = false;
         for (var i = 0; dots.length > i; i++) {
-            flag = i === dots.length - 1 ? -1 : i;
-            tableData.push(createRow(flag, dots[i]));
+            i === dots.length - 1 && (flag = true);
+            tableData.push(createRow(flag, dots[i], i, distance(userPosition, dots[i])));
         }
         $.table.data = tableData;
     };

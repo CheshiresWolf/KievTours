@@ -1,1 +1,0 @@
-/Users/vladislavzhovtiy/KievTours/Resources/alloy/styles/audioPlayer.js

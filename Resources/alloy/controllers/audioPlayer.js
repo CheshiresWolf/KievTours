@@ -118,15 +118,22 @@ function Controller() {
     $.__views.container.add($.__views.audioIconMax);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var audioPlayer, isPlay = false;
+    var audioPlayer, isPlay = false, songTime = 0;
     setInterval(function() {
         if (isPlay) {
-            $.sliderSong.value = audioPlayer.time / 1e3;
-            $.timePassed.text = secToString(audioPlayer.time / 1e3);
+            songTime = audioPlayer.time / 1e3;
+            $.sliderSong.value = songTime;
+            $.timePassed.text = secToString(songTime);
         }
     }, 1e3);
     $.sliderVolume.addEventListener("change", function(e) {
         audioPlayer.volume = e.value;
+    });
+    $.buttonBack.addEventListener("click", function() {
+        audioPlayer.pause();
+        songTime >= 5 && audioPlayer.setTime(1e3 * (songTime - 5));
+        audioPlayer.play();
+        isPlay = true;
     });
     $.buttonPlay.addEventListener("click", function() {
         if (isPlay) {
@@ -142,6 +149,12 @@ function Controller() {
             audioPlayer.play();
             isPlay = true;
         }
+    });
+    $.buttonForward.addEventListener("click", function() {
+        audioPlayer.pause();
+        audioPlayer.duration - 5 >= songTime && audioPlayer.setTime(1e3 * (songTime + 5));
+        audioPlayer.play();
+        isPlay = true;
     });
     exports.initPlayer = function(width, songPath) {
         audioPlayer = Ti.Media.createSound({

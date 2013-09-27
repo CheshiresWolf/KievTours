@@ -53,7 +53,6 @@ var tours = [];
 //load tours from somwere and cast it to array
 //function load(url) {
 var gallery = [];
-gallery.push("bufTour/bufGallery/SmallSircle.png");
 gallery.push("bufTour/bufGallery/SmallSircleBuf.png");
 gallery.push("bufTour/bufGallery/SmallSircleBuf2.png");
 gallery.push("bufTour/bufGallery/SmallSircleBuf3.png");
