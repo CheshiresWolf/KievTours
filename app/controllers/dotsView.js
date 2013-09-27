@@ -9,7 +9,6 @@ var userPosition = {
 var galleryIndex = 0;
 
 Titanium.Geolocation.getCurrentPosition(function(e) {
-	Ti.Geolocation.purpose = "Hello, we need you coordinates to calculate distance.";
 	if (!e.error) {
 		userPosition.latitude = e.coords.latitude;
 		userPosition.longitude = e.coords.longitude;
@@ -19,10 +18,11 @@ Titanium.Geolocation.getCurrentPosition(function(e) {
 });
 
 $.bigPicture.addEventListener("click", function(e) {
+	galleryShow(false);
 	playerShow(false);
-	$.smallPicturePhoto.animate(smallImagePhotoStyle, function() {
-		galleryShow(false);
-	});
+	$.smallPicturePhoto.animate(smallImagePhotoStyle);//, function() {
+	//	galleryShow(false);
+	//});
 	$.smallPictureAudio.animate(smallImageAudioStyle);
 	$.bigPicture.animate(bigImageStyle, function() {
 		bigPictureShow(true);
@@ -40,11 +40,12 @@ $.smallPicturePhoto.addEventListener("click", function(e) {
 });
 
 $.smallPictureAudio.addEventListener("click", function(e) {
+	galleryShow(false);
 	bigPictureShow(false);
 	$.bigPicture.animate(smallImageAudioStyle);
-	$.smallPicturePhoto.animate(smallImagePhotoStyle, function() {
-		galleryShow(false);
-	});
+	$.smallPicturePhoto.animate(smallImagePhotoStyle);//, function() {
+	//	galleryShow(false);
+	//});
 	$.smallPictureAudio.animate(bigImageStyle, function() {
 		playerShow(true);
 	});
@@ -64,9 +65,10 @@ $.smallPictureList.addEventListener("click", function(e) {
 });
 
 $.smallPictureCenter.addEventListener("click", function(e) {
-	$.smallPicturePhoto.animate(smallImagePhotoStyle, function() {
-		galleryShow(false);
-	});
+	galleryShow(false);
+	$.smallPicturePhoto.animate(smallImagePhotoStyle);//, function() {
+	//	galleryShow(false);
+	//});
 	$.smallPictureAudio.animate(smallImageAudioStyle, function() {	
 		playerShow(false);
 	});
@@ -80,6 +82,7 @@ $.galleryLeft.addEventListener("click", function(e) {
 	if (galleryIndex > 0) {
 		galleryIndex--;
 		$.smallPicturePhoto.applyProperties({image: currentDot.gallery[galleryIndex]});
+		$.galleryPaging.text = (galleryIndex + 1) + "/" + currentDot.gallery.length;
 	}
 });
 
@@ -87,16 +90,18 @@ $.galleryRight.addEventListener("click", function(e) {
 	if (galleryIndex < currentTour.dots[0].gallery.length - 1) {
 		galleryIndex++;
 		$.smallPicturePhoto.applyProperties({image: currentDot.gallery[galleryIndex]});
+		$.galleryPaging.text = (galleryIndex + 1) + "/" + currentDot.gallery.length;
 	}
 });
 
 function galleryShow(flag) {
 	var img = currentTour.img;
 	
-	if (flag) img = currentDot.gallery[0];
+	if (flag) img = currentDot.gallery[galleryIndex];
 	
 	$.smallPicturePhoto.applyProperties({image: img});
 	$.galleryLeft.setVisible(flag);
+	$.galleryPaging.setVisible(flag);
 	$.galleryRight.setVisible(flag);
 }
 
@@ -142,4 +147,6 @@ exports.setController = function (tourController, tour) {
 	//temporary FIX ==================================================
 	currentDot = currentTour.dots[0];
 	//================================================================
+	
+	$.galleryPaging.text = "1/" + currentDot.gallery.length;
 };

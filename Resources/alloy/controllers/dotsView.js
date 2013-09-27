@@ -6,6 +6,7 @@ function Controller() {
             image: img
         });
         $.galleryLeft.setVisible(flag);
+        $.galleryPaging.setVisible(flag);
         $.galleryRight.setVisible(flag);
     }
     function bigPictureShow(flag) {
@@ -49,6 +50,7 @@ function Controller() {
         width: "auto",
         height: "auto",
         zIndex: 3,
+        userLocation: false,
         annotations: __alloyId0,
         id: "map",
         ns: Ti.Map,
@@ -122,6 +124,20 @@ function Controller() {
         id: "galleryLeft"
     });
     $.__views.dotContainer.add($.__views.galleryLeft);
+    $.__views.galleryPaging = Ti.UI.createLabel({
+        color: "white",
+        bottom: 80,
+        width: 30,
+        height: 30,
+        zIndex: 5,
+        visible: false,
+        font: {
+            fontSize: 8
+        },
+        textAlign: "center",
+        id: "galleryPaging"
+    });
+    $.__views.dotContainer.add($.__views.galleryPaging);
     $.__views.galleryRight = Ti.UI.createImageView({
         image: "images/dotsView/galleryControlsRight.png",
         bottom: 80,
@@ -143,17 +159,15 @@ function Controller() {
     };
     var galleryIndex = 0;
     Titanium.Geolocation.getCurrentPosition(function(e) {
-        Ti.Geolocation.purpose = "Hello, we need you coordinates to calculate distance.";
         if (e.error) Ti.API.info("T_T"); else {
             userPosition.latitude = e.coords.latitude;
             userPosition.longitude = e.coords.longitude;
         }
     });
     $.bigPicture.addEventListener("click", function() {
+        galleryShow(false);
         playerShow(false);
-        $.smallPicturePhoto.animate(smallImagePhotoStyle, function() {
-            galleryShow(false);
-        });
+        $.smallPicturePhoto.animate(smallImagePhotoStyle);
         $.smallPictureAudio.animate(smallImageAudioStyle);
         $.bigPicture.animate(bigImageStyle, function() {
             bigPictureShow(true);
@@ -169,11 +183,10 @@ function Controller() {
         $.smallPictureAudio.animate(smallImageAudioStyle);
     });
     $.smallPictureAudio.addEventListener("click", function() {
+        galleryShow(false);
         bigPictureShow(false);
         $.bigPicture.animate(smallImageAudioStyle);
-        $.smallPicturePhoto.animate(smallImagePhotoStyle, function() {
-            galleryShow(false);
-        });
+        $.smallPicturePhoto.animate(smallImagePhotoStyle);
         $.smallPictureAudio.animate(bigImageStyle, function() {
             playerShow(true);
         });
@@ -191,9 +204,8 @@ function Controller() {
         list.getView().open();
     });
     $.smallPictureCenter.addEventListener("click", function() {
-        $.smallPicturePhoto.animate(smallImagePhotoStyle, function() {
-            galleryShow(false);
-        });
+        galleryShow(false);
+        $.smallPicturePhoto.animate(smallImagePhotoStyle);
         $.smallPictureAudio.animate(smallImageAudioStyle, function() {
             playerShow(false);
         });
@@ -208,6 +220,7 @@ function Controller() {
             $.smallPicturePhoto.applyProperties({
                 image: currentDot.gallery[galleryIndex]
             });
+            $.galleryPaging.text = galleryIndex + 1 + "/" + currentDot.gallery.length;
         }
     });
     $.galleryRight.addEventListener("click", function() {
@@ -216,6 +229,7 @@ function Controller() {
             $.smallPicturePhoto.applyProperties({
                 image: currentDot.gallery[galleryIndex]
             });
+            $.galleryPaging.text = galleryIndex + 1 + "/" + currentDot.gallery.length;
         }
     });
     exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
@@ -227,6 +241,7 @@ function Controller() {
         controller = tourController;
         currentTour = tour;
         currentDot = currentTour.dots[0];
+        $.galleryPaging.text = "1/" + currentDot.gallery.length;
     };
     _.extend($, exports);
 }

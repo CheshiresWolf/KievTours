@@ -14,6 +14,7 @@
 		<ImageView id="smallPictureList" class="index"></ImageView>
 		<ImageView id="smallPictureCenter" class="index"></ImageView>
 		<ImageView id="galleryLeft"></ImageView>
+		<Label id="galleryPaging"></Label>
 		<ImageView id="galleryRight"></ImageView>
 	</View>
 </Alloy>

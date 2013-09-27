@@ -4,7 +4,8 @@
 "#map": {
 	width: "auto",
 	height: "auto",
-	zIndex: 3
+	zIndex: 3,
+	userLocation: false
 },
 ".mask": {
 	backgroundColor: "white",
@@ -26,6 +27,18 @@
 	height: 30,
 	zIndex: 5,
 	visible: false
+},
+"#galleryPaging": {
+	color: "white",
+	bottom: 80,
+	width: 30,
+	height: 30,
+	zIndex: 5,
+	visible: false,
+	font: {
+		fontSize: 8
+	},
+	textAlign: 'center'
 },
 "#galleryRight": {
 	image: "images/dotsView/galleryControlsRight.png",
