@@ -1,0 +1,39 @@
+"#container": {
+	backgroundColor: "white",
+	width: "auto",
+	height: "auto",
+	zIndex: 5,
+	top: Titanium.Platform.displayCaps.platformHeight
+},
+"#dotNumber": {
+	top: 0,
+	width: 15,
+	height: 15,
+	backgroundImage: "images/dotsList/TableNumber_off.png",
+	color: "white",
+	textAlign: "center",
+	font: {
+		fontSize: 8
+	}
+},
+"#dotTitle": {
+	top: 0,
+	height: 15,
+	font: {
+		fontSize: 10,
+		fontWeight: 'bold'  
+	}
+},
+"#Aa": {
+	image: "images/dotsView/Aa.png",
+	top: 20,
+	left: 5,
+	width: 20,
+	height: 20,
+	zIndex: 5
+},
+"#dotText": {
+	top: 20,
+	left: 30,
+	zIndex: 5
+}

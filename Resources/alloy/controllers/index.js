@@ -7,6 +7,7 @@ function Controller() {
     var $ = this;
     var exports = {};
     $.__views.window = Ti.UI.createWindow({
+        backgroundColor: "white",
         zIndex: 0,
         id: "window"
     });
@@ -21,6 +22,10 @@ function Controller() {
         id: "logo"
     });
     $.__views.window.add($.__views.logo);
+    $.__views.scrollView = Ti.UI.createScrollView({
+        id: "scrollView"
+    });
+    $.__views.window.add($.__views.scrollView);
     $.__views.paging = Ti.UI.createView({
         id: "paging"
     });

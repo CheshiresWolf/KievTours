@@ -19,6 +19,11 @@
 "#player": {
 	visible: false
 },
+"#gallery": {
+	visible: false,
+	zIndex: 3,
+	touchEnabled: false
+},
 "#galleryLeft": {
 	image: "images/dotsView/galleryControlsLeft.png",
 	bottom: 80,

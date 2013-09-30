@@ -1,5 +1,8 @@
-var controller, currentTour, currentDot;
+var controller, topPaging, currentTour, currentDot;
 var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
+
+//int position of last loaded photo from currentDot.gallery
+var alreadyLoaded = 0;
 
 var userPosition = {
 	latitude: 0,
@@ -81,15 +84,27 @@ $.smallPictureCenter.addEventListener("click", function(e) {
 $.galleryLeft.addEventListener("click", function(e) {
 	if (galleryIndex > 0) {
 		galleryIndex--;
-		$.smallPicturePhoto.applyProperties({image: currentDot.gallery[galleryIndex]});
+		$.gallery.scrollToView(galleryIndex);
+		//$.smallPicturePhoto.applyProperties({image: currentDot.gallery[galleryIndex]});
 		$.galleryPaging.text = (galleryIndex + 1) + "/" + currentDot.gallery.length;
 	}
 });
 
 $.galleryRight.addEventListener("click", function(e) {
-	if (galleryIndex < currentTour.dots[0].gallery.length - 1) {
+	if (galleryIndex < currentDot.gallery.length - 1) {
 		galleryIndex++;
-		$.smallPicturePhoto.applyProperties({image: currentDot.gallery[galleryIndex]});
+		
+		if (galleryIndex > alreadyLoaded) {
+			alreadyLoaded++;
+			
+			$.gallery.addView(Ti.UI.createImageView({
+				image: currentDot.gallery[galleryIndex], 
+				width: Titanium.Platform.displayCaps.platformWidth
+			}));
+		}
+		
+		$.gallery.scrollToView(galleryIndex);
+		//$.smallPicturePhoto.applyProperties({image: currentDot.gallery[galleryIndex]});
 		$.galleryPaging.text = (galleryIndex + 1) + "/" + currentDot.gallery.length;
 	}
 });
@@ -97,12 +112,14 @@ $.galleryRight.addEventListener("click", function(e) {
 function galleryShow(flag) {
 	var img = currentTour.img;
 	
-	if (flag) img = currentDot.gallery[galleryIndex];
+	if (flag) img = "";//currentDot.gallery[galleryIndex];
 	
 	$.smallPicturePhoto.applyProperties({image: img});
 	$.galleryLeft.setVisible(flag);
 	$.galleryPaging.setVisible(flag);
 	$.galleryRight.setVisible(flag);
+	$.gallery.setVisible(flag);
+	topPaging.setVisible(!flag);
 }
 
 function bigPictureShow(flag) {
@@ -149,10 +166,10 @@ exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
 	smallImageAudioStyle = smallAudioStyle;
 };
 
-exports.setController = function (tourController, tour) {
+exports.setController = function (tourController, tour, paging) {
 	controller = tourController;
 	currentTour = tour;
-	
+	topPaging = paging;
 	//temporary FIX ==================================================
 	currentDot = currentTour.dots[0];
 	//================================================================

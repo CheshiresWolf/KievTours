@@ -1,13 +1,15 @@
 function Controller() {
     function galleryShow(flag) {
         var img = currentTour.img;
-        flag && (img = currentDot.gallery[galleryIndex]);
+        flag && (img = "");
         $.smallPicturePhoto.applyProperties({
             image: img
         });
         $.galleryLeft.setVisible(flag);
         $.galleryPaging.setVisible(flag);
         $.galleryRight.setVisible(flag);
+        $.gallery.setVisible(flag);
+        topPaging.setVisible(!flag);
     }
     function bigPictureShow(flag) {
         var img = "";
@@ -113,6 +115,15 @@ function Controller() {
         id: "smallPictureCenter"
     });
     $.__views.dotContainer.add($.__views.smallPictureCenter);
+    var __alloyId1 = [];
+    $.__views.gallery = Ti.UI.createScrollableView({
+        visible: false,
+        zIndex: 3,
+        touchEnabled: false,
+        views: __alloyId1,
+        id: "gallery"
+    });
+    $.__views.dotContainer.add($.__views.gallery);
     $.__views.galleryLeft = Ti.UI.createImageView({
         image: "images/dotsView/galleryControlsLeft.png",
         bottom: 80,
@@ -151,8 +162,9 @@ function Controller() {
     $.__views.dotContainer.add($.__views.galleryRight);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var controller, currentTour, currentDot;
+    var controller, topPaging, currentTour, currentDot;
     var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
+    var alreadyLoaded = 0;
     var userPosition = {
         latitude: 0,
         longitude: 0
@@ -217,18 +229,21 @@ function Controller() {
     $.galleryLeft.addEventListener("click", function() {
         if (galleryIndex > 0) {
             galleryIndex--;
-            $.smallPicturePhoto.applyProperties({
-                image: currentDot.gallery[galleryIndex]
-            });
+            $.gallery.scrollToView(galleryIndex);
             $.galleryPaging.text = galleryIndex + 1 + "/" + currentDot.gallery.length;
         }
     });
     $.galleryRight.addEventListener("click", function() {
-        if (currentTour.dots[0].gallery.length - 1 > galleryIndex) {
+        if (currentDot.gallery.length - 1 > galleryIndex) {
             galleryIndex++;
-            $.smallPicturePhoto.applyProperties({
-                image: currentDot.gallery[galleryIndex]
-            });
+            if (galleryIndex > alreadyLoaded) {
+                alreadyLoaded++;
+                $.gallery.addView(Ti.UI.createImageView({
+                    image: currentDot.gallery[galleryIndex],
+                    width: Titanium.Platform.displayCaps.platformWidth
+                }));
+            }
+            $.gallery.scrollToView(galleryIndex);
             $.galleryPaging.text = galleryIndex + 1 + "/" + currentDot.gallery.length;
         }
     });
@@ -237,9 +252,10 @@ function Controller() {
         smallImagePhotoStyle = smallPhotoStyle;
         smallImageAudioStyle = smallAudioStyle;
     };
-    exports.setController = function(tourController, tour) {
+    exports.setController = function(tourController, tour, paging) {
         controller = tourController;
         currentTour = tour;
+        topPaging = paging;
         currentDot = currentTour.dots[0];
         $.galleryPaging.text = "1/" + currentDot.gallery.length;
     };

@@ -1,6 +1,7 @@
-var controller;
-var currentTour;
+var controller, currentTour, currentDot;
 var dotsView, audioView, scrollView;
+
+var isGallerySet = false;
 
 var platformWidth = Titanium.Platform.displayCaps.platformWidth;
 var bigSircleSize = platformWidth * 0.9; //90%
@@ -52,6 +53,8 @@ var smallSircleCenterStyle = {
 	left: platformWidth - (leftOffsetBig + bigSircleSize / 4.5),
 	zIndex: 5
 };
+
+//=======================================FUNCTIONS=======================================
 
 function addAnotation(dot, i) {
 	var annot = Titanium.Map.createAnnotation({
@@ -126,7 +129,7 @@ function createDotView() {
 	
 	dotsView = Alloy.createController("dotsView");
 	dotsView.setStyles(bigSircleStyle, smallSirclePhotoStyle, smallSircleAudioStyle);
-	dotsView.setController(controller, currentTour);
+	dotsView.setController(controller, currentTour, controller.getView("paging"));
 	audioView = Alloy.createController("audioPlayer");
 	audioView.initPlayer(bigSircleSize, currentTour.songPath);
 	
@@ -135,8 +138,8 @@ function createDotView() {
 	dotsView.getView("map").addEventListener("complete", function() {
 		if (!isComplete) {
 			dotsView.getView("map").region = {
-				latitude: currentTour.dots[0].latitude,
-				longitude: currentTour.dots[0].longitude,
+				latitude: currentDot.latitude,
+				longitude: currentDot.longitude,
 				latitudeDelta: 0.01,
 				longitudeDelta: 0.01
 			};
@@ -151,7 +154,8 @@ function createDotView() {
 	initMask();
 	
 	smallSirclePhotoStyle.image = currentTour.img;
-	dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
+	dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);	
+	dotsView.getView("gallery").addView(Ti.UI.createImageView({image: currentDot.gallery[0], width: Titanium.Platform.displayCaps.platformWidth}));
 	
 	dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);
 	
@@ -160,6 +164,12 @@ function createDotView() {
 	dotsView.getView("smallPictureList").applyProperties(smallSircleListStyle);
 	
 	dotsView.getView("smallPictureCenter").applyProperties(smallSircleCenterStyle);
+	
+	//dotsView.getView("dotText").applyProperties({bottom: -50});
+	//dotsView.getView("Aa").applyProperties({bottom: -5});
+	var dotText = Alloy.createController("dotsViewText");
+	dotText.initText(currentDot);
+	dotsView.getView("dotContainer").add(dotText.getView());
 	
 	return dotsView.getView();
 }
@@ -179,7 +189,10 @@ exports.initDotsView = function(newController, tour) {
 	
 	controller.getView("logo").applyProperties({image: "images/APP_Kiev_logo_green.png"});
 	
-	controller.getView("window").add(createDotView());
+	//controller.getView("window").add(createDotView());
+	controller.getView("scrollView").add(createDotView());
+	//var dotText = Alloy.createController("dotsViewText");
+	//controller.getView("scrollView").add(dotText.getView());
 	
 	var pagingArray = [], paging = controller.getView("paging"), dotsLength = currentTour.dots.length;
 	

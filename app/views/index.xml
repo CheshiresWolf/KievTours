@@ -1,7 +1,7 @@
 <Alloy>
 	<Window id="window">
 		<ImageView id="logo"></ImageView>
-		<!--<ScrollableView id="scrollView"></ScrollableView>-->
+		<ScrollView id="scrollView"></ScrollView>
 		<View id="paging"></View>
 	</Window>
 </Alloy>

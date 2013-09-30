@@ -1,4 +1,5 @@
 "#window": {
+	backgroundColor: "white",
 	zIndex: 0
 },
 "#logo": {

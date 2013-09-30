@@ -58,15 +58,15 @@ function createDotView() {
     currentDot = currentTour.dots[0];
     dotsView = Alloy.createController("dotsView");
     dotsView.setStyles(bigSircleStyle, smallSirclePhotoStyle, smallSircleAudioStyle);
-    dotsView.setController(controller, currentTour);
+    dotsView.setController(controller, currentTour, controller.getView("paging"));
     audioView = Alloy.createController("audioPlayer");
     audioView.initPlayer(bigSircleSize, currentTour.songPath);
     dotsView.getView("bigPicture").applyProperties(bigSircleStyle);
     dotsView.getView("map").addEventListener("complete", function() {
         if (!isComplete) {
             dotsView.getView("map").region = {
-                latitude: currentTour.dots[0].latitude,
-                longitude: currentTour.dots[0].longitude,
+                latitude: currentDot.latitude,
+                longitude: currentDot.longitude,
                 latitudeDelta: .01,
                 longitudeDelta: .01
             };
@@ -77,10 +77,17 @@ function createDotView() {
     initMask();
     smallSirclePhotoStyle.image = currentTour.img;
     dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
+    dotsView.getView("gallery").addView(Ti.UI.createImageView({
+        image: currentDot.gallery[0],
+        width: Titanium.Platform.displayCaps.platformWidth
+    }));
     dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);
     dotsView.getView("player").add(audioView.getView());
     dotsView.getView("smallPictureList").applyProperties(smallSircleListStyle);
     dotsView.getView("smallPictureCenter").applyProperties(smallSircleCenterStyle);
+    var dotText = Alloy.createController("dotsViewText");
+    dotText.initText(currentDot);
+    dotsView.getView("dotContainer").add(dotText.getView());
     return dotsView.getView();
 }
 
@@ -94,11 +101,11 @@ function openWindow() {
     controller.getView().open(leftSlide);
 }
 
-var controller;
-
-var currentTour;
+var controller, currentTour, currentDot;
 
 var dotsView, audioView, scrollView;
+
+var isGallerySet = false;
 
 var platformWidth = Titanium.Platform.displayCaps.platformWidth;
 
@@ -159,7 +166,7 @@ exports.initDotsView = function(newController, tour) {
     controller.getView("logo").applyProperties({
         image: "images/APP_Kiev_logo_green.png"
     });
-    controller.getView("window").add(createDotView());
+    controller.getView("scrollView").add(createDotView());
     var pagingArray = [], paging = controller.getView("paging"), dotsLength = currentTour.dots.length;
     for (var i = 0; dotsLength > i; i++) {
         pagingArray.push(Ti.UI.createImageView({
