@@ -134,7 +134,7 @@ function Controller() {
     exports.destroy = function() {};
     _.extend($, $.__views);
     $.backButton.addEventListener("click", function() {
-        $.window.close();
+        Alloy.Globals.closeWindow($.window);
     });
     exports.fillTable = function(dots, userPosition) {
         var tableData = [], flag = false;

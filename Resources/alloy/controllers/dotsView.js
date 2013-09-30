@@ -1,7 +1,7 @@
 function Controller() {
     function galleryShow(flag) {
         var img = currentTour.img;
-        flag && (img = currentDot.gallery[0]);
+        flag && (img = currentDot.gallery[galleryIndex]);
         $.smallPicturePhoto.applyProperties({
             image: img
         });
@@ -195,13 +195,13 @@ function Controller() {
         var list = Alloy.createController("dotsList");
         var menu = Alloy.createController("menuView");
         menu.getView("buttonTours").addEventListener("click", function() {
-            list.getView().close();
             controller.close();
+            Alloy.Globals.closeWindow(list.getView("window"));
         });
         list.getView("window").add(menu.getView("menuListener"));
         list.getView("window").add(menu.getView("menu"));
         list.fillTable(currentTour.dots, userPosition);
-        list.getView().open();
+        Alloy.Globals.openWindow(list.getView("window"));
     });
     $.smallPictureCenter.addEventListener("click", function() {
         galleryShow(false);

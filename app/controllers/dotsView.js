@@ -55,13 +55,13 @@ $.smallPictureList.addEventListener("click", function(e) {
 	var list = Alloy.createController("dotsList");
 	var menu = Alloy.createController("menuView");
 	menu.getView("buttonTours").addEventListener("click", function() {
-		list.getView().close();
 		controller.close();
+		Alloy.Globals.closeWindow(list.getView("window"));
 	});
 	list.getView("window").add(menu.getView("menuListener"));
 	list.getView("window").add(menu.getView("menu"));
 	list.fillTable(currentTour.dots, userPosition);
-	list.getView().open();
+	Alloy.Globals.openWindow(list.getView("window"));
 });
 
 $.smallPictureCenter.addEventListener("click", function(e) {
@@ -132,6 +132,15 @@ function centeringMap() {
 		latitudeDelta: 0.01,
 		longitudeDelta: 0.01
 	};
+}
+
+function openList(win) {
+	var leftSlide = Titanium.UI.createAnimation();
+    leftSlide.left = 0; // to put it back to the left side of the window
+    leftSlide.duration = 300;
+    win.getView("window").applyProperties({left: Titanium.Platform.displayCaps.platformWidth});
+    
+	win.getView().open(leftSlide);
 }
 
 exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {

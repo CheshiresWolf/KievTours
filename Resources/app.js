@@ -80,4 +80,21 @@ var tourViewProcedures = require("lib/tourViewProcedures");
 
 tourViewProcedures.initTourViews(index);
 
+Alloy.Globals.openWindow = function(win) {
+    var leftSlide = Titanium.UI.createAnimation();
+    leftSlide.left = 0;
+    leftSlide.duration = 300;
+    win.applyProperties({
+        left: Titanium.Platform.displayCaps.platformWidth
+    });
+    win.open(leftSlide);
+};
+
+Alloy.Globals.closeWindow = function(win) {
+    var rightSlide = Titanium.UI.createAnimation();
+    rightSlide.left = Titanium.Platform.displayCaps.platformWidth;
+    rightSlide.duration = 300;
+    win.close(rightSlide);
+};
+
 Alloy.createController("index");

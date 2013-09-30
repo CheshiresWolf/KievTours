@@ -84,6 +84,16 @@ function createDotView() {
     return dotsView.getView();
 }
 
+function openWindow() {
+    var leftSlide = Titanium.UI.createAnimation();
+    leftSlide.left = 0;
+    leftSlide.duration = 300;
+    controller.getView("window").applyProperties({
+        left: Titanium.Platform.displayCaps.platformWidth
+    });
+    controller.getView().open(leftSlide);
+}
+
 var controller;
 
 var currentTour;
@@ -171,7 +181,7 @@ exports.initDotsView = function(newController, tour) {
     });
     var menu = Alloy.createController("menuView");
     menu.getView("buttonTours").addEventListener("click", function() {
-        controller.close();
+        Alloy.Globals.closeWindow(controller.getView("window"));
     });
     controller.getView("window").add(menu.getView("menuListener"));
     controller.getView("window").add(menu.getView("menu"));
@@ -179,5 +189,5 @@ exports.initDotsView = function(newController, tour) {
         audioView.closePlayer();
         controller.getView().close();
     };
-    controller.getView().open();
+    Alloy.Globals.openWindow(controller.getView("window"));
 };

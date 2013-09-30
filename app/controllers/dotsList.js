@@ -1,10 +1,8 @@
 $.backButton.addEventListener("click", function() {
-	$.window.close();
+	Alloy.Globals.closeWindow($.window);
 });
 
 function createRow(flag, dot, i, distance) {
-	//Ti.API.info('dotPos: [' + dot.latitude + " | " + dot.longitude + "]");
-	//Ti.API.info('distance = ' + distance);
 	
 	var row = Titanium.UI.createTableViewRow({hasChild: true, height: 40});
 	

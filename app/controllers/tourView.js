@@ -37,7 +37,7 @@ $.button.addEventListener("click", function () {
 			listenerFlag++;
 		break;
 		case 2:
-			var newWindow = Alloy.createController("index");
+			var newWindow = Alloy.createController("index");			
 			var insideTourProcedures = require("lib/insideTourProcedures");
 			
 			insideTourProcedures.initDotsView(newWindow, currentTour);
