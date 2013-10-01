@@ -9,4 +9,14 @@
 	heigth: 50,
 	top: 15,
 	left: 15
+},
+"#paging": {
+	touchEnabled: false
+},
+"#scrollView": {
+	top: 0,
+	left: 0,
+	width: Titanium.Platform.displayCaps.platformWidth,
+	height: "auto",
+	layout: "vertical"
 }

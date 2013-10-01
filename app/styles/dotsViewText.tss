@@ -1,12 +1,18 @@
 "#container": {
+	top: 0,
 	backgroundColor: "white",
 	width: "auto",
 	height: "auto",
-	zIndex: 5,
-	top: Titanium.Platform.displayCaps.platformHeight
+	zIndex: 5
+},
+"#topContainer": {
+	top: 0,
+	layout: "horizontal",
+	width: "auto"
 },
 "#dotNumber": {
-	top: 0,
+	//top: 0,
+	left: 0,
 	width: 15,
 	height: 15,
 	backgroundImage: "images/dotsList/TableNumber_off.png",
@@ -17,23 +23,37 @@
 	}
 },
 "#dotTitle": {
-	top: 0,
-	height: 15,
+	//top: 0,
+	left: 30,
+	//height: 15,
 	font: {
-		fontSize: 10,
+		fontSize: 13,
 		fontWeight: 'bold'  
 	}
 },
 "#Aa": {
 	image: "images/dotsView/Aa.png",
-	top: 20,
-	left: 5,
-	width: 20,
-	height: 20,
+	top: 22,
+	left: 9,
+	width: 15,
+	height: 12,
 	zIndex: 5
 },
 "#dotText": {
-	top: 20,
+	height: "auto",
 	left: 30,
-	zIndex: 5
+	zIndex: 5,
+	font: {
+		fontSize: 10  
+	}
+},
+"#textContainer": {
+	layout: "vertical"
+},
+"#foter": {
+	backgroundColor: "red",
+	top: 0,
+	left: 0,
+	width: "auto",
+	height: 50
 }

@@ -20,5 +20,9 @@
 		<ImageView id="galleryLeft"></ImageView>
 		<Label id="galleryPaging"></Label>
 		<ImageView id="galleryRight"></ImageView>
+		
+		<View id="dotsPaging"></View>
+		
+		<!--View id="dotsDesc"></View-->
 	</View>
 </Alloy>

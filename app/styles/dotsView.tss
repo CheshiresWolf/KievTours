@@ -20,13 +20,17 @@
 	visible: false
 },
 "#gallery": {
+	top: 0,
+	left: 0,
+	width: "auto",
+	height: "auto",
 	visible: false,
 	zIndex: 3,
 	touchEnabled: false
 },
 "#galleryLeft": {
 	image: "images/dotsView/galleryControlsLeft.png",
-	bottom: 80,
+	//bottom: 80,
 	left: 10,
 	width: 10,
 	height: 30,
@@ -35,7 +39,7 @@
 },
 "#galleryPaging": {
 	color: "white",
-	bottom: 80,
+	//bottom: 80,
 	width: 30,
 	height: 30,
 	zIndex: 5,
@@ -47,10 +51,17 @@
 },
 "#galleryRight": {
 	image: "images/dotsView/galleryControlsRight.png",
-	bottom: 80,
+	//bottom: 80,
 	right: 10,
 	width: 10,
 	height: 30,
 	zIndex: 5,
 	visible: false
+},
+"#dotsPaging": {
+	zIndex: 4
+},
+"#dotsDesc": {
+	width: "auto",
+	zIndex: 5
 }

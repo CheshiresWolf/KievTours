@@ -1,4 +1,4 @@
-var controller, topPaging, currentTour, currentDot;
+var controller, currentTour, currentDot;
 var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
 
 //int position of last loaded photo from currentDot.gallery
@@ -23,9 +23,7 @@ Titanium.Geolocation.getCurrentPosition(function(e) {
 $.bigPicture.addEventListener("click", function(e) {
 	galleryShow(false);
 	playerShow(false);
-	$.smallPicturePhoto.animate(smallImagePhotoStyle);//, function() {
-	//	galleryShow(false);
-	//});
+	$.smallPicturePhoto.animate(smallImagePhotoStyle);
 	$.smallPictureAudio.animate(smallImageAudioStyle);
 	$.bigPicture.animate(bigImageStyle, function() {
 		bigPictureShow(true);
@@ -46,9 +44,7 @@ $.smallPictureAudio.addEventListener("click", function(e) {
 	galleryShow(false);
 	bigPictureShow(false);
 	$.bigPicture.animate(smallImageAudioStyle);
-	$.smallPicturePhoto.animate(smallImagePhotoStyle);//, function() {
-	//	galleryShow(false);
-	//});
+	$.smallPicturePhoto.animate(smallImagePhotoStyle);
 	$.smallPictureAudio.animate(bigImageStyle, function() {
 		playerShow(true);
 	});
@@ -69,9 +65,7 @@ $.smallPictureList.addEventListener("click", function(e) {
 
 $.smallPictureCenter.addEventListener("click", function(e) {
 	galleryShow(false);
-	$.smallPicturePhoto.animate(smallImagePhotoStyle);//, function() {
-	//	galleryShow(false);
-	//});
+	$.smallPicturePhoto.animate(smallImagePhotoStyle);
 	$.smallPictureAudio.animate(smallImageAudioStyle, function() {	
 		playerShow(false);
 	});
@@ -85,7 +79,6 @@ $.galleryLeft.addEventListener("click", function(e) {
 	if (galleryIndex > 0) {
 		galleryIndex--;
 		$.gallery.scrollToView(galleryIndex);
-		//$.smallPicturePhoto.applyProperties({image: currentDot.gallery[galleryIndex]});
 		$.galleryPaging.text = (galleryIndex + 1) + "/" + currentDot.gallery.length;
 	}
 });
@@ -98,13 +91,13 @@ $.galleryRight.addEventListener("click", function(e) {
 			alreadyLoaded++;
 			
 			$.gallery.addView(Ti.UI.createImageView({
-				image: currentDot.gallery[galleryIndex], 
+				image: currentDot.gallery[galleryIndex],
+				top: bigImageStyle.top, 
 				width: Titanium.Platform.displayCaps.platformWidth
 			}));
 		}
 		
 		$.gallery.scrollToView(galleryIndex);
-		//$.smallPicturePhoto.applyProperties({image: currentDot.gallery[galleryIndex]});
 		$.galleryPaging.text = (galleryIndex + 1) + "/" + currentDot.gallery.length;
 	}
 });
@@ -112,14 +105,14 @@ $.galleryRight.addEventListener("click", function(e) {
 function galleryShow(flag) {
 	var img = currentTour.img;
 	
-	if (flag) img = "";//currentDot.gallery[galleryIndex];
+	if (flag) img = "";
 	
 	$.smallPicturePhoto.applyProperties({image: img});
 	$.galleryLeft.setVisible(flag);
 	$.galleryPaging.setVisible(flag);
 	$.galleryRight.setVisible(flag);
 	$.gallery.setVisible(flag);
-	topPaging.setVisible(!flag);
+	$.dotsPaging.setVisible(!flag);
 }
 
 function bigPictureShow(flag) {
@@ -143,22 +136,18 @@ function playerShow(flag) {
 function centeringMap() {
 	$.map.region = {
 		//temporary FIX ====================================================================
-		latitude: currentTour.dots[0].latitude,
-		longitude: currentTour.dots[0].longitude,
+		latitude: currentDot.latitude,
+		longitude: currentDot.longitude,
 		//temporary FIX ====================================================================
 		latitudeDelta: 0.01,
 		longitudeDelta: 0.01
 	};
 }
 
-function openList(win) {
-	var leftSlide = Titanium.UI.createAnimation();
-    leftSlide.left = 0; // to put it back to the left side of the window
-    leftSlide.duration = 300;
-    win.getView("window").applyProperties({left: Titanium.Platform.displayCaps.platformWidth});
-    
-	win.getView().open(leftSlide);
-}
+exports.setDot = function(i) {
+	currentDot = currentTour.dots[i];
+	centeringMap();
+};
 
 exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
 	bigImageStyle = bigStyle;
@@ -166,10 +155,10 @@ exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
 	smallImageAudioStyle = smallAudioStyle;
 };
 
-exports.setController = function (tourController, tour, paging) {
+exports.setController = function (tourController, tour) {
 	controller = tourController;
 	currentTour = tour;
-	topPaging = paging;
+	
 	//temporary FIX ==================================================
 	currentDot = currentTour.dots[0];
 	//================================================================

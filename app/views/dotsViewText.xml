@@ -1,10 +1,13 @@
 <Alloy>
 	<View id="container">
-		<Label id="dotNumber">1</Label>
-		<Label id="dotTitle">title</Label>
+		<View id="topContainer">
+			<Label id="dotNumber">0</Label>
+			<Label id="dotTitle"></Label>
+		</View>
 		<ImageView id="Aa"></ImageView>
-		<Label id="dotText">
-			jjjjj jj jjjj jjjjj jjjjj jjjjj jjjjj jjjjj jjjjjjj jjjjj jjjjjj jjjjjj jjj jjjj jjjjj jjjjj jjjjj jjjjjj jjjjj jjjj jjjjjjj jjjjj jjjj jj jjjjjjj jj jjjj jjjjj jjj jjjjj jj jj jjjjj jj jjjj jjjjj jjjjj jjjjj jjjjj jjjjj jjjjjjj jjjjj jjjjjj jjjjjj jjj jjjj jjjjj jjjjj jjjjj jjjjjj jjjjj jjjj jjjjjjj jjjjj jjjj jj jjjjjjj jj jjjj jjjjj jjj jjjjj jj jj jjjjj jj jjjj jjjjj jjjjj jjjjj jjjjj jjjjj jjjjjjj jjjjj jjjjjj jjjjjj jjj jjjj jjjjj jjjjj jjjjj jjjjjj jjjjj jjjj jjjjjjj jjjjj jjjj jj jjjjjjj jj jjjj jjjjj jjj jjjjj jj jj jjjjj jj jjjj jjjjj jjjjj jjjjj jjjjj jjjjj jjjjjjj jjjjj jjjjjj jjjjjj jjj jjjj jjjjj jjjjj jjjjj jjjjjj jjjjj jjjj jjjjjjj jjjjj jjjj jj jjjjjjj jj jjjj jjjjj jjj jjjjj jj jj
-		</Label>
+		<View id="textContainer">
+			<Label id="dotText"></Label>
+			<View id="foter"></View>
+		</View>
 	</View>
 </Alloy>

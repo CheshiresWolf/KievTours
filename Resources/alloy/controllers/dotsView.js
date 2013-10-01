@@ -9,7 +9,7 @@ function Controller() {
         $.galleryPaging.setVisible(flag);
         $.galleryRight.setVisible(flag);
         $.gallery.setVisible(flag);
-        topPaging.setVisible(!flag);
+        $.dotsPaging.setVisible(!flag);
     }
     function bigPictureShow(flag) {
         var img = "";
@@ -29,8 +29,8 @@ function Controller() {
     }
     function centeringMap() {
         $.map.region = {
-            latitude: currentTour.dots[0].latitude,
-            longitude: currentTour.dots[0].longitude,
+            latitude: currentDot.latitude,
+            longitude: currentDot.longitude,
             latitudeDelta: .01,
             longitudeDelta: .01
         };
@@ -117,6 +117,10 @@ function Controller() {
     $.__views.dotContainer.add($.__views.smallPictureCenter);
     var __alloyId1 = [];
     $.__views.gallery = Ti.UI.createScrollableView({
+        top: 0,
+        left: 0,
+        width: "auto",
+        height: "auto",
         visible: false,
         zIndex: 3,
         touchEnabled: false,
@@ -126,7 +130,6 @@ function Controller() {
     $.__views.dotContainer.add($.__views.gallery);
     $.__views.galleryLeft = Ti.UI.createImageView({
         image: "images/dotsView/galleryControlsLeft.png",
-        bottom: 80,
         left: 10,
         width: 10,
         height: 30,
@@ -137,7 +140,6 @@ function Controller() {
     $.__views.dotContainer.add($.__views.galleryLeft);
     $.__views.galleryPaging = Ti.UI.createLabel({
         color: "white",
-        bottom: 80,
         width: 30,
         height: 30,
         zIndex: 5,
@@ -151,7 +153,6 @@ function Controller() {
     $.__views.dotContainer.add($.__views.galleryPaging);
     $.__views.galleryRight = Ti.UI.createImageView({
         image: "images/dotsView/galleryControlsRight.png",
-        bottom: 80,
         right: 10,
         width: 10,
         height: 30,
@@ -160,9 +161,14 @@ function Controller() {
         id: "galleryRight"
     });
     $.__views.dotContainer.add($.__views.galleryRight);
+    $.__views.dotsPaging = Ti.UI.createView({
+        zIndex: 4,
+        id: "dotsPaging"
+    });
+    $.__views.dotContainer.add($.__views.dotsPaging);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var controller, topPaging, currentTour, currentDot;
+    var controller, currentTour, currentDot;
     var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
     var alreadyLoaded = 0;
     var userPosition = {
@@ -240,6 +246,7 @@ function Controller() {
                 alreadyLoaded++;
                 $.gallery.addView(Ti.UI.createImageView({
                     image: currentDot.gallery[galleryIndex],
+                    top: bigImageStyle.top,
                     width: Titanium.Platform.displayCaps.platformWidth
                 }));
             }
@@ -247,15 +254,18 @@ function Controller() {
             $.galleryPaging.text = galleryIndex + 1 + "/" + currentDot.gallery.length;
         }
     });
+    exports.setDot = function(i) {
+        currentDot = currentTour.dots[i];
+        centeringMap();
+    };
     exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
         bigImageStyle = bigStyle;
         smallImagePhotoStyle = smallPhotoStyle;
         smallImageAudioStyle = smallAudioStyle;
     };
-    exports.setController = function(tourController, tour, paging) {
+    exports.setController = function(tourController, tour) {
         controller = tourController;
         currentTour = tour;
-        topPaging = paging;
         currentDot = currentTour.dots[0];
         $.galleryPaging.text = "1/" + currentDot.gallery.length;
     };

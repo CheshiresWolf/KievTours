@@ -23,10 +23,16 @@ function Controller() {
     });
     $.__views.window.add($.__views.logo);
     $.__views.scrollView = Ti.UI.createScrollView({
+        top: 0,
+        left: 0,
+        width: Titanium.Platform.displayCaps.platformWidth,
+        height: "auto",
+        layout: "vertical",
         id: "scrollView"
     });
     $.__views.window.add($.__views.scrollView);
     $.__views.paging = Ti.UI.createView({
+        touchEnabled: false,
         id: "paging"
     });
     $.__views.window.add($.__views.paging);
