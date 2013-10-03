@@ -1,9 +1,9 @@
 <Alloy>
 	<View id="container">
-		<View id="topContainer">
+		<!--View id="topContainer"-->
 			<Label id="dotNumber">0</Label>
-			<Label id="dotTitle"></Label>
-		</View>
+			<!--Label id="dotTitle">title</Label>
+		</View-->
 		<ImageView id="Aa"></ImageView>
 		<View id="textContainer">
 			<Label id="dotText"></Label>

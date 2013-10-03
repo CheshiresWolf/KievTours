@@ -59,7 +59,17 @@ $.smallPictureList.addEventListener("click", function(e) {
 	});
 	list.getView("window").add(menu.getView("menuListener"));
 	list.getView("window").add(menu.getView("menu"));
-	list.fillTable(currentTour.dots, userPosition);
+	list.fillTable(currentTour.dots, userPosition, controller.getIndex());
+	list.getView("table").addEventListener("click", function(e) {
+		//===================================================================================
+		//Ti.API.info("clicked | " + e.index);
+		//Ti.API.info("id: " + e.row.dotNameLabel);
+		//===================================================================================
+	    controller.setIndex(e.index);
+
+	    Alloy.Globals.closeWindow(list.getView("window"));
+
+	});
 	Alloy.Globals.openWindow(list.getView("window"));
 });
 
@@ -135,10 +145,8 @@ function playerShow(flag) {
 
 function centeringMap() {
 	$.map.region = {
-		//temporary FIX ====================================================================
 		latitude: currentDot.latitude,
 		longitude: currentDot.longitude,
-		//temporary FIX ====================================================================
 		latitudeDelta: 0.01,
 		longitudeDelta: 0.01
 	};
@@ -147,6 +155,8 @@ function centeringMap() {
 exports.setDot = function(i) {
 	currentDot = currentTour.dots[i];
 	centeringMap();
+	
+	$.galleryPaging.text = "1/" + currentDot.gallery.length;
 };
 
 exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
@@ -158,10 +168,4 @@ exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
 exports.setController = function (tourController, tour) {
 	controller = tourController;
 	currentTour = tour;
-	
-	//temporary FIX ==================================================
-	currentDot = currentTour.dots[0];
-	//================================================================
-	
-	$.galleryPaging.text = "1/" + currentDot.gallery.length;
 };

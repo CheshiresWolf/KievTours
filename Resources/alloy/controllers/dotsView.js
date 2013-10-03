@@ -53,6 +53,7 @@ function Controller() {
         height: "auto",
         zIndex: 3,
         userLocation: false,
+        hideAnnotationWhenTouchMap: true,
         annotations: __alloyId0,
         id: "map",
         ns: Ti.Map,
@@ -218,7 +219,11 @@ function Controller() {
         });
         list.getView("window").add(menu.getView("menuListener"));
         list.getView("window").add(menu.getView("menu"));
-        list.fillTable(currentTour.dots, userPosition);
+        list.fillTable(currentTour.dots, userPosition, controller.getIndex());
+        list.getView("table").addEventListener("click", function(e) {
+            controller.setIndex(e.index);
+            Alloy.Globals.closeWindow(list.getView("window"));
+        });
         Alloy.Globals.openWindow(list.getView("window"));
     });
     $.smallPictureCenter.addEventListener("click", function() {
@@ -257,6 +262,7 @@ function Controller() {
     exports.setDot = function(i) {
         currentDot = currentTour.dots[i];
         centeringMap();
+        $.galleryPaging.text = "1/" + currentDot.gallery.length;
     };
     exports.setStyles = function(bigStyle, smallPhotoStyle, smallAudioStyle) {
         bigImageStyle = bigStyle;
@@ -266,8 +272,6 @@ function Controller() {
     exports.setController = function(tourController, tour) {
         controller = tourController;
         currentTour = tour;
-        currentDot = currentTour.dots[0];
-        $.galleryPaging.text = "1/" + currentDot.gallery.length;
     };
     _.extend($, exports);
 }

@@ -5,7 +5,8 @@
 	width: "auto",
 	height: "auto",
 	zIndex: 3,
-	userLocation: false
+	userLocation: false,
+	hideAnnotationWhenTouchMap: true
 },
 ".mask": {
 	backgroundColor: "white",

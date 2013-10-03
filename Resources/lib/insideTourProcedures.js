@@ -1,24 +1,69 @@
+function changeDot(id) {
+    var bufAnnotImage = Ti.UI.createLabel({
+        text: activeDotIndex,
+        width: 35,
+        height: 55,
+        backgroundImage: "images/dotsView/MapPin_off.png",
+        textAlign: "center",
+        font: {
+            fontSize: 10
+        }
+    });
+    pagingArray[activeDotIndex].applyProperties({
+        image: "images/Radio_bullets_off.png"
+    });
+    annotationArray[activeDotIndex].applyProperties({
+        image: bufAnnotImage.toImage()
+    });
+    Ti.API.info("Old id: " + activeDotIndex + " | New id: " + id);
+    activeDotIndex = id;
+    bufAnnotImage = Ti.UI.createLabel({
+        text: activeDotIndex,
+        width: 35,
+        height: 55,
+        backgroundImage: "images/dotsView/MapPin_on.png",
+        textAlign: "center",
+        font: {
+            fontSize: 10
+        }
+    });
+    pagingArray[activeDotIndex].applyProperties({
+        image: "images/Radio_bullets_on.png"
+    });
+    annotationArray[activeDotIndex].applyProperties({
+        image: bufAnnotImage.toImage()
+    });
+    dotsView.setDot(activeDotIndex);
+    controller.getView("scrollView").remove(dotText.getView());
+    dotText = Alloy.createController("dotsViewText");
+    dotText.initText(currentTour.dots[activeDotIndex], controller.getView("scrollView"));
+    controller.getView("scrollView").add(dotText.getView());
+}
+
 function addAnotation(dot, i) {
+    var image = "images/dotsView/MapPin_off.png";
+    0 === i && (image = "images/dotsView/MapPin_on.png");
+    var annotImage = Ti.UI.createLabel({
+        text: i,
+        width: 35,
+        height: 55,
+        backgroundImage: image,
+        textAlign: "center",
+        font: {
+            fontSize: 10
+        }
+    });
     var annot = Titanium.Map.createAnnotation({
         title: currentTour.dots[i].name,
+        image: annotImage.toImage(),
         latitude: dot.latitude,
         longitude: dot.longitude,
         myid: i
     });
     annot.addEventListener("click", function(evt) {
-        pagingArray[activeDotIndex].applyProperties({
-            image: "images/Radio_bullets_off.png"
-        });
-        activeDotIndex = evt.annotation.myid;
-        pagingArray[evt.annotation.myid].applyProperties({
-            image: "images/Radio_bullets_on.png"
-        });
-        dotsView.setDot(evt.annotation.myid);
-        controller.getView("scrollView").remove(dotText.getView());
-        dotText = Alloy.createController("dotsViewText");
-        dotText.initText(currentTour.dots[evt.annotation.myid], controller.getView("scrollView"));
-        controller.getView("scrollView").add(dotText.getView());
+        changeDot(evt.annotation.myid);
     });
+    annotationArray.push(annot);
     dotsView.getView("map").addAnnotation(annot);
 }
 
@@ -62,11 +107,11 @@ function initMask() {
 }
 
 function createDotView() {
-    var i = 0;
-    var isComplete;
+    var isComplete = false;
     dotsView = Alloy.createController("dotsView");
     dotsView.setStyles(bigSircleStyle, smallSirclePhotoStyle, smallSircleAudioStyle);
     dotsView.setController(controller, currentTour);
+    dotsView.setDot(0);
     audioView = Alloy.createController("audioPlayer");
     audioView.initPlayer(bigSircleSize, currentTour.songPath);
     dotsView.getView("bigPicture").applyProperties(bigSircleStyle);
@@ -78,7 +123,8 @@ function createDotView() {
                 latitudeDelta: .01,
                 longitudeDelta: .01
             };
-            for (i = 0; currentTour.dots.length > i; i++) addAnotation(currentTour.dots[i], i);
+            var i = 0, tourDotsLength = currentTour.dots.length;
+            for (i; tourDotsLength > i; i++) addAnotation(currentTour.dots[i], i);
             isComplete = true;
         }
     });
@@ -104,25 +150,28 @@ function createDotView() {
     dotsView.getView("player").add(audioView.getView());
     dotsView.getView("smallPictureList").applyProperties(smallSircleListStyle);
     dotsView.getView("smallPictureCenter").applyProperties(smallSircleCenterStyle);
-    var paging = dotsView.getView("dotsPaging"), dotsLength = currentTour.dots.length;
-    for (var i = 0; dotsLength > i; i++) {
+    var paging = dotsView.getView("dotsPaging"), pagingI = 0, dotsLength = currentTour.dots.length;
+    for (pagingI; dotsLength > pagingI; pagingI++) {
         pagingArray.push(Ti.UI.createImageView({
             top: 0,
             width: 5,
             height: 5,
-            left: 10 * i,
+            left: 10 * pagingI,
             image: "images/Radio_bullets_off.png"
         }));
-        paging.add(pagingArray[i]);
+        paging.add(pagingArray[pagingI]);
     }
     paging.applyProperties({
         top: topOffsetBig + bigSircleSize + 25,
         width: 10 * pagingArray.length,
         height: 5
     });
-    activeDotIndex = 0;
+    Ti.API.info("Paging array length: " + pagingArray.length);
     pagingArray[0].applyProperties({
         image: "images/Radio_bullets_on.png"
+    });
+    dotsView.getView().applyProperties({
+        height: topOffsetBig + bigSircleSize + 50
     });
     return dotsView.getView();
 }
@@ -131,9 +180,9 @@ var controller, currentTour;
 
 var dotsView, audioView, dotText;
 
-var pagingArray = [];
+var pagingArray = [], annotationArray = [];
 
-var activeDotIndex;
+var activeDotIndex = 0;
 
 var isGallerySet = false;
 
@@ -193,21 +242,33 @@ var smallSircleCenterStyle = {
 exports.initDotsView = function(newController, tour) {
     controller = newController;
     currentTour = tour;
+    controller.close = function() {
+        audioView.closePlayer();
+        Alloy.Globals.closeWindow(controller.getView("window"));
+        pagingArray = [];
+        annotationArray = [];
+        isGallerySet = false;
+        activeDotIndex = 0;
+    };
+    controller.getIndex = function() {
+        return activeDotIndex;
+    };
+    controller.setIndex = function(id) {
+        changeDot(id);
+        dotsView.getView("map").selectAnnotation(annotationArray[id]);
+    };
     controller.getView("logo").applyProperties({
         image: "images/APP_Kiev_logo_green.png"
     });
     controller.getView("scrollView").add(createDotView());
     dotText = Alloy.createController("dotsViewText");
+    dotText.initText(currentTour.dots[0]);
     controller.getView("scrollView").add(dotText.getView());
     var menu = Alloy.createController("menuView");
     menu.getView("buttonTours").addEventListener("click", function() {
-        Alloy.Globals.closeWindow(controller.getView("window"));
+        controller.close();
     });
     controller.getView("window").add(menu.getView("menuListener"));
     controller.getView("window").add(menu.getView("menu"));
-    controller.close = function() {
-        audioView.closePlayer();
-        controller.getView().close();
-    };
     Alloy.Globals.openWindow(controller.getView("window"));
 };

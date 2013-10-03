@@ -1,15 +1,47 @@
 function Controller() {
-    function refreshScroll() {
-        $.container.removeEventListener("postlayout", refreshScroll);
-        $.topContainer.applyProperties({
-            left: (Titanium.Platform.displayCaps.platformWidth - $.topContainer.toImage().width) / 2
-        });
-        $.textContainer.applyProperties({
-            top: $.dotTitle.toImage().height + 10
-        });
-        $.Aa.applyProperties({
-            top: $.dotTitle.toImage().height + 10
-        });
+    function showTitleAndGetSize(text) {
+        var globalHeight = 0, maxWidth = 0;
+        var splitBuf = text.split(" "), bufNew = "", bufOld = "";
+        var i = 0, splitLength = splitBuf.length;
+        var approvedLabel;
+        for (i; splitLength > i; i++) {
+            0 !== i && (bufNew += " ");
+            bufNew += splitBuf[i];
+            if (Ti.UI.createLabel({
+                text: bufNew
+            }).toImage().width > 280) {
+                approvedLabel = Ti.UI.createLabel({
+                    text: bufOld,
+                    top: globalHeight,
+                    font: {
+                        fontSize: 13,
+                        fontWeight: "bold"
+                    }
+                });
+                $.container.add(approvedLabel);
+                bufOld = "";
+                bufNew = splitBuf[i];
+                globalHeight += approvedLabel.toImage().height;
+                approvedLabel.toImage().width > maxWidth && (maxWidth = approvedLabel.toImage().width);
+            } else bufOld = bufNew;
+            if (i === splitLength - 1) {
+                approvedLabel = Ti.UI.createLabel({
+                    text: bufNew,
+                    top: globalHeight,
+                    font: {
+                        fontSize: 13,
+                        fontWeight: "bold"
+                    }
+                });
+                $.container.add(approvedLabel);
+                globalHeight += approvedLabel.toImage().height;
+                approvedLabel.toImage().width > maxWidth && (maxWidth = approvedLabel.toImage().width);
+            }
+        }
+        return {
+            height: globalHeight,
+            width: maxWidth
+        };
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "dotsViewText";
@@ -21,21 +53,12 @@ function Controller() {
     $.__views.container = Ti.UI.createView({
         top: 0,
         backgroundColor: "white",
-        width: "auto",
-        height: "auto",
         zIndex: 5,
         id: "container"
     });
     $.__views.container && $.addTopLevelView($.__views.container);
-    $.__views.topContainer = Ti.UI.createView({
-        top: 0,
-        layout: "horizontal",
-        width: "auto",
-        id: "topContainer"
-    });
-    $.__views.container.add($.__views.topContainer);
     $.__views.dotNumber = Ti.UI.createLabel({
-        left: 0,
+        top: 0,
         width: 15,
         height: 15,
         backgroundImage: "images/dotsList/TableNumber_off.png",
@@ -47,16 +70,7 @@ function Controller() {
         text: "0",
         id: "dotNumber"
     });
-    $.__views.topContainer.add($.__views.dotNumber);
-    $.__views.dotTitle = Ti.UI.createLabel({
-        left: 30,
-        font: {
-            fontSize: 13,
-            fontWeight: "bold"
-        },
-        id: "dotTitle"
-    });
-    $.__views.topContainer.add($.__views.dotTitle);
+    $.__views.container.add($.__views.dotNumber);
     $.__views.Aa = Ti.UI.createImageView({
         image: "images/dotsView/Aa.png",
         top: 22,
@@ -83,7 +97,6 @@ function Controller() {
     });
     $.__views.textContainer.add($.__views.dotText);
     $.__views.foter = Ti.UI.createView({
-        backgroundColor: "red",
         top: 0,
         left: 0,
         width: "auto",
@@ -93,20 +106,22 @@ function Controller() {
     $.__views.textContainer.add($.__views.foter);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var scroll;
-    exports.initText = function(dot, sc) {
-        scroll = sc;
+    var maxWidth = Titanium.Platform.displayCaps.platformWidth - 40;
+    exports.initText = function(dot) {
         $.dotNumber.text = dot.number;
-        $.dotTitle.text = dot.name;
         $.dotText.text = dot.text;
-        $.dotTitle.applyProperties({
-            width: Titanium.Platform.displayCaps.platformWidth - 40
+        var title = showTitleAndGetSize(dot.name);
+        $.dotNumber.applyProperties({
+            left: (Titanium.Platform.displayCaps.platformWidth - title.width) / 2 - 20
         });
         $.dotText.applyProperties({
-            width: Titanium.Platform.displayCaps.platformWidth - 40
+            top: title.height + 10,
+            width: maxWidth
+        });
+        $.Aa.applyProperties({
+            top: title.height + 12
         });
     };
-    $.container.addEventListener("postlayout", refreshScroll);
     _.extend($, exports);
 }
 

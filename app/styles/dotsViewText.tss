@@ -1,18 +1,15 @@
 "#container": {
 	top: 0,
 	backgroundColor: "white",
-	width: "auto",
-	height: "auto",
+	//width: "auto",
+	//height: "auto",
 	zIndex: 5
 },
-"#topContainer": {
-	top: 0,
-	layout: "horizontal",
-	width: "auto"
-},
+//"#topContainer": {
+//	top: 0
+//},
 "#dotNumber": {
-	//top: 0,
-	left: 0,
+	top: 0,
 	width: 15,
 	height: 15,
 	backgroundImage: "images/dotsList/TableNumber_off.png",
@@ -23,9 +20,9 @@
 	}
 },
 "#dotTitle": {
-	//top: 0,
-	left: 30,
-	//height: 15,
+	top: 0,
+	width: "auto",
+	height: "auto",
 	font: {
 		fontSize: 13,
 		fontWeight: 'bold'  
@@ -51,7 +48,7 @@
 	layout: "vertical"
 },
 "#foter": {
-	backgroundColor: "red",
+	//backgroundColor: "red",
 	top: 0,
 	left: 0,
 	width: "auto",

@@ -1,5 +1,5 @@
 function Controller() {
-    function createRow(flag, dot, i, distance) {
+    function createRow(flag, dot, i, distance, currentI) {
         var row = Titanium.UI.createTableViewRow({
             hasChild: true,
             height: 40
@@ -27,8 +27,10 @@ function Controller() {
             zIndex: 4
         });
         row.add(distanceLabel);
+        var numberImg = "images/dotsList/TableNumber_off.png";
+        i === currentI && (numberImg = "images/dotsList/TableNumber_on.png");
         var dotNumber = Titanium.UI.createImageView({
-            image: "images/dotsList/TableNumber_off.png",
+            image: numberImg,
             width: 20,
             height: 20,
             left: 50,
@@ -136,11 +138,11 @@ function Controller() {
     $.backButton.addEventListener("click", function() {
         Alloy.Globals.closeWindow($.window);
     });
-    exports.fillTable = function(dots, userPosition) {
+    exports.fillTable = function(dots, userPosition, index) {
         var tableData = [], flag = false;
         for (var i = 0; dots.length > i; i++) {
             i === dots.length - 1 && (flag = true);
-            tableData.push(createRow(flag, dots[i], i, distance(userPosition, dots[i])));
+            tableData.push(createRow(flag, dots[i], i, distance(userPosition, dots[i]), index));
         }
         $.table.data = tableData;
     };
