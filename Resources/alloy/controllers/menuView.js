@@ -87,6 +87,11 @@ function Controller() {
             menuFlag = false;
         }
     });
+    $.buttonMore.addEventListener("click", function() {
+        var more = Alloy.createController("more");
+        more.fillTable();
+        Alloy.Globals.openWindow(more.getView());
+    });
     _.extend($, exports);
 }
 

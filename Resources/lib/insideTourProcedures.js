@@ -15,7 +15,6 @@ function changeDot(id) {
     annotationArray[activeDotIndex].applyProperties({
         image: bufAnnotImage.toImage()
     });
-    Ti.API.info("Old id: " + activeDotIndex + " | New id: " + id);
     activeDotIndex = id;
     bufAnnotImage = Ti.UI.createLabel({
         text: activeDotIndex,
@@ -68,7 +67,6 @@ function addAnotation(dot, i) {
 }
 
 function initMask() {
-    Ti.API.info("INIT");
     dotsView.getView("maskCenter").applyProperties({
         width: bigSircleSize,
         height: bigSircleSize,
@@ -166,7 +164,6 @@ function createDotView() {
         width: 10 * pagingArray.length,
         height: 5
     });
-    Ti.API.info("Paging array length: " + pagingArray.length);
     pagingArray[0].applyProperties({
         image: "images/Radio_bullets_on.png"
     });

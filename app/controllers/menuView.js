@@ -26,3 +26,10 @@ $.menuListener.addEventListener("click", function(e) {
 		menuFlag = false;
 	}
 });
+
+$.buttonMore.addEventListener("click", function() {
+	var more = Alloy.createController("more");
+	more.fillTable();
+	
+	Alloy.Globals.openWindow(more.getView());
+});
