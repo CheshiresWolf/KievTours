@@ -1,4 +1,4 @@
-function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, backgroundImage, tourPrice, songPath) {
+function Tour(tourImage, tourTitle, tourText, fileSize, timeLength, backgroundImage, tourPrice, songPath) {
     this.img = tourImage;
     this.title = tourTitle;
     this.text = tourText;
@@ -12,9 +12,59 @@ function Tour(tourImage, tourTitle, tourText, fileSize, tourDots, timeLength, ba
     this.isDownloaded = false;
 }
 
+function getPhoto(id, index) {
+    Cloud.Photos.query({
+        where: {
+            tags_array: id
+        }
+    }, function(e) {
+        if (e.success) {
+            tours[index].background = e.photos[0].urls.original;
+            Ti.API.info("IMAGE SET to " + index);
+            starter();
+        } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
+    });
+}
+
+function getAudio(id, index) {
+    Cloud.Files.query({
+        where: {
+            id: id
+        }
+    }, function(e) {
+        if (e.success) {
+            tours[index].songPath = e.files[0].url;
+            Ti.API.info("FILE SET to " + index);
+            starter();
+        } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
+    });
+}
+
+function starter() {
+    counter--;
+    if (0 >= counter) {
+        var index = Alloy.createController("index");
+        var tourViewProcedures = require("lib/tourViewProcedures");
+        tourViewProcedures.initTourViews(index);
+    }
+}
+
+function addTour(tour, index) {
+    var bufTour = new Tour(tour.photo.urls.original, tour.name, tour.text, tour.audio_size, tour.audio_length, null, tour.price, null);
+    getPhoto(tour.id, index);
+    getAudio(tour.audio_id, index);
+    tours.push(bufTour);
+}
+
 var Alloy = require("alloy"), _ = Alloy._, Backbone = Alloy.Backbone;
 
 Ti.API.info("alloy.js start");
+
+var Cloud = require("ti.cloud");
+
+var tours = [], i = 0, counter = 0;
+
+Cloud.debug = true;
 
 Tour.prototype.buy = function() {
     this.isBuyed = true;
@@ -24,69 +74,23 @@ Tour.prototype.download = function() {
     this.isDownloaded = true;
 };
 
-var tours = [];
-
-var gallery = [];
-
-gallery.push("bufTour/bufGallery/SmallSircleBuf.png");
-
-gallery.push("bufTour/bufGallery/SmallSircleBuf2.png");
-
-gallery.push("bufTour/bufGallery/SmallSircleBuf3.png");
-
-gallery.push("bufTour/bufGallery/SmallSircleBuf4.png");
-
-var buf = new Tour("images/SmallSircle.png", "Жемчужины Печерска", "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99, "bufTour/song.mp3");
-
-buf.dots.push({
-    number: 0,
-    name: "Особняк по ул. Шелковичная 19",
-    text: "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.",
-    gallery: gallery,
-    latitude: 50.4635,
-    longitude: 30.3718
+Cloud.Users.login({
+    login: "guest@gmail.com",
+    password: "12345"
+}, function(e) {
+    e.success ? Cloud.Objects.query({
+        classname: "Tour"
+    }, function(ee) {
+        if (ee.success) {
+            counter = 2 * ee.Tour.length;
+            for (i = 0; ee.Tour.length > i; i++) addTour(ee.Tour[i], i);
+        } else alert("Error: " + (ee.error && ee.message || JSON.stringify(ee)));
+    }) : alert("Login Error: " + (e.error && e.message || JSON.stringify(e)));
 });
-
-buf.dots.push({
-    number: 1,
-    name: "Мост благородных девиц",
-    text: "Мост с девицами",
-    gallery: gallery,
-    latitude: 50.466,
-    longitude: 30.3718
-});
-
-buf.dots.push({
-    number: 2,
-    name: "Мариинский парк и его достопримечательности",
-    text: "Парк с достопримечательностями",
-    gallery: gallery,
-    latitude: 50.47,
-    longitude: 30.3718
-});
-
-buf.dots.push({
-    number: 3,
-    name: "Пряничный домик",
-    text: "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.",
-    gallery: gallery,
-    latitude: 50.46,
-    longitude: 30.3718
-});
-
-tours.push(buf);
-
-tours.push(new Tour("images/SmallSircle.png", "Жемчужины Печерска", "Полное описание тура к Югу от Киева, между притоками Днепра, рек Коник и Вита, расположен Жуков остров. Вы увидите то, что осталось от когда-то секретного обьекта.", 125, null, "2:10", "images/APP_Kiev_background.png", 9.99, "bufTour/song.mp3"));
 
 Alloy.Globals.getTours = function() {
     return tours;
 };
-
-var index = Alloy.createController("index");
-
-var tourViewProcedures = require("lib/tourViewProcedures");
-
-tourViewProcedures.initTourViews(index);
 
 Alloy.Globals.openWindow = function(win) {
     var leftSlide = Titanium.UI.createAnimation();
