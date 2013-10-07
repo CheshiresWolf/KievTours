@@ -1,4 +1,11 @@
 function Controller() {
+    function pressButton(img) {
+        $.button.applyProperties({
+            image: img
+        });
+        listenerFlag++;
+        Ti.API.info("pressButton");
+    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "tourView";
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -207,19 +214,11 @@ function Controller() {
     $.button.addEventListener("click", function() {
         switch (listenerFlag) {
           case 0:
-            currentTour.buy();
-            $.button.applyProperties({
-                image: "images/tourView/Download_Button.png"
-            });
-            listenerFlag++;
+            currentTour.buy(pressButton);
             break;
 
           case 1:
-            currentTour.download();
-            $.button.applyProperties({
-                image: "images/tourView/Play_Button.png"
-            });
-            listenerFlag++;
+            currentTour.download(pressButton);
             break;
 
           case 2:

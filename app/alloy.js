@@ -15,22 +15,160 @@ Ti.API.info("alloy.js start");
 //===========================================
 
 var Cloud = require("ti.cloud");
-var tours = [], i = 0, counter = 0;
+var starter, dotViewStarter;
 
 Cloud.debug = true;
 
-function Tour(tourImage, tourTitle, tourText, fileSize, timeLength, backgroundImage, tourPrice, songPath) {
+//=================================<Starter>================================
+//wait when we get all tours
+function Starter(toursAmount) {
+	this.size = toursAmount;
+	this.tours = [];
+	//callback function can use it when calling the other method
+	//this.starter = this;
+}
+
+Starter.prototype.addTour = function(tour) {
+	this.tours.push(tour);
+	
+	if (this.tours.length === this.size) {
+		var index = Alloy.createController("index");
+		var tourViewProcedures = require("lib/tourViewProcedures");
+		tourViewProcedures.initTourViews(index);
+	}
+};
+//=================================</Starter>================================
+
+//=================================<DotViewStarter>================================
+
+function DotViewStarter(pressButton, currentTour) {
+	this.done = pressButton;
+	this.tour = currentTour;
+	
+	this.size = currentTour.tourPath.length;
+	this.index = 0;
+}
+
+DotViewStarter.prototype.loadDots = function() {
+	var starter = this;
+	getAudio(this.tour);
+	
+	Cloud.Places.query({
+		where: {
+			tags_array: this.tour.id
+		}
+	}, function(e) {
+		if (e.success) {
+			var i = 0;
+			
+			this.size = e.places.length;
+			
+			//=============================================<<<<<<<<<<
+			Ti.API.info('load dots; length = ' + this.size);
+			//=============================================<<<<<<<<<<
+			
+			for (i; i < this.size; i++) {
+				starter.createDot(e.places[i]);
+			}
+	    } else {
+			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));  
+	    }
+	});
+};
+
+DotViewStarter.prototype.createDot = function(place) {
+	var starter = this;
+	
+	Cloud.PhotoCollections.showPhotos({
+		collection_id: place.custom_fields.collection_id
+	}, function (e) {
+	    if (e.success) {
+	        if (!e.photos) {
+	            alert('Success: No photos');
+	        } else {
+
+				//=============================================<<<<<<<<<<
+				Ti.API.info('createDot');
+				//=============================================<<<<<<<<<<
+				
+	            starter.saveDot({
+					id: place.id,
+					name: place.name,
+					text: place.text,
+					cover: place.photo.urls.original,
+					gallery: createPhotoArray(e.photos),
+					latitude: place.custom_fields.coordinates[1],
+					longitude: place.custom_fields.coordinates[0]
+	            });
+	        }
+	    } else {
+	        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+	    }
+	});
+};
+
+DotViewStarter.prototype.saveDot = function(dot) {	
+	var i = this.tour.tourPath.indexOf(dot.id);
+	this.tour.dots[i] = dot;
+	this.index++;
+	
+	//=============================================<<<<<<<<<<
+	Ti.API.info("saveDot [ " + this.index + " | " + this.size + " ]");
+	//=============================================<<<<<<<<<<
+	
+	if (this.index === this.size) {
+		//=============================================<<<<<<<<<<
+		Ti.API.info('DONNNNNEN');
+		//=============================================<<<<<<<<<<
+		this.tour.isDownloaded = true;
+		this.done("images/tourView/Play_Button.png");
+	}
+};
+
+
+function getAudio(tour) {
+	Cloud.Files.query({
+	    where: {
+	        id: tour.audio_id
+	    }
+	}, function (e) {
+	    if (e.success) {
+			tour.songPath = e.files[0].url;
+	    } else {
+			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));  
+	    }
+	});
+}
+
+function createPhotoArray(oldArray) {
+	var photoArray = [], i = 0;
+	
+	for (i; i < oldArray.length; i++) {
+		photoArray.push(oldArray[i].urls.original);
+	}
+	
+	return photoArray;
+}
+
+//=================================</DotViewStarter>================================
+
+//=================================<Tour>================================
+
+function Tour(tourId, tourImage, backgroundImage, tourTitle, tourText, fileSize, audioLength, tourPrice, dotsPath) {
+	
+	this.id = tourId; //id in cloud
 	this.img = tourImage;
+	this.background = backgroundImage;
 	this.title = tourTitle;
 	this.text = tourText;
 	this.size = fileSize;
-	this.dots = [];
-	this.time = timeLength;
-	this.background = backgroundImage;
+	this.time = audioLength;
 	this.price = tourPrice;
-	this.songPath = songPath;
+	this.songPath = "";
+	this.dots = [];
+	this.tourPath = dotsPath;
 	
-	if (tourPrice !== 0) {
+	if (tourPrice !== 0) {	//wrong logic, if we buy tour - hide price (=======FIX======)
 		this.isBuyed = false;
 	} else {
 		this.isBuyed = true;
@@ -39,90 +177,60 @@ function Tour(tourImage, tourTitle, tourText, fileSize, timeLength, backgroundIm
 	this.isDownloaded = false;
 }
 
-Tour.prototype.buy = function() {
+Tour.prototype.buy = function(pressButton) {
 	//buying
 	//...
 	
 	this.isBuyed = true;
+	pressButton("images/tourView/Download_Button.png");
 };
 
-Tour.prototype.download = function() {
+Tour.prototype.download = function(pressButton) {
 	//downloading
 	//...
 	
-	this.isDownloaded = true;
+	//=============================================<<<<<<<<<<
+	Ti.API.info('Tour.prototype.download');
+	//=============================================<<<<<<<<<<
+	
+	dotViewStarter = new DotViewStarter(pressButton, this);
+	dotViewStarter.loadDots();
 };
 
-function getPhoto(id, index) {
-	//var tagArray = [];
-	//tagArray.push(id);
-	//tagArray.push(backId);
-	
+function loadTour(tour) {
+	var bufTour = new Tour(
+		tour.id,
+		tour.photo.urls.original,
+		null,
+		tour.name,
+		tour.text,
+		tour.audio_size,
+		tour.audio_length,
+		tour.price,
+		tour.path
+	);
+	bufTour.dots = [tour.path.length];
+	setBackground(bufTour);
+}
+
+function setBackground(tour) {	
 	Cloud.Photos.query({
 	    where: {
-	        tags_array: id
+	        tags_array: tour.id
 	    }
 	}, function (e) {
 	    if (e.success) {
-			tours[index].background = e.photos[0].urls.original;
-			Ti.API.info('IMAGE SET to ' + index);
-			starter();
+			tour.background = e.photos[0].urls.original;
+			starter.addTour(tour);
 	    } else {
 			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));
 	    }
 	});
 }
 
-function getAudio(id, index) {
-	Cloud.Files.query({
-	    where: {
-	        id: id
-	    }
-	}, function (e) {
-	    if (e.success) {
-			tours[index].songPath = e.files[0].url;
-			Ti.API.info('FILE SET to ' + index);
-			starter();
-	    } else {
-			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));  
-	    }
-	});
-}
+//=================================</Tour>================================
 
-function starter() {
-	counter--;
-	
-	if (counter <= 0) {
-		//var window = Ti.UI.createWindow({width: "auto", height: "auto", backgroundColor: "red"});
-		//var imgView = Ti.UI.createImageView({image: tours[0].img, top: 0, left: 0, width: 200, height: 200});
-		//window.add(imgView);
-		//window.open();
-		
-		var index = Alloy.createController("index");
-		var tourViewProcedures = require("lib/tourViewProcedures");
-		tourViewProcedures.initTourViews(index);
-	}
-}
-
-function addTour(tour, index) {
-	var bufTour = new Tour(
-		tour.photo.urls.original,//getPhoto(tour.photo.id, bufTour.img), // ===============
-		tour.name,
-		tour.text,
-		tour.audio_size,
-		tour.audio_length,
-		null,//getPhoto(tour.background_id), // ===============
-		tour.price,
-		null//getAudio(tour.audio_id)
-	);
-	getPhoto(tour.id, index);
-	getAudio(tour.audio_id, index);
-	//getPhoto(tour.photo.id, bufTour.background);
-	//Ti.API.info(">>[ ORIGINAL: " + bufTour.img + " ]<<");
-	tours.push(bufTour);
-}
-
-//=================================MAIN================================
+//=================================<MAIN>================================
 
 Cloud.Users.login({
 	login: "guest@gmail.com",
@@ -133,21 +241,46 @@ Cloud.Users.login({
 			classname: 'Tour'
 		}, function(ee) {
 			if (ee.success) {
-				//alert('Success: ' + ee.Tour.length);
-				counter = ee.Tour.length * 2;
+				var i = 0;
+				starter = new Starter(ee.Tour.length);
 				
-				for (i = 0; i < ee.Tour.length; i++) {
-					addTour(ee.Tour[i], i);
+				for (i; i < ee.Tour.length; i++) {
+					loadTour(ee.Tour[i]);
 				}
 				
 			} else {
 				alert('Error: ' + ((ee.error && ee.message) || JSON.stringify(ee)));        
-			} // else - fail
+			}
 		});
 	} else {
 		alert('Login Error: ' + ((e.error && e.message) || JSON.stringify(e)));
 	}
 });
+//=================================</MAIN>===============================
+
+//=================================<Globals>===============================
+
+Alloy.Globals.getTours = function() {
+	return starter.tours;
+};
+
+Alloy.Globals.openWindow = function(win) {
+	var leftSlide = Titanium.UI.createAnimation();
+    leftSlide.left = 0; // to put it back to the left side of the window
+    leftSlide.duration = 300;
+    win.applyProperties({left: Titanium.Platform.displayCaps.platformWidth});
+    
+	win.open(leftSlide);
+};
+
+Alloy.Globals.closeWindow = function(win) {
+	var rightSlide = Titanium.UI.createAnimation();
+    rightSlide.left = Titanium.Platform.displayCaps.platformWidth; // to put it back to the right side of the window
+    rightSlide.duration = 300;
+    
+	win.close(rightSlide);
+};
+
 
 /* <====== KILL THIS TO RETURN
 var tours = [];
@@ -217,37 +350,3 @@ tours.push(new Tour(
 	"bufTour/song.mp3"
 ));
 */
-
-Alloy.Globals.getTours = function() {
-	return tours;
-};
-/*
-var index = Alloy.createController("index");
-
-
-var tourViewProcedures = require("lib/tourViewProcedures");
-tourViewProcedures.initTourViews(index);
-//*/
-/*
-var insideTourProcedures = require("lib/insideTourProcedures");
-insideTourProcedures.setData(Alloy.createController("index"), tours[0]);
-insideTourProcedures.initDotsView();
-*/
-
-//===========================================
-Alloy.Globals.openWindow = function(win) {
-	var leftSlide = Titanium.UI.createAnimation();
-    leftSlide.left = 0; // to put it back to the left side of the window
-    leftSlide.duration = 300;
-    win.applyProperties({left: Titanium.Platform.displayCaps.platformWidth});
-    
-	win.open(leftSlide);
-};
-
-Alloy.Globals.closeWindow = function(win) {
-	var rightSlide = Titanium.UI.createAnimation();
-    rightSlide.left = Titanium.Platform.displayCaps.platformWidth; // to put it back to the left side of the window
-    rightSlide.duration = 300;
-    
-	win.close(rightSlide);
-};

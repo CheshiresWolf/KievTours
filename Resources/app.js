@@ -1,59 +1,64 @@
-function Tour(tourImage, tourTitle, tourText, fileSize, timeLength, backgroundImage, tourPrice, songPath) {
+function Starter(toursAmount) {
+    this.size = toursAmount;
+    this.tours = [];
+}
+
+function DotViewStarter(pressButton, currentTour) {
+    this.done = pressButton;
+    this.tour = currentTour;
+    this.size = currentTour.tourPath.length;
+    this.index = 0;
+}
+
+function getAudio(tour) {
+    Cloud.Files.query({
+        where: {
+            id: tour.audio_id
+        }
+    }, function(e) {
+        e.success ? tour.songPath = e.files[0].url : alert("Error: " + (e.error && e.message || JSON.stringify(e)));
+    });
+}
+
+function createPhotoArray(oldArray) {
+    var photoArray = [], i = 0;
+    for (i; oldArray.length > i; i++) photoArray.push(oldArray[i].urls.original);
+    return photoArray;
+}
+
+function Tour(tourId, tourImage, backgroundImage, tourTitle, tourText, fileSize, audioLength, tourPrice, dotsPath) {
+    this.id = tourId;
     this.img = tourImage;
+    this.background = backgroundImage;
     this.title = tourTitle;
     this.text = tourText;
     this.size = fileSize;
-    this.dots = [];
-    this.time = timeLength;
-    this.background = backgroundImage;
+    this.time = audioLength;
     this.price = tourPrice;
-    this.songPath = songPath;
+    this.songPath = "";
+    this.dots = [];
+    this.tourPath = dotsPath;
     this.isBuyed = 0 !== tourPrice ? false : true;
     this.isDownloaded = false;
 }
 
-function getPhoto(id, index) {
+function loadTour(tour) {
+    var bufTour = new Tour(tour.id, tour.photo.urls.original, null, tour.name, tour.text, tour.audio_size, tour.audio_length, tour.price, tour.path);
+    bufTour.dots = [ tour.path.length ];
+    setBackground(bufTour);
+}
+
+function setBackground(tour) {
     Cloud.Photos.query({
         where: {
-            tags_array: id
+            tags_array: tour.id
         }
     }, function(e) {
         if (e.success) {
-            tours[index].background = e.photos[0].urls.original;
-            Ti.API.info("IMAGE SET to " + index);
-            starter();
+            tour.background = e.photos[0].urls.original;
+            starter.addTour(tour);
         } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
     });
-}
-
-function getAudio(id, index) {
-    Cloud.Files.query({
-        where: {
-            id: id
-        }
-    }, function(e) {
-        if (e.success) {
-            tours[index].songPath = e.files[0].url;
-            Ti.API.info("FILE SET to " + index);
-            starter();
-        } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
-    });
-}
-
-function starter() {
-    counter--;
-    if (0 >= counter) {
-        var index = Alloy.createController("index");
-        var tourViewProcedures = require("lib/tourViewProcedures");
-        tourViewProcedures.initTourViews(index);
-    }
-}
-
-function addTour(tour, index) {
-    var bufTour = new Tour(tour.photo.urls.original, tour.name, tour.text, tour.audio_size, tour.audio_length, null, tour.price, null);
-    getPhoto(tour.id, index);
-    getAudio(tour.audio_id, index);
-    tours.push(bufTour);
 }
 
 var Alloy = require("alloy"), _ = Alloy._, Backbone = Alloy.Backbone;
@@ -62,16 +67,77 @@ Ti.API.info("alloy.js start");
 
 var Cloud = require("ti.cloud");
 
-var tours = [], i = 0, counter = 0;
+var starter, dotViewStarter;
 
 Cloud.debug = true;
 
-Tour.prototype.buy = function() {
-    this.isBuyed = true;
+Starter.prototype.addTour = function(tour) {
+    this.tours.push(tour);
+    if (this.tours.length === this.size) {
+        var index = Alloy.createController("index");
+        var tourViewProcedures = require("lib/tourViewProcedures");
+        tourViewProcedures.initTourViews(index);
+    }
 };
 
-Tour.prototype.download = function() {
-    this.isDownloaded = true;
+DotViewStarter.prototype.loadDots = function() {
+    var starter = this;
+    getAudio(this.tour);
+    Cloud.Places.query({
+        where: {
+            tags_array: this.tour.id
+        }
+    }, function(e) {
+        if (e.success) {
+            var i = 0;
+            this.size = e.places.length;
+            Ti.API.info("load dots; length = " + this.size);
+            for (i; this.size > i; i++) starter.createDot(e.places[i]);
+        } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
+    });
+};
+
+DotViewStarter.prototype.createDot = function(place) {
+    var starter = this;
+    Cloud.PhotoCollections.showPhotos({
+        collection_id: place.custom_fields.collection_id
+    }, function(e) {
+        if (e.success) if (e.photos) {
+            Ti.API.info("createDot");
+            starter.saveDot({
+                id: place.id,
+                name: place.name,
+                text: place.text,
+                cover: place.photo.urls.original,
+                gallery: createPhotoArray(e.photos),
+                latitude: place.custom_fields.coordinates[1],
+                longitude: place.custom_fields.coordinates[0]
+            });
+        } else alert("Success: No photos"); else alert("Error:\n" + (e.error && e.message || JSON.stringify(e)));
+    });
+};
+
+DotViewStarter.prototype.saveDot = function(dot) {
+    var i = this.tour.tourPath.indexOf(dot.id);
+    this.tour.dots[i] = dot;
+    this.index++;
+    Ti.API.info("saveDot [ " + this.index + " | " + this.size + " ]");
+    if (this.index === this.size) {
+        Ti.API.info("DONNNNNEN");
+        this.tour.isDownloaded = true;
+        this.done("images/tourView/Play_Button.png");
+    }
+};
+
+Tour.prototype.buy = function(pressButton) {
+    this.isBuyed = true;
+    pressButton("images/tourView/Download_Button.png");
+};
+
+Tour.prototype.download = function(pressButton) {
+    Ti.API.info("Tour.prototype.download");
+    dotViewStarter = new DotViewStarter(pressButton, this);
+    dotViewStarter.loadDots();
 };
 
 Cloud.Users.login({
@@ -82,14 +148,15 @@ Cloud.Users.login({
         classname: "Tour"
     }, function(ee) {
         if (ee.success) {
-            counter = 2 * ee.Tour.length;
-            for (i = 0; ee.Tour.length > i; i++) addTour(ee.Tour[i], i);
+            var i = 0;
+            starter = new Starter(ee.Tour.length);
+            for (i; ee.Tour.length > i; i++) loadTour(ee.Tour[i]);
         } else alert("Error: " + (ee.error && ee.message || JSON.stringify(ee)));
     }) : alert("Login Error: " + (e.error && e.message || JSON.stringify(e)));
 });
 
 Alloy.Globals.getTours = function() {
-    return tours;
+    return starter.tours;
 };
 
 Alloy.Globals.openWindow = function(win) {

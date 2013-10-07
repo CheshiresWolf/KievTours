@@ -27,14 +27,14 @@ $.smallPicture.addEventListener("click", function(e) {
 $.button.addEventListener("click", function () {
 	switch (listenerFlag) {
 		case 0:
-			currentTour.buy();
-			$.button.applyProperties({image: "images/tourView/Download_Button.png"});
-			listenerFlag++;
+			currentTour.buy(pressButton);
+			//$.button.applyProperties({image: "images/tourView/Download_Button.png"});
+			//listenerFlag++;
 		break;
 		case 1:
-			currentTour.download();
-			$.button.applyProperties({image: "images/tourView/Play_Button.png"});
-			listenerFlag++;
+			currentTour.download(pressButton);
+			//$.button.applyProperties({image: "images/tourView/Play_Button.png"});
+			//listenerFlag++;
 		break;
 		case 2:
 			var newWindow = Alloy.createController("index");			
@@ -44,6 +44,14 @@ $.button.addEventListener("click", function () {
 		break;
 	}
 });
+
+function pressButton(img) {
+	$.button.applyProperties({image: img});
+	listenerFlag++;
+	//=============================================<<<<<<<<<<
+	Ti.API.info('pressButton');
+	//=============================================<<<<<<<<<<
+}
 
 exports.setListenerFlag = function (listener) {
 	listenerFlag = listener;
