@@ -61,14 +61,8 @@ $.smallPictureList.addEventListener("click", function(e) {
 	list.getView("window").add(menu.getView("menu"));
 	list.fillTable(currentTour.dots, userPosition, controller.getIndex());
 	list.getView("table").addEventListener("click", function(e) {
-		//===================================================================================
-		//Ti.API.info("clicked | " + e.index);
-		//Ti.API.info("id: " + e.row.dotNameLabel);
-		//===================================================================================
 	    controller.setIndex(e.index);
-
 	    Alloy.Globals.closeWindow(list.getView("window"));
-
 	});
 	Alloy.Globals.openWindow(list.getView("window"));
 });
@@ -91,6 +85,8 @@ $.galleryLeft.addEventListener("click", function(e) {
 		$.gallery.scrollToView(galleryIndex);
 		$.galleryPaging.text = (galleryIndex + 1) + "/" + currentDot.gallery.length;
 	}
+	
+	Ti.API.info('dotsView| gallery.length = ' + $.gallery.getViews().length);   //===================================
 });
 
 $.galleryRight.addEventListener("click", function(e) {
@@ -110,10 +106,12 @@ $.galleryRight.addEventListener("click", function(e) {
 		$.gallery.scrollToView(galleryIndex);
 		$.galleryPaging.text = (galleryIndex + 1) + "/" + currentDot.gallery.length;
 	}
+		
+	Ti.API.info('dotsView| gallery.length = ' + $.gallery.getViews().length); //===================================
 });
 
 function galleryShow(flag) {
-	var img = currentTour.img;
+	var img = currentDot.cover;
 	
 	if (flag) img = "";
 	
@@ -154,6 +152,21 @@ function centeringMap() {
 
 exports.setDot = function(i) {
 	currentDot = currentTour.dots[i];
+	$.smallPicturePhoto.applyProperties({image: currentDot.cover});
+	galleryIndex = 0;
+	alreadyLoaded = 0;
+	
+	//Ti.API.info('dotsView| setDot (v) | gallery.length = ' + $.gallery.getViews().length); //===================================
+	$.gallery.views = [];
+	//Ti.API.info('dotsView| setDot (^) | gallery.length = ' + $.gallery.getViews().length); //===================================
+	
+	var img = Ti.UI.createImageView({
+		image: currentDot.gallery[0],
+		top: bigImageStyle.top,
+		width: Titanium.Platform.displayCaps.platformWidth
+	});
+	//img.top = (bigImageStyle.top - img.toImage().height) / 2;
+	$.gallery.addView(img);
 	centeringMap();
 	
 	$.galleryPaging.text = "1/" + currentDot.gallery.length;

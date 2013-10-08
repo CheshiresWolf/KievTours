@@ -79,4 +79,12 @@
 	height: 25,
 	bottom: 10,
 	zIndex: 4
+},
+"#loadingIco": {
+	image: "images/tourView/loading/loading_ico_0.png",
+	width: 25,
+	height: 25,
+	bottom: 10,
+	zIndex: 4,
+	visible: false
 }

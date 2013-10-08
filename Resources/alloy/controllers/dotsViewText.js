@@ -107,8 +107,9 @@ function Controller() {
     exports.destroy = function() {};
     _.extend($, $.__views);
     var maxWidth = Titanium.Platform.displayCaps.platformWidth - 40;
-    exports.initText = function(dot) {
-        $.dotNumber.text = dot.number;
+    exports.initText = function(dot, i) {
+        Ti.API.info("dotsViewText| initText");
+        $.dotNumber.text = i;
         $.dotText.text = dot.text;
         var title = showTitleAndGetSize(dot.name);
         $.dotNumber.applyProperties({

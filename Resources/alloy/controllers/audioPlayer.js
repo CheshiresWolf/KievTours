@@ -156,12 +156,8 @@ function Controller() {
         audioPlayer.play();
         isPlay = true;
     });
-    exports.initPlayer = function(width, songPath) {
-        audioPlayer = Ti.Media.createSound({
-            url: songPath,
-            volume: .5,
-            allowBackground: true
-        });
+    exports.initPlayer = function(width, player) {
+        audioPlayer = player;
         $.timeLeft.text = secToString(audioPlayer.duration);
         $.container.applyProperties({
             width: .6 * width,
@@ -176,7 +172,8 @@ function Controller() {
         });
     };
     exports.closePlayer = function() {
-        audioPlayer.release();
+        audioPlayer.pause();
+        audioPlayer.setTime(0);
     };
     _.extend($, exports);
 }

@@ -183,6 +183,16 @@ function Controller() {
         id: "button"
     });
     $.__views.tourContent.add($.__views.button);
+    $.__views.loadingIco = Ti.UI.createImageView({
+        image: "images/tourView/loading/loading_ico_0.png",
+        width: 25,
+        height: 25,
+        bottom: 10,
+        zIndex: 4,
+        visible: false,
+        id: "loadingIco"
+    });
+    $.__views.tourContent.add($.__views.loadingIco);
     exports.destroy = function() {};
     _.extend($, $.__views);
     var swapDirection = false;
@@ -218,7 +228,7 @@ function Controller() {
             break;
 
           case 1:
-            currentTour.download(pressButton);
+            currentTour.download(pressButton, $.loadingIco);
             break;
 
           case 2:

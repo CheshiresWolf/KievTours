@@ -1,23 +1,5 @@
 var maxWidth = Titanium.Platform.displayCaps.platformWidth - 40;
 
-exports.initText = function(dot) {
-	$.dotNumber.text = dot.number;
-	$.dotText.text = dot.text;
-	
-	var title = showTitleAndGetSize(dot.name);
-	
-	$.dotNumber.applyProperties({
-		left: (Titanium.Platform.displayCaps.platformWidth - title.width) / 2 - 20
-	});
-	$.dotText.applyProperties({
-		top: title.height + 10,
-		width: maxWidth
-	});
-	$.Aa.applyProperties({
-		top: title.height + 12
-	});
-};
-
 function showTitleAndGetSize(text) {
 	var globalHeight = 0, maxWidth = 0;
 	
@@ -75,3 +57,23 @@ function showTitleAndGetSize(text) {
 	
 	return {height: globalHeight, width: maxWidth};
 }
+
+exports.initText = function(dot, i) {
+	Ti.API.info('dotsViewText| initText');   //===================================
+	
+	$.dotNumber.text = i;
+	$.dotText.text = dot.text;
+	
+	var title = showTitleAndGetSize(dot.name);
+	
+	$.dotNumber.applyProperties({
+		left: (Titanium.Platform.displayCaps.platformWidth - title.width) / 2 - 20
+	});
+	$.dotText.applyProperties({
+		top: title.height + 10,
+		width: maxWidth
+	});
+	$.Aa.applyProperties({
+		top: title.height + 12
+	});
+};

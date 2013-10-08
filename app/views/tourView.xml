@@ -18,6 +18,7 @@
 					<Label id="price" class="topIco"></Label>
 				</View>
 				<ImageView id="button"></ImageView>
+				<ImageView id="loadingIco"></ImageView>
 			</View>
 		</ImageView>	
 	</View>

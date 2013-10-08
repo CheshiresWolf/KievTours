@@ -27,7 +27,7 @@ function makeTourView(tour) {
         left: bigImgSize / 2 - 90
     });
     tourView.getView("sizeMb").text = tour.size;
-    tourView.getView("dotAmount").text = tour.dots.length;
+    tourView.getView("dotAmount").text = tour.tourPath.length;
     tourView.getView("time").text = tour.time;
     tourView.getView("price").text = 0 === tour.price ? "FREE" : "$" + tour.price;
     var buttonView = tourView.getView("button");
@@ -45,6 +45,9 @@ function makeTourView(tour) {
     buttonView.applyProperties({
         left: bigImgSize / 2 - 46,
         image: buttonImgPath
+    });
+    tourView.getView("loadingIco").applyProperties({
+        left: bigImgSize / 2 + 56
     });
     return tourView.getView();
 }

@@ -32,11 +32,13 @@ $.button.addEventListener("click", function () {
 			//listenerFlag++;
 		break;
 		case 1:
-			currentTour.download(pressButton);
+			currentTour.download(pressButton, $.loadingIco);
 			//$.button.applyProperties({image: "images/tourView/Play_Button.png"});
 			//listenerFlag++;
 		break;
 		case 2:
+			//Ti.API.info('tourView| Case 2');   //===================================
+			
 			var newWindow = Alloy.createController("index");			
 			var insideTourProcedures = require("lib/insideTourProcedures");
 			

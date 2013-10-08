@@ -35,7 +35,7 @@ function changeDot(id) {
     dotsView.setDot(activeDotIndex);
     controller.getView("scrollView").remove(dotText.getView());
     dotText = Alloy.createController("dotsViewText");
-    dotText.initText(currentTour.dots[activeDotIndex], controller.getView("scrollView"));
+    dotText.initText(currentTour.dots[activeDotIndex], activeDotIndex);
     controller.getView("scrollView").add(dotText.getView());
 }
 
@@ -105,13 +105,16 @@ function initMask() {
 }
 
 function createDotView() {
+    Ti.API.info("insideTourProcedures| createDotView");
     var isComplete = false;
     dotsView = Alloy.createController("dotsView");
     dotsView.setStyles(bigSircleStyle, smallSirclePhotoStyle, smallSircleAudioStyle);
     dotsView.setController(controller, currentTour);
     dotsView.setDot(0);
+    Ti.API.info("insideTourProcedures| createDotView | player");
     audioView = Alloy.createController("audioPlayer");
-    audioView.initPlayer(bigSircleSize, currentTour.songPath);
+    audioView.initPlayer(bigSircleSize, currentTour.audio.player);
+    Ti.API.info("insideTourProcedures| createDotView | map");
     dotsView.getView("bigPicture").applyProperties(bigSircleStyle);
     dotsView.getView("map").addEventListener("complete", function() {
         if (!isComplete) {
@@ -127,13 +130,16 @@ function createDotView() {
         }
     });
     initMask();
-    smallSirclePhotoStyle.image = currentTour.img;
+    Ti.API.info("insideTourProcedures| createDotView | gallery");
+    smallSirclePhotoStyle.image = currentTour.dots[0].cover;
     dotsView.getView("smallPicturePhoto").applyProperties(smallSirclePhotoStyle);
-    dotsView.getView("gallery").addView(Ti.UI.createImageView({
+    var img = Ti.UI.createImageView({
         image: currentTour.dots[0].gallery[0],
         top: topOffsetBig,
         width: Titanium.Platform.displayCaps.platformWidth
-    }));
+    });
+    img.top = (Titanium.Platform.displayCaps.platformHeight - img.toImage().height) / 2;
+    dotsView.getView("gallery").addView(img);
     var galleryControlsOffset = bigSircleSize + topOffsetBig - 30;
     dotsView.getView("galleryLeft").applyProperties({
         top: galleryControlsOffset
@@ -144,6 +150,7 @@ function createDotView() {
     dotsView.getView("galleryRight").applyProperties({
         top: galleryControlsOffset
     });
+    Ti.API.info("insideTourProcedures| createDotView | form view");
     dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);
     dotsView.getView("player").add(audioView.getView());
     dotsView.getView("smallPictureList").applyProperties(smallSircleListStyle);
@@ -237,6 +244,7 @@ var smallSircleCenterStyle = {
 };
 
 exports.initDotsView = function(newController, tour) {
+    Ti.API.info("insideTourProcedures| initDotsView");
     controller = newController;
     currentTour = tour;
     controller.close = function() {
@@ -259,7 +267,7 @@ exports.initDotsView = function(newController, tour) {
     });
     controller.getView("scrollView").add(createDotView());
     dotText = Alloy.createController("dotsViewText");
-    dotText.initText(currentTour.dots[0]);
+    dotText.initText(currentTour.dots[0], 0);
     controller.getView("scrollView").add(dotText.getView());
     var menu = Alloy.createController("menuView");
     menu.getView("buttonTours").addEventListener("click", function() {

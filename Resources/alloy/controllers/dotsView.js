@@ -1,6 +1,6 @@
 function Controller() {
     function galleryShow(flag) {
-        var img = currentTour.img;
+        var img = currentDot.cover;
         flag && (img = "");
         $.smallPicturePhoto.applyProperties({
             image: img
@@ -243,6 +243,7 @@ function Controller() {
             $.gallery.scrollToView(galleryIndex);
             $.galleryPaging.text = galleryIndex + 1 + "/" + currentDot.gallery.length;
         }
+        Ti.API.info("dotsView| gallery.length = " + $.gallery.getViews().length);
     });
     $.galleryRight.addEventListener("click", function() {
         if (currentDot.gallery.length - 1 > galleryIndex) {
@@ -258,9 +259,22 @@ function Controller() {
             $.gallery.scrollToView(galleryIndex);
             $.galleryPaging.text = galleryIndex + 1 + "/" + currentDot.gallery.length;
         }
+        Ti.API.info("dotsView| gallery.length = " + $.gallery.getViews().length);
     });
     exports.setDot = function(i) {
         currentDot = currentTour.dots[i];
+        $.smallPicturePhoto.applyProperties({
+            image: currentDot.cover
+        });
+        galleryIndex = 0;
+        alreadyLoaded = 0;
+        $.gallery.views = [];
+        var img = Ti.UI.createImageView({
+            image: currentDot.gallery[0],
+            top: bigImageStyle.top,
+            width: Titanium.Platform.displayCaps.platformWidth
+        });
+        $.gallery.addView(img);
         centeringMap();
         $.galleryPaging.text = "1/" + currentDot.gallery.length;
     };

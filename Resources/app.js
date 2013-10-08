@@ -10,23 +10,13 @@ function DotViewStarter(pressButton, currentTour) {
     this.index = 0;
 }
 
-function getAudio(tour) {
-    Cloud.Files.query({
-        where: {
-            id: tour.audio_id
-        }
-    }, function(e) {
-        e.success ? tour.songPath = e.files[0].url : alert("Error: " + (e.error && e.message || JSON.stringify(e)));
-    });
-}
-
 function createPhotoArray(oldArray) {
     var photoArray = [], i = 0;
     for (i; oldArray.length > i; i++) photoArray.push(oldArray[i].urls.original);
     return photoArray;
 }
 
-function Tour(tourId, tourImage, backgroundImage, tourTitle, tourText, fileSize, audioLength, tourPrice, dotsPath) {
+function Tour(tourId, tourImage, backgroundImage, tourTitle, tourText, fileSize, audioLength, tourPrice, dotsPath, audioId) {
     this.id = tourId;
     this.img = tourImage;
     this.background = backgroundImage;
@@ -35,15 +25,27 @@ function Tour(tourId, tourImage, backgroundImage, tourTitle, tourText, fileSize,
     this.size = fileSize;
     this.time = audioLength;
     this.price = tourPrice;
-    this.songPath = "";
     this.dots = [];
     this.tourPath = dotsPath;
+    this.audio = {
+        id: audioId,
+        player: null
+    };
     this.isBuyed = 0 !== tourPrice ? false : true;
     this.isDownloaded = false;
 }
 
+function timerTick(timer) {
+    Ti.API.info("alloy.js| timer index = " + timer.index);
+    timer.view.applyProperties({
+        image: "images/tourView/loading/loading_ico_" + timer.index + ".png"
+    });
+    timer.index++;
+    3 === timer.index && (timer.index = 0);
+}
+
 function loadTour(tour) {
-    var bufTour = new Tour(tour.id, tour.photo.urls.original, null, tour.name, tour.text, tour.audio_size, tour.audio_length, tour.price, tour.path);
+    var bufTour = new Tour(tour.id, tour.photo.urls.original, null, tour.name, tour.text, tour.audio_size, tour.audio_length, tour.price, tour.path, tour.audio_id);
     bufTour.dots = [ tour.path.length ];
     setBackground(bufTour);
 }
@@ -61,15 +63,27 @@ function setBackground(tour) {
     });
 }
 
+function getAudio(tour) {
+    Cloud.Files.show({
+        file_id: tour.audio.id
+    }, function(e) {
+        Ti.API.info("alloy.js| Loading audio file (" + e.files[0].name + ")");
+        e.success ? tour.audio.player = Ti.Media.createSound({
+            url: e.files[0].url,
+            volume: .5,
+            allowBackground: true,
+            preload: true
+        }) : alert("Error: " + (e.error && e.message || JSON.stringify(e)));
+    });
+}
+
 var Alloy = require("alloy"), _ = Alloy._, Backbone = Alloy.Backbone;
 
-Ti.API.info("alloy.js start");
+Ti.API.info("alloy.js| Start");
 
 var Cloud = require("ti.cloud");
 
 var starter, dotViewStarter;
-
-Cloud.debug = true;
 
 Starter.prototype.addTour = function(tour) {
     this.tours.push(tour);
@@ -82,7 +96,6 @@ Starter.prototype.addTour = function(tour) {
 
 DotViewStarter.prototype.loadDots = function() {
     var starter = this;
-    getAudio(this.tour);
     Cloud.Places.query({
         where: {
             tags_array: this.tour.id
@@ -91,7 +104,6 @@ DotViewStarter.prototype.loadDots = function() {
         if (e.success) {
             var i = 0;
             this.size = e.places.length;
-            Ti.API.info("load dots; length = " + this.size);
             for (i; this.size > i; i++) starter.createDot(e.places[i]);
         } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
     });
@@ -102,18 +114,15 @@ DotViewStarter.prototype.createDot = function(place) {
     Cloud.PhotoCollections.showPhotos({
         collection_id: place.custom_fields.collection_id
     }, function(e) {
-        if (e.success) if (e.photos) {
-            Ti.API.info("createDot");
-            starter.saveDot({
-                id: place.id,
-                name: place.name,
-                text: place.text,
-                cover: place.photo.urls.original,
-                gallery: createPhotoArray(e.photos),
-                latitude: place.custom_fields.coordinates[1],
-                longitude: place.custom_fields.coordinates[0]
-            });
-        } else alert("Success: No photos"); else alert("Error:\n" + (e.error && e.message || JSON.stringify(e)));
+        e.success ? e.photos ? starter.saveDot({
+            id: place.id,
+            name: place.name,
+            text: place.custom_fields.text,
+            cover: place.photo.urls.original,
+            gallery: createPhotoArray(e.photos),
+            latitude: place.latitude,
+            longitude: place.longitude
+        }) : alert("Success: No photos") : alert("Error:\n" + (e.error && e.message || JSON.stringify(e)));
     });
 };
 
@@ -121,9 +130,8 @@ DotViewStarter.prototype.saveDot = function(dot) {
     var i = this.tour.tourPath.indexOf(dot.id);
     this.tour.dots[i] = dot;
     this.index++;
-    Ti.API.info("saveDot [ " + this.index + " | " + this.size + " ]");
     if (this.index === this.size) {
-        Ti.API.info("DONNNNNEN");
+        Ti.API.info("alloy.js| Load finished");
         this.tour.isDownloaded = true;
         this.done("images/tourView/Play_Button.png");
     }
@@ -135,7 +143,7 @@ Tour.prototype.buy = function(pressButton) {
 };
 
 Tour.prototype.download = function(pressButton) {
-    Ti.API.info("Tour.prototype.download");
+    getAudio(this);
     dotViewStarter = new DotViewStarter(pressButton, this);
     dotViewStarter.loadDots();
 };

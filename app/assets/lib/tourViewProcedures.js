@@ -73,7 +73,7 @@ function makeTourView (tour) {
 	tourView.getView("icons").applyProperties({top: bigImgSize * 4 / 6, left: bigImgSize / 2 - 90});
 	tourView.getView("sizeMb").text = tour.size;
 	
-	tourView.getView("dotAmount").text = tour.dots.length;
+	tourView.getView("dotAmount").text = tour.tourPath.length;
 	
 	tourView.getView("time").text = tour.time;
 	if (tour.price === 0) {
@@ -100,6 +100,9 @@ function makeTourView (tour) {
 	buttonView.applyProperties({
 		left: bigImgSize / 2 - 46,
 		image: buttonImgPath
+	});
+	tourView.getView("loadingIco").applyProperties({
+		left: bigImgSize / 2 + 56
 	});
 	
 	//show View

@@ -47,13 +47,9 @@ function secToString (sec) {
 	return min[0] + ":" + min[2] + min[3];
 }
 
-exports.initPlayer = function(width, songPath) {
+exports.initPlayer = function(width, player) {
 	
-	audioPlayer = Ti.Media.createSound({ 
-	    url: songPath,
-	    volume: 0.5,
-	    allowBackground: true
-	}); 
+	audioPlayer = player;
 	
 	$.timeLeft.text = secToString(audioPlayer.duration);
 	
@@ -73,5 +69,8 @@ exports.initPlayer = function(width, songPath) {
 };
 
 exports.closePlayer = function () {
-	audioPlayer.release();
+	//$.buttonPlay.applyProperties({image: "images/dotsView/audioPlayerButtonPlay.png"});
+	audioPlayer.pause();
+	audioPlayer.setTime(0);
+	//audioPlayer.release();
 };
