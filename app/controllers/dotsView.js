@@ -53,16 +53,16 @@ $.smallPictureAudio.addEventListener("click", function(e) {
 $.smallPictureList.addEventListener("click", function(e) {
 	var list = Alloy.createController("dotsList");
 	var menu = Alloy.createController("menuView");
-	menu.getView("buttonTours").addEventListener("click", function() {
-		controller.close();
-		Alloy.Globals.closeWindow(list.getView("window"));
-	});
+	//menu.getView("buttonTours").addEventListener("click", function() {
+	//	controller.close();
+	//	Alloy.Globals.closeWindow(list.getView("window"));
+	//});
 	list.getView("window").add(menu.getView("menuListener"));
 	list.getView("window").add(menu.getView("menu"));
-	list.fillTable(currentTour.dots, userPosition, controller.getIndex());
+	list.fillTable(currentTour.dots, userPosition, controller.getIndex(), currentTour.title);
 	list.getView("table").addEventListener("click", function(e) {
 	    controller.setIndex(e.index);
-	    Alloy.Globals.closeWindow(list.getView("window"));
+	    Alloy.Globals.closeWindow();
 	});
 	Alloy.Globals.openWindow(list.getView("window"));
 });

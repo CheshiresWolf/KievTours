@@ -6,7 +6,8 @@
 	left: 0,
 	width: "auto",
 	height: "auto",
-	zIndex: 0
+	zIndex: 0,
+	preload: true
 },
 "#title": {
 	textAlign: Ti.UI.TEXT_ALIGNMENT_CENTER,

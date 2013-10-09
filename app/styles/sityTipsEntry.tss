@@ -31,9 +31,19 @@
 	left: 15,
 	zIndex: 6
 },
-"#table": {
+"#Aa": {
+	image: "images/dotsView/Aa.png",
+	top: 82,
+	left: 9,
+	width: 15,
+	height: 12,
+	zIndex: 5
+},
+"#textContainer": {
+	//backgroundColor: "red",
 	top: 80,
-	left: 0,
-	width: "auto",
-	height: "auto"
+	left: 30,
+	height: "auto",
+	layout: "vertical",
+	zIndex: 4
 }

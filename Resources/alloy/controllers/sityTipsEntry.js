@@ -1,34 +1,30 @@
 function Controller() {
-    function createRow(img, text) {
-        var row = Titanium.UI.createTableViewRow({
-            hasChild: true,
-            height: 40
-        });
-        var icon = Titanium.UI.createImageView({
-            image: img,
-            width: 20,
-            height: 20,
-            left: 10,
-            top: 10
-        });
-        row.add(icon);
-        var name = Titanium.UI.createLabel({
-            text: text,
+    function createTextBlock(title, text, view) {
+        var titleLabel = Ti.UI.createLabel({
+            text: title,
+            width: textWidth,
             font: {
-                fontSize: 10,
+                fontSize: "10dp",
                 fontWeight: "bold"
-            },
-            left: 40,
-            width: "auto",
-            height: 20,
-            textAlign: "left",
-            zIndex: 4
+            }
         });
-        row.add(name);
-        return row;
+        var textLabel = Ti.UI.createLabel({
+            text: text,
+            width: textWidth,
+            font: {
+                fontSize: "10dp"
+            }
+        });
+        var space = Ti.UI.createLabel({
+            text: "        ",
+            width: textWidth
+        });
+        view.add(titleLabel);
+        view.add(textLabel);
+        view.add(space);
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
-    this.__controllerPath = "more";
+    this.__controllerPath = "sityTipsEntry";
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
     arguments[0] ? arguments[0]["$model"] : null;
     arguments[0] ? arguments[0]["__itemTemplate"] : null;
@@ -64,7 +60,6 @@ function Controller() {
             fontSize: "19dp",
             fontWeight: "bold"
         },
-        text: "...",
         id: "title"
     });
     $.__views.topPanel.add($.__views.title);
@@ -78,28 +73,38 @@ function Controller() {
         id: "logo"
     });
     $.__views.topPanel.add($.__views.logo);
-    $.__views.table = Ti.UI.createTableView({
-        top: 80,
-        left: 0,
-        width: "auto",
-        height: "auto",
-        id: "table"
+    $.__views.Aa = Ti.UI.createImageView({
+        image: "images/dotsView/Aa.png",
+        top: 82,
+        left: 9,
+        width: 15,
+        height: 12,
+        zIndex: 5,
+        id: "Aa"
     });
-    $.__views.window.add($.__views.table);
+    $.__views.window.add($.__views.Aa);
+    $.__views.textContainer = Ti.UI.createScrollView({
+        top: 80,
+        left: 30,
+        height: "auto",
+        layout: "vertical",
+        zIndex: 4,
+        id: "textContainer"
+    });
+    $.__views.window.add($.__views.textContainer);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    var textWidth = Titanium.Platform.displayCaps.platformWidth - 30;
     $.backButton.addEventListener("click", function() {
         Alloy.Globals.closeWindow();
     });
-    exports.fillTable = function() {
-        var tableData = [];
-        tableData.push(createRow("images/more/_settings.png", "Settings"));
-        tableData.push(createRow("images/more/_languages.png", "Languages"));
-        tableData.push(createRow("images/more/_about.png", "About application"));
-        tableData.push(createRow("images/more/_contact.png", "Contact us"));
-        tableData.push(createRow("images/more/_feed.png", "Feedback"));
-        tableData.push(createRow("images/more/_social.png", "Social networks"));
-        $.table.data = tableData;
+    exports.init = function(tip) {
+        var i = 0;
+        $.title.text = tip.short_title;
+        $.textContainer.applyProperties({
+            width: textWidth
+        });
+        for (i; tip.titles.length > i; i++) createTextBlock(tip.titles[i], tip.texts[i], $.textContainer);
     };
     _.extend($, exports);
 }

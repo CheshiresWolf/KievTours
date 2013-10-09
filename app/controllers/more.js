@@ -1,5 +1,5 @@
 $.backButton.addEventListener("click", function() {
-	Alloy.Globals.closeWindow($.window);
+	Alloy.Globals.closeWindow();
 });
 
 function createRow(img, text) {
@@ -7,19 +7,20 @@ function createRow(img, text) {
 	
 	var icon =  Titanium.UI.createImageView({
 		image: img,
-		width: 40,
-		height: 40,
-		left: 4,
-		top: 0
+		width: 20,
+		height: 20,
+		left: 10,
+		top: 10
 	});
 	row.add(icon);
 	
 	var name = Titanium.UI.createLabel({
 		text: text,
 		font: {
-			fontSize: 8
+			fontSize: 10,
+			fontWeight: 'bold' 
 		},
-		left: 59,
+		left: 40,
 		width: 'auto',
 		height: 20,
 		textAlign: 'left',

@@ -1,5 +1,5 @@
 $.backButton.addEventListener("click", function() {
-	Alloy.Globals.closeWindow($.window);
+	Alloy.Globals.closeWindow();
 });
 
 function createRow(flag, dot, i, distance, currentI) {
@@ -98,8 +98,10 @@ function distance(dotA, dotB) {
 }
 
 
-exports.fillTable = function(dots, userPosition, index) {
+exports.fillTable = function(dots, userPosition, index, title) {
 	var tableData = [], flag = false;
+	
+	$.title.text = title;
 	
 	for (var i = 0; i < dots.length; i++) {
 		if (i === dots.length - 1) {

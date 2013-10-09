@@ -143,6 +143,7 @@ exports.initTourViews = function(index) {
     controller.getView("window").add(menu.getView("menuListener"));
     controller.getView("window").add(menu.getView("menu"));
     controller.getView().open();
+    Alloy.Globals.setRootWindow(controller.getView());
 };
 
 exports.getBigImageStyle = function() {

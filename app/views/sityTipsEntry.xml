@@ -1,0 +1,11 @@
+<Alloy>
+	<Window id="window">
+		<View id="topPanel">
+			<ImageView id="backButton"></ImageView>
+			<Label id="title"></Label>
+			<ImageView id="logo"></ImageView>
+		</View>
+		<ImageView id="Aa"></ImageView>
+		<ScrollView id="textContainer"></ScrollView>
+	</Window>
+</Alloy>

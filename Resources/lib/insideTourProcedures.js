@@ -247,14 +247,6 @@ exports.initDotsView = function(newController, tour) {
     Ti.API.info("insideTourProcedures| initDotsView");
     controller = newController;
     currentTour = tour;
-    controller.close = function() {
-        audioView.closePlayer();
-        Alloy.Globals.closeWindow(controller.getView("window"));
-        pagingArray = [];
-        annotationArray = [];
-        isGallerySet = false;
-        activeDotIndex = 0;
-    };
     controller.getIndex = function() {
         return activeDotIndex;
     };
@@ -270,10 +262,14 @@ exports.initDotsView = function(newController, tour) {
     dotText.initText(currentTour.dots[0], 0);
     controller.getView("scrollView").add(dotText.getView());
     var menu = Alloy.createController("menuView");
-    menu.getView("buttonTours").addEventListener("click", function() {
-        controller.close();
-    });
     controller.getView("window").add(menu.getView("menuListener"));
     controller.getView("window").add(menu.getView("menu"));
+    controller.getView("window").cleanTour = function() {
+        audioView.closePlayer();
+        pagingArray = [];
+        annotationArray = [];
+        isGallerySet = false;
+        activeDotIndex = 0;
+    };
     Alloy.Globals.openWindow(controller.getView("window"));
 };

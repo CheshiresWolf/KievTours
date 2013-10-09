@@ -136,10 +136,11 @@ function Controller() {
     exports.destroy = function() {};
     _.extend($, $.__views);
     $.backButton.addEventListener("click", function() {
-        Alloy.Globals.closeWindow($.window);
+        Alloy.Globals.closeWindow();
     });
-    exports.fillTable = function(dots, userPosition, index) {
+    exports.fillTable = function(dots, userPosition, index, title) {
         var tableData = [], flag = false;
+        $.title.text = title;
         for (var i = 0; dots.length > i; i++) {
             i === dots.length - 1 && (flag = true);
             tableData.push(createRow(flag, dots[i], i, distance(userPosition, dots[i]), index));

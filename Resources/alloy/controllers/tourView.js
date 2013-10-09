@@ -23,6 +23,7 @@ function Controller() {
         width: "auto",
         height: "auto",
         zIndex: 0,
+        preload: true,
         id: "background"
     });
     $.__views.tourView.add($.__views.background);

@@ -1,34 +1,48 @@
 function Controller() {
-    function createRow(img, text) {
+    function createRow(tip) {
         var row = Titanium.UI.createTableViewRow({
             hasChild: true,
             height: 40
         });
         var icon = Titanium.UI.createImageView({
-            image: img,
+            image: tip.photo.urls.original,
             width: 20,
             height: 20,
             left: 10,
             top: 10
         });
         row.add(icon);
-        var name = Titanium.UI.createLabel({
-            text: text,
+        var title = Titanium.UI.createLabel({
+            text: tip.short_title,
             font: {
                 fontSize: 10,
                 fontWeight: "bold"
             },
+            top: 0,
             left: 40,
             width: "auto",
             height: 20,
             textAlign: "left",
             zIndex: 4
         });
-        row.add(name);
+        row.add(title);
+        var text = Titanium.UI.createLabel({
+            text: tip.short_text,
+            font: {
+                fontSize: 10
+            },
+            top: 20,
+            left: 40,
+            width: "auto",
+            height: 20,
+            textAlign: "left",
+            zIndex: 4
+        });
+        row.add(text);
         return row;
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
-    this.__controllerPath = "more";
+    this.__controllerPath = "sityTipsMenu";
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
     arguments[0] ? arguments[0]["$model"] : null;
     arguments[0] ? arguments[0]["__itemTemplate"] : null;
@@ -64,7 +78,7 @@ function Controller() {
             fontSize: "19dp",
             fontWeight: "bold"
         },
-        text: "...",
+        text: "ПОЛЕЗНО ЗНАТЬ",
         id: "title"
     });
     $.__views.topPanel.add($.__views.title);
@@ -91,15 +105,18 @@ function Controller() {
     $.backButton.addEventListener("click", function() {
         Alloy.Globals.closeWindow();
     });
-    exports.fillTable = function() {
-        var tableData = [];
-        tableData.push(createRow("images/more/_settings.png", "Settings"));
-        tableData.push(createRow("images/more/_languages.png", "Languages"));
-        tableData.push(createRow("images/more/_about.png", "About application"));
-        tableData.push(createRow("images/more/_contact.png", "Contact us"));
-        tableData.push(createRow("images/more/_feed.png", "Feedback"));
-        tableData.push(createRow("images/more/_social.png", "Social networks"));
+    exports.init = function(tipsArray) {
+        var i = 0, tableData = [];
+        for (i; tipsArray.length > i; i++) tableData.push(createRow(tipsArray[i]));
         $.table.data = tableData;
+        $.table.addEventListener("click", function(e) {
+            var sityTipsEntry = Alloy.createController("sityTipsEntry");
+            var menu = Alloy.createController("menuView");
+            sityTipsEntry.getView("window").add(menu.getView("menuListener"));
+            sityTipsEntry.getView("window").add(menu.getView("menu"));
+            sityTipsEntry.init(tipsArray[e.index]);
+            Alloy.Globals.openWindow(sityTipsEntry.getView());
+        });
     };
     _.extend($, exports);
 }

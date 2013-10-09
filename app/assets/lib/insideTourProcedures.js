@@ -272,15 +272,16 @@ exports.initDotsView = function(newController, tour) {
 	controller = newController;
 	currentTour = tour;
 	
+	/*
 	controller.close = function () {
 		audioView.closePlayer();
-		Alloy.Globals.closeWindow(controller.getView("window"));
+		Alloy.Globals.closeWindow();//controller.getView("window"));
 		pagingArray = [];
 		annotationArray = [];
 		isGallerySet = false;
 		activeDotIndex = 0;
 	};
-	
+	*/
 	controller.getIndex = function () {
 		return activeDotIndex;
 	};
@@ -298,11 +299,19 @@ exports.initDotsView = function(newController, tour) {
 	controller.getView("scrollView").add(dotText.getView());
 		
 	var menu = Alloy.createController("menuView");
-	menu.getView("buttonTours").addEventListener("click", function() {
-		controller.close();
-	});
+	//menu.getView("buttonTours").addEventListener("click", function() {
+	//	controller.close();
+	//});
 	controller.getView("window").add(menu.getView("menuListener"));
 	controller.getView("window").add(menu.getView("menu"));
+	
+	controller.getView("window").cleanTour = function () {
+		audioView.closePlayer();
+		pagingArray = [];
+		annotationArray = [];
+		isGallerySet = false;
+		activeDotIndex = 0;
+	};
 	
 	Alloy.Globals.openWindow(controller.getView("window"));
 };
