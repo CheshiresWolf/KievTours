@@ -115,6 +115,7 @@ function Controller() {
             sityTipsEntry.getView("window").add(menu.getView("menuListener"));
             sityTipsEntry.getView("window").add(menu.getView("menu"));
             sityTipsEntry.init(tipsArray[e.index]);
+            sityTipsEntry.getView().windowName = "sityTipsEntryView";
             Alloy.Globals.openWindow(sityTipsEntry.getView());
         });
     };

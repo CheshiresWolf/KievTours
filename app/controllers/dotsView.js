@@ -65,6 +65,7 @@ $.smallPictureList.addEventListener("click", function(e) {
 	    centeringLogic();
 	    Alloy.Globals.closeWindow();
 	});
+	list.getView("window").windowName = "listView";
 	Alloy.Globals.openWindow(list.getView("window"));
 });
 

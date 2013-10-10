@@ -99,6 +99,7 @@ function Controller() {
         more.getView("window").add(menu.getView("menu"));
         more.fillTable();
         closeMenu();
+        more.getView().windowName = "moreView";
         Alloy.Globals.openWindow(more.getView());
     });
     $.buttonTips.addEventListener("click", function() {
@@ -108,6 +109,7 @@ function Controller() {
         sityTips.getView("window").add(menu.getView("menu"));
         sityTips.init(Alloy.Globals.getTips());
         closeMenu();
+        sityTips.getView().windowName = "sityTipsView";
         Alloy.Globals.openWindow(sityTips.getView());
     });
     _.extend($, exports);

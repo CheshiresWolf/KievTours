@@ -68,11 +68,12 @@ function getAudio(tour) {
         file_id: tour.audio.id
     }, function(e) {
         Ti.API.info("loadFromCloud| Loading audio file (" + e.files[0].name + ")");
-        e.success ? tour.audio.player = Ti.Media.createSound({
+        e.success ? tour.audio.player = Ti.Media.createVideoPlayer({
             url: e.files[0].url,
             volume: .5,
             allowBackground: true,
-            preload: true
+            autoplay: false,
+            useApplicationAudioSession: true
         }) : alert("Error: " + (e.error && e.message || JSON.stringify(e)));
     });
 }
@@ -93,6 +94,8 @@ var Cloud = require("ti.cloud");
 var starter, dotViewStarter;
 
 var sityTips = [];
+
+Cloud.debug = true;
 
 Starter.prototype.addTour = function(tour) {
     this.tours.push(tour);

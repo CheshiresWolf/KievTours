@@ -47,6 +47,7 @@ $.buttonMore.addEventListener("click", function() {
 	more.fillTable();
 	
 	closeMenu();
+	more.getView().windowName = "moreView";
 	Alloy.Globals.openWindow(more.getView());
 });
 
@@ -59,5 +60,6 @@ $.buttonTips.addEventListener("click", function() {
 	sityTips.init(Alloy.Globals.getTips());
 	
 	closeMenu();
+	sityTips.getView().windowName = "sityTipsView";
 	Alloy.Globals.openWindow(sityTips.getView());
 });

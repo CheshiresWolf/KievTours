@@ -8,7 +8,7 @@ var sityTips = [];
 //};
 //var timer;
 
-//Cloud.debug = true;
+Cloud.debug = true;
 
 //=================================<Starter>================================
 
@@ -226,11 +226,12 @@ function getAudio(tour) {
 		//=============================================<<<<<<<<<<
 		
 	    if (e.success) {
-			tour.audio.player = Ti.Media.createSound({ 
+			tour.audio.player = Ti.Media.createVideoPlayer({ 
 			    url: e.files[0].url,
 			    volume: 0.5,
 			    allowBackground: true,
-			    preload: true
+			    autoplay: false,
+			    useApplicationAudioSession: true
 			});
 	    } else {
 			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));  

@@ -1,16 +1,23 @@
-var audioPlayer, isPlay = false, songTime = 0;
+var audioPlayer, isPlay = false, songTime = 0, intervalStep = 1000;
                               
 $.sliderVolume.addEventListener('change', function(e) {
+	Ti.API.info('audioPlayer| volume = ' + e.value); //====================
     audioPlayer.volume = e.value;
 });
 
 $.buttonBack.addEventListener("click", function () {
 	audioPlayer.pause();
-	if (songTime >= 5) {
-		audioPlayer.setTime((songTime - 5) * 1000);
+	if (songTime > 6000) {
+		//audioPlayer.setTime((songTime - 5) * 1000);
+		songTime -= 5000;
+		audioPlayer.setCurrentPlaybackTime(songTime);
+	} else {
+		audioPlayer.setCurrentPlaybackTime(0);
 	}
 	audioPlayer.play();
 	isPlay = true;
+	
+	Ti.API.info('audioPlayer| currentPlaybackTime = ' + audioPlayer.getCurrentPlaybackTime()); //====================
 });
 
 $.buttonPlay.addEventListener("click", function () {
@@ -27,21 +34,27 @@ $.buttonPlay.addEventListener("click", function () {
 
 $.buttonForward.addEventListener("click", function () {
 	audioPlayer.pause();
-	if (songTime <= audioPlayer.duration - 5) {
-		audioPlayer.setTime((songTime + 5) * 1000);
+	if (songTime < audioPlayer.duration - 6000) {
+		//audioPlayer.setTime((songTime + 5) * 1000);
+		songTime += 5000;
+		audioPlayer.setCurrentPlaybackTime(songTime + 5000);
+		
+	} else {
+		audioPlayer.setCurrentPlaybackTime(0);
 	}
+	
 	audioPlayer.play();
 	isPlay = true;
 });
 
-function secToString (sec) {
-	var min = (sec / 60).toString();
+function secToString (ms) {
+	var min = (ms / 60000).toString();
 	return min[0] + ":" + min[2] + min[3];
 }
 
 function audioProgress() {
 	if (isPlay) {
-		songTime = audioPlayer.time / 1000;
+		songTime = audioPlayer.getCurrentPlaybackTime();
 		$.sliderSong.value = songTime;
 		$.timePassed.text = secToString(songTime);
 	}
@@ -58,8 +71,10 @@ exports.initPlayer = function(width, player) {
 		height: width / 3
 	});
 	
+	Ti.API.info('audioPlayer| duration = ' + audioPlayer.getDuration()); //====================
+	
 	$.sliderSong.applyProperties({
-		max: audioPlayer.duration,
+		max: audioPlayer.getDuration(),
 		width: width * 0.6 - 40
 	});
 	
@@ -68,13 +83,13 @@ exports.initPlayer = function(width, player) {
 	});
 	
 	
-	setInterval(audioProgress, 1000);
+	setInterval(audioProgress, intervalStep);
 };
 
 exports.closePlayer = function () {
 	//$.buttonPlay.applyProperties({image: "images/dotsView/audioPlayerButtonPlay.png"});
 	clearInterval(audioProgress);
 	audioPlayer.pause();
-	audioPlayer.setTime(0);
+	audioPlayer.setCurrentPlaybackTime(0);
 	//audioPlayer.release();
 };

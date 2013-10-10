@@ -1,11 +1,11 @@
 function Controller() {
-    function secToString(sec) {
-        var min = (sec / 60).toString();
+    function secToString(ms) {
+        var min = (ms / 6e4).toString();
         return min[0] + ":" + min[2] + min[3];
     }
     function audioProgress() {
         if (isPlay) {
-            songTime = audioPlayer.time / 1e3;
+            songTime = audioPlayer.getCurrentPlaybackTime();
             $.sliderSong.value = songTime;
             $.timePassed.text = secToString(songTime);
         }
@@ -125,15 +125,20 @@ function Controller() {
     $.__views.container.add($.__views.audioIconMax);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var audioPlayer, isPlay = false, songTime = 0;
+    var audioPlayer, isPlay = false, songTime = 0, intervalStep = 1e3;
     $.sliderVolume.addEventListener("change", function(e) {
+        Ti.API.info("audioPlayer| volume = " + e.value);
         audioPlayer.volume = e.value;
     });
     $.buttonBack.addEventListener("click", function() {
         audioPlayer.pause();
-        songTime >= 5 && audioPlayer.setTime(1e3 * (songTime - 5));
+        if (songTime > 6e3) {
+            songTime -= 5e3;
+            audioPlayer.setCurrentPlaybackTime(songTime);
+        } else audioPlayer.setCurrentPlaybackTime(0);
         audioPlayer.play();
         isPlay = true;
+        Ti.API.info("audioPlayer| currentPlaybackTime = " + audioPlayer.getCurrentPlaybackTime());
     });
     $.buttonPlay.addEventListener("click", function() {
         if (isPlay) {
@@ -152,7 +157,10 @@ function Controller() {
     });
     $.buttonForward.addEventListener("click", function() {
         audioPlayer.pause();
-        audioPlayer.duration - 5 >= songTime && audioPlayer.setTime(1e3 * (songTime + 5));
+        if (audioPlayer.duration - 6e3 > songTime) {
+            songTime += 5e3;
+            audioPlayer.setCurrentPlaybackTime(songTime + 5e3);
+        } else audioPlayer.setCurrentPlaybackTime(0);
         audioPlayer.play();
         isPlay = true;
     });
@@ -163,19 +171,20 @@ function Controller() {
             width: .6 * width,
             height: width / 3
         });
+        Ti.API.info("audioPlayer| duration = " + audioPlayer.getDuration());
         $.sliderSong.applyProperties({
-            max: audioPlayer.duration,
+            max: audioPlayer.getDuration(),
             width: .6 * width - 40
         });
         $.sliderVolume.applyProperties({
             width: .6 * width - 40
         });
-        setInterval(audioProgress, 1e3);
+        setInterval(audioProgress, intervalStep);
     };
     exports.closePlayer = function() {
         clearInterval(audioProgress);
         audioPlayer.pause();
-        audioPlayer.setTime(0);
+        audioPlayer.setCurrentPlaybackTime(0);
     };
     _.extend($, exports);
 }

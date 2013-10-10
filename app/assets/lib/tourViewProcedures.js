@@ -174,7 +174,8 @@ exports.initTourViews = function(index) {
 	var menu = Alloy.createController("menuView");
 	controller.getView("window").add(menu.getView("menuListener"));
 	controller.getView("window").add(menu.getView("menu"));
-		
+	
+	controller.getView().windowName = "tourView";
 	controller.getView().open();
 	Alloy.Globals.setRootWindow(controller.getView());
 };

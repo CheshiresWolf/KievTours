@@ -313,5 +313,6 @@ exports.initDotsView = function(newController, tour) {
 		activeDotIndex = 0;
 	};
 	
+	controller.getView("window").windowName = "dotView";
 	Alloy.Globals.openWindow(controller.getView("window"));
 };
