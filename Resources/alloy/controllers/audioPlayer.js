@@ -3,6 +3,13 @@ function Controller() {
         var min = (sec / 60).toString();
         return min[0] + ":" + min[2] + min[3];
     }
+    function audioProgress() {
+        if (isPlay) {
+            songTime = audioPlayer.time / 1e3;
+            $.sliderSong.value = songTime;
+            $.timePassed.text = secToString(songTime);
+        }
+    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "audioPlayer";
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -119,13 +126,6 @@ function Controller() {
     exports.destroy = function() {};
     _.extend($, $.__views);
     var audioPlayer, isPlay = false, songTime = 0;
-    setInterval(function() {
-        if (isPlay) {
-            songTime = audioPlayer.time / 1e3;
-            $.sliderSong.value = songTime;
-            $.timePassed.text = secToString(songTime);
-        }
-    }, 1e3);
     $.sliderVolume.addEventListener("change", function(e) {
         audioPlayer.volume = e.value;
     });
@@ -170,8 +170,10 @@ function Controller() {
         $.sliderVolume.applyProperties({
             width: .6 * width - 40
         });
+        setInterval(audioProgress, 1e3);
     };
     exports.closePlayer = function() {
+        clearInterval(audioProgress);
         audioPlayer.pause();
         audioPlayer.setTime(0);
     };

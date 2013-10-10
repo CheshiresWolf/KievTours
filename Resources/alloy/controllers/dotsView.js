@@ -1,4 +1,15 @@
 function Controller() {
+    function centeringLogic() {
+        galleryShow(false);
+        $.smallPicturePhoto.animate(smallImagePhotoStyle);
+        $.smallPictureAudio.animate(smallImageAudioStyle, function() {
+            playerShow(false);
+        });
+        $.bigPicture.animate(bigImageStyle, function() {
+            bigPictureShow(true);
+            centeringMap();
+        });
+    }
     function galleryShow(flag) {
         var img = currentDot.cover;
         flag && (img = "");
@@ -218,21 +229,12 @@ function Controller() {
         list.fillTable(currentTour.dots, userPosition, controller.getIndex(), currentTour.title);
         list.getView("table").addEventListener("click", function(e) {
             controller.setIndex(e.index);
+            centeringLogic();
             Alloy.Globals.closeWindow();
         });
         Alloy.Globals.openWindow(list.getView("window"));
     });
-    $.smallPictureCenter.addEventListener("click", function() {
-        galleryShow(false);
-        $.smallPicturePhoto.animate(smallImagePhotoStyle);
-        $.smallPictureAudio.animate(smallImageAudioStyle, function() {
-            playerShow(false);
-        });
-        $.bigPicture.animate(bigImageStyle, function() {
-            bigPictureShow(true);
-            centeringMap();
-        });
-    });
+    $.smallPictureCenter.addEventListener("click", centeringLogic);
     $.galleryLeft.addEventListener("click", function() {
         if (galleryIndex > 0) {
             galleryIndex--;

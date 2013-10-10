@@ -23,6 +23,18 @@ loadFromCloud.init();
 
 //======================</Start>=====================
 
+function closeWindowAnimation(win) {
+	var rightSlide = Titanium.UI.createAnimation();
+    rightSlide.left = Titanium.Platform.displayCaps.platformWidth; // to put it back to the right side of the window
+    rightSlide.duration = 300;
+    
+    //var win = windowStack.pop();
+    
+    if (win.cleanTour !== undefined) win.cleanTour();
+    
+	win.close(rightSlide);
+}
+
 Alloy.Globals.getTours = function() {
 	return loadFromCloud.getTours();
 };
@@ -36,9 +48,6 @@ Alloy.Globals.setRootWindow = function(win) {
 };
 
 Alloy.Globals.backToRootWindow = function() {
-	var rightSlide = Titanium.UI.createAnimation();
-    rightSlide.left = Titanium.Platform.displayCaps.platformWidth; // to put it back to the right side of the window
-    rightSlide.duration = 300;
     var last = windowStack.pop();
     var i = windowStack.length - 1;
     
@@ -48,7 +57,7 @@ Alloy.Globals.backToRootWindow = function() {
 	}
 	
 	windowStack = [windowStack[0]];
-	last.close(rightSlide);
+	closeWindowAnimation(last);
 };
 
 Alloy.Globals.openWindow = function(win) {
@@ -62,13 +71,5 @@ Alloy.Globals.openWindow = function(win) {
 };
 
 Alloy.Globals.closeWindow = function() {
-	var rightSlide = Titanium.UI.createAnimation();
-    rightSlide.left = Titanium.Platform.displayCaps.platformWidth; // to put it back to the right side of the window
-    rightSlide.duration = 300;
-    
-    var win = windowStack.pop();
-    
-    if (win.cleanTour !== undefined) win.cleanTour();
-    
-	win.close(rightSlide);
+	closeWindowAnimation(windowStack.pop());
 };

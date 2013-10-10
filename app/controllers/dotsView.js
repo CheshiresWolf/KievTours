@@ -62,22 +62,13 @@ $.smallPictureList.addEventListener("click", function(e) {
 	list.fillTable(currentTour.dots, userPosition, controller.getIndex(), currentTour.title);
 	list.getView("table").addEventListener("click", function(e) {
 	    controller.setIndex(e.index);
+	    centeringLogic();
 	    Alloy.Globals.closeWindow();
 	});
 	Alloy.Globals.openWindow(list.getView("window"));
 });
 
-$.smallPictureCenter.addEventListener("click", function(e) {
-	galleryShow(false);
-	$.smallPicturePhoto.animate(smallImagePhotoStyle);
-	$.smallPictureAudio.animate(smallImageAudioStyle, function() {	
-		playerShow(false);
-	});
-	$.bigPicture.animate(bigImageStyle, function() {	
-		bigPictureShow(true);
-		centeringMap();
-	});
-});
+$.smallPictureCenter.addEventListener("click", centeringLogic);
 
 $.galleryLeft.addEventListener("click", function(e) {
 	if (galleryIndex > 0) {
@@ -109,6 +100,18 @@ $.galleryRight.addEventListener("click", function(e) {
 		
 	Ti.API.info('dotsView| gallery.length = ' + $.gallery.getViews().length); //===================================
 });
+
+function centeringLogic() {
+	galleryShow(false);
+	$.smallPicturePhoto.animate(smallImagePhotoStyle);
+	$.smallPictureAudio.animate(smallImageAudioStyle, function() {	
+		playerShow(false);
+	});
+	$.bigPicture.animate(bigImageStyle, function() {	
+		bigPictureShow(true);
+		centeringMap();
+	});
+}
 
 function galleryShow(flag) {
 	var img = currentDot.cover;

@@ -1,3 +1,11 @@
+function closeWindowAnimation(win) {
+    var rightSlide = Titanium.UI.createAnimation();
+    rightSlide.left = Titanium.Platform.displayCaps.platformWidth;
+    rightSlide.duration = 300;
+    void 0 !== win.cleanTour && win.cleanTour();
+    win.close(rightSlide);
+}
+
 var Alloy = require("alloy"), _ = Alloy._, Backbone = Alloy.Backbone;
 
 Ti.API.info("alloy.js| Start");
@@ -21,9 +29,6 @@ Alloy.Globals.setRootWindow = function(win) {
 };
 
 Alloy.Globals.backToRootWindow = function() {
-    var rightSlide = Titanium.UI.createAnimation();
-    rightSlide.left = Titanium.Platform.displayCaps.platformWidth;
-    rightSlide.duration = 300;
     var last = windowStack.pop();
     var i = windowStack.length - 1;
     for (i; i > 0; i--) {
@@ -31,7 +36,7 @@ Alloy.Globals.backToRootWindow = function() {
         windowStack[i].close();
     }
     windowStack = [ windowStack[0] ];
-    last.close(rightSlide);
+    closeWindowAnimation(last);
 };
 
 Alloy.Globals.openWindow = function(win) {
@@ -46,12 +51,7 @@ Alloy.Globals.openWindow = function(win) {
 };
 
 Alloy.Globals.closeWindow = function() {
-    var rightSlide = Titanium.UI.createAnimation();
-    rightSlide.left = Titanium.Platform.displayCaps.platformWidth;
-    rightSlide.duration = 300;
-    var win = windowStack.pop();
-    void 0 !== win.cleanTour && win.cleanTour();
-    win.close(rightSlide);
+    closeWindowAnimation(windowStack.pop());
 };
 
 Alloy.createController("index");

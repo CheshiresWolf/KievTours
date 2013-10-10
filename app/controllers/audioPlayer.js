@@ -1,12 +1,4 @@
 var audioPlayer, isPlay = false, songTime = 0;
-
-setInterval(function() { 
-	if (isPlay) {
-		songTime = audioPlayer.time / 1000;
-		$.sliderSong.value = songTime;
-		$.timePassed.text = secToString(songTime);
-	}
-}, 1000);
                               
 $.sliderVolume.addEventListener('change', function(e) {
     audioPlayer.volume = e.value;
@@ -47,6 +39,14 @@ function secToString (sec) {
 	return min[0] + ":" + min[2] + min[3];
 }
 
+function audioProgress() {
+	if (isPlay) {
+		songTime = audioPlayer.time / 1000;
+		$.sliderSong.value = songTime;
+		$.timePassed.text = secToString(songTime);
+	}
+}
+
 exports.initPlayer = function(width, player) {
 	
 	audioPlayer = player;
@@ -66,10 +66,14 @@ exports.initPlayer = function(width, player) {
 	$.sliderVolume.applyProperties({
 		width: width * 0.6 - 40
 	});
+	
+	
+	setInterval(audioProgress, 1000);
 };
 
 exports.closePlayer = function () {
 	//$.buttonPlay.applyProperties({image: "images/dotsView/audioPlayerButtonPlay.png"});
+	clearInterval(audioProgress);
 	audioPlayer.pause();
 	audioPlayer.setTime(0);
 	//audioPlayer.release();
