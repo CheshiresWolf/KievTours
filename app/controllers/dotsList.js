@@ -77,28 +77,7 @@ function createRow(flag, dot, i, distance, currentI) {
 	return row;
 }
 
-function toRad(grad) {
-	return Math.PI * grad / 180;
-}
-
-//in google we trust
-function distance(dotA, dotB) {
-   
-    var R = 6371; //Earth radius
-    var latA = toRad(dotA.latitude), latB = toRad(dotB.latitude);
-    var lonA = toRad(dotA.longitude), lonB = toRad(dotB.longitude);
-    var x = (lonB - lonA) * Math.cos((latA + latB) / 2);
-	var y = (latB - latA);
-    
-    return Math.acos(
-	    	Math.sin(latA) * Math.sin(latB) +
-	    	Math.cos(latA) * Math.cos(latB) *
-	    	Math.cos(lonB - lonA)
-    	) * R;
-}
-
-
-exports.fillTable = function(dots, userPosition, index, title) {
+exports.fillTable = function(dots, index, title) {
 	var tableData = [], flag = false;
 	
 	$.title.text = title;
@@ -108,7 +87,7 @@ exports.fillTable = function(dots, userPosition, index, title) {
 			flag = true;
 		}
 		
-		tableData.push( createRow(flag, dots[i], i, distance(userPosition, dots[i]), index) );
+		tableData.push( createRow(flag, dots[i], i, Alloy.Globals.getDistanceTo(dots[i]), index) );
 	}
 	
 	$.table.data = tableData;

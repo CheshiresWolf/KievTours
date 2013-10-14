@@ -25,7 +25,6 @@ function isInStackAlready(win) {
 function backToStackPos(pos) {
     var last = windowStack.pop();
     var i = windowStack.length - 1;
-    Ti.API.info("alloy.js| backToStackPos | i = " + i + "; pos = " + pos);
     for (i; i > pos; i--) {
         void 0 !== windowStack[i].cleanTour && windowStack[i].cleanTour();
         windowStack[i].close();
@@ -34,15 +33,39 @@ function backToStackPos(pos) {
     closeWindowAnimation(last);
 }
 
+function toRad(grad) {
+    return Math.PI * grad / 180;
+}
+
 var Alloy = require("alloy"), _ = Alloy._, Backbone = Alloy.Backbone;
 
 Ti.API.info("alloy.js| Start");
 
 var windowStack = [];
 
+var userPosition = {
+    latitude: 0,
+    longitude: 0
+};
+
+Titanium.Geolocation.getCurrentPosition(function(e) {
+    if (e.error) Ti.API.info("T_T"); else {
+        userPosition.latitude = e.coords.latitude;
+        userPosition.longitude = e.coords.longitude;
+    }
+});
+
 var loadFromCloud = require("lib/loadFromCloud");
 
 loadFromCloud.init();
+
+Alloy.Globals.getDistanceTo = function(dot) {
+    var R = 6371;
+    var latA = toRad(userPosition.latitude), latB = toRad(dot.latitude);
+    var lonA = toRad(userPosition.longitude), lonB = toRad(dot.longitude);
+    (lonB - lonA) * Math.cos((latA + latB) / 2);
+    return Math.acos(Math.sin(latA) * Math.sin(latB) + Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA)) * R;
+};
 
 Alloy.Globals.getTours = function() {
     return loadFromCloud.getTours();
@@ -62,26 +85,24 @@ Alloy.Globals.backToRootWindow = function() {
 
 Alloy.Globals.openWindow = function(win) {
     var pos = isInStackAlready(win);
-    Ti.API.info("alloy.js| windowPos = " + pos + " -----------------------------------");
     switch (pos) {
       case -1:
         openWindowAnimation(win);
         windowStack.push(win);
-        Ti.API.info("alloy.js| case = -1");
         break;
 
       case windowStack.length - 1:
-        Ti.API.info("alloy.js| case = " + (windowStack.length - 1));
         break;
 
       default:
         backToStackPos(pos);
-        Ti.API.info("alloy.js| case = def");
     }
 };
 
 Alloy.Globals.closeWindow = function() {
     closeWindowAnimation(windowStack.pop());
 };
+
+Alloy.Globals.userPosition = userPosition;
 
 Alloy.createController("index");

@@ -178,6 +178,25 @@ exports.init = function() {
     });
 };
 
+exports.getDotsNear = function() {
+    var pos = Alloy.Globals.userPosition;
+    Cloud.Places.query({
+        where: {
+            lnglat: {
+                $nearSphere: [ pos.longitude, pos.latitude ],
+                $maxDistance: .003
+            }
+        }
+    }, function(e) {
+        if (e.success) {
+            var discover = Alloy.createController("discoverMenu");
+            discover.fillTable(e.places);
+            discover.getView().windowName = "discoverMenu";
+            Alloy.Globals.openWindow(discover.getView());
+        } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
+    });
+};
+
 exports.getTours = function() {
     return starter.tours;
 };

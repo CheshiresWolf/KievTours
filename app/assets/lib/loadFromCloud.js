@@ -263,6 +263,7 @@ function loadTips() {
 //=================================</SityTips>================================
 
 //=================================<MAIN>================================
+
 exports.init = function() {
 	Cloud.Users.login({
 		login: "guest@gmail.com",
@@ -291,7 +292,40 @@ exports.init = function() {
 		}
 	});
 };
+
 //=================================</MAIN>===============================
+
+//===============================<Discover>==============================
+
+exports.getDotsNear = function() {
+	var pos = Alloy.Globals.userPosition;
+	
+	Cloud.Places.query({
+		where: {
+	        lnglat: {
+	            '$nearSphere': [pos.longitude,pos.latitude],
+	            '$maxDistance': 0.003
+	        }
+	    }
+	}, function(e) {
+		if (e.success) {
+			var i = 0;
+			var discover = Alloy.createController("discoverMenu");
+			//Ti.API.info("loadFromCloud| Places:"); //========================
+			//for (i; i < e.places.length; i++) {
+			discover.fillTable(e.places);
+			discover.getView().windowName = "discoverMenu";
+			Alloy.Globals.openWindow(discover.getView());
+			//}
+			//Ti.API.info("loadFromCloud| Places end."); //========================
+			
+	    } else {
+			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));  
+	    }
+	});
+};
+
+//==============================</Discover>==============================
 
 exports.getTours = function() {
 	return starter.tours;

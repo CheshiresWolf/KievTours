@@ -64,16 +64,6 @@ function Controller() {
         row.add(dotName);
         return row;
     }
-    function toRad(grad) {
-        return Math.PI * grad / 180;
-    }
-    function distance(dotA, dotB) {
-        var R = 6371;
-        var latA = toRad(dotA.latitude), latB = toRad(dotB.latitude);
-        var lonA = toRad(dotA.longitude), lonB = toRad(dotB.longitude);
-        (lonB - lonA) * Math.cos((latA + latB) / 2);
-        return Math.acos(Math.sin(latA) * Math.sin(latB) + Math.cos(latA) * Math.cos(latB) * Math.cos(lonB - lonA)) * R;
-    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "dotsList";
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -138,12 +128,12 @@ function Controller() {
     $.backButton.addEventListener("click", function() {
         Alloy.Globals.closeWindow();
     });
-    exports.fillTable = function(dots, userPosition, index, title) {
+    exports.fillTable = function(dots, index, title) {
         var tableData = [], flag = false;
         $.title.text = title;
         for (var i = 0; dots.length > i; i++) {
             i === dots.length - 1 && (flag = true);
-            tableData.push(createRow(flag, dots[i], i, distance(userPosition, dots[i]), index));
+            tableData.push(createRow(flag, dots[i], i, Alloy.Globals.getDistanceTo(dots[i]), index));
         }
         $.table.data = tableData;
     };

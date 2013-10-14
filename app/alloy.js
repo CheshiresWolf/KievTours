@@ -16,6 +16,24 @@ Ti.API.info("alloy.js| Start");
 
 var windowStack = [];
 
+//==================<UserPosition>=================
+
+var userPosition = {
+	latitude: 0,
+	longitude: 0
+};
+
+Titanium.Geolocation.getCurrentPosition(function(e) {
+	if (!e.error) {
+		userPosition.latitude = e.coords.latitude;
+		userPosition.longitude = e.coords.longitude;
+	} else {
+		Ti.API.info('T_T');
+	}
+});
+
+//==================</UserPosition>=================
+
 //======================<Start>=====================
 
 var loadFromCloud = require("lib/loadFromCloud");
@@ -71,6 +89,26 @@ function backToStackPos(pos) {
 	closeWindowAnimation(last);
 }
 
+function toRad(grad) {
+	return Math.PI * grad / 180;
+}
+
+//in google we trust
+Alloy.Globals.getDistanceTo = function(dot) {
+   
+    var R = 6371; //Earth radius
+    var latA = toRad(userPosition.latitude), latB = toRad(dot.latitude);
+    var lonA = toRad(userPosition.longitude), lonB = toRad(dot.longitude);
+    var x = (lonB - lonA) * Math.cos((latA + latB) / 2);
+	var y = (latB - latA);
+    
+    return Math.acos(
+	    	Math.sin(latA) * Math.sin(latB) +
+	    	Math.cos(latA) * Math.cos(latB) *
+	    	Math.cos(lonB - lonA)
+    	) * R;
+};
+
 Alloy.Globals.getTours = function() {
 	return loadFromCloud.getTours();
 };
@@ -114,3 +152,5 @@ Alloy.Globals.openWindow = function(win) {
 Alloy.Globals.closeWindow = function() {
 	closeWindowAnimation(windowStack.pop());
 };
+
+Alloy.Globals.userPosition = userPosition;

@@ -182,18 +182,7 @@ function Controller() {
     _.extend($, $.__views);
     var controller, currentTour, currentDot;
     var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
-    var alreadyLoaded = 0;
-    var userPosition = {
-        latitude: 0,
-        longitude: 0
-    };
-    var galleryIndex = 0;
-    Titanium.Geolocation.getCurrentPosition(function(e) {
-        if (e.error) Ti.API.info("T_T"); else {
-            userPosition.latitude = e.coords.latitude;
-            userPosition.longitude = e.coords.longitude;
-        }
-    });
+    var alreadyLoaded = 0, galleryIndex = 0;
     $.bigPicture.addEventListener("click", function() {
         galleryShow(false);
         playerShow(false);
@@ -226,7 +215,7 @@ function Controller() {
         var menu = Alloy.createController("menuView");
         list.getView("window").add(menu.getView("menuListener"));
         list.getView("window").add(menu.getView("menu"));
-        list.fillTable(currentTour.dots, userPosition, controller.getIndex(), currentTour.title);
+        list.fillTable(currentTour.dots, controller.getIndex(), currentTour.title);
         list.getView("table").addEventListener("click", function(e) {
             controller.setIndex(e.index);
             centeringLogic();

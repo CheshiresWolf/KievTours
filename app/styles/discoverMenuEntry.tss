@@ -1,0 +1,42 @@
+"#window": {
+	backgroundColor: "white"	
+},
+"#topPanel": {
+	top: 0,
+	left: 0,
+	width: "auto",
+	height: 80,
+	zIndex: 5
+},
+"#title": {
+	left: 35,
+	height: 60,
+	font: {
+        fontSize: '17dp',
+		fontWeight: 'bold'   
+	},
+	textAlign: "center"
+},
+"#logo": {
+	image: "images/APP_Kiev_logo_green.png",
+	width: 50,
+	heigth: 50,
+	top: 15,
+	right: 15,
+	zIndex: 6
+},
+"#backButton": {
+	image: "images/dotsList/BackButton.png",
+	width: 15,
+	height: 20,
+	top: 30,
+	left: 15,
+	zIndex: 6
+},
+"#table": {
+	top: 80,
+	left: 0,
+	width: "auto",
+	height: "auto",
+	filterAttribute: "my_filter"
+}

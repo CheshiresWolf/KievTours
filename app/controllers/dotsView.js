@@ -2,23 +2,7 @@ var controller, currentTour, currentDot;
 var bigImageStyle, smallImagePhotoStyle, smallImageAudioStyle;
 
 //int position of last loaded photo from currentDot.gallery
-var alreadyLoaded = 0;
-
-var userPosition = {
-	latitude: 0,
-	longitude: 0
-};
-
-var galleryIndex = 0;
-
-Titanium.Geolocation.getCurrentPosition(function(e) {
-	if (!e.error) {
-		userPosition.latitude = e.coords.latitude;
-		userPosition.longitude = e.coords.longitude;
-	} else {
-		Ti.API.info('T_T');
-	}
-});
+var alreadyLoaded = 0, galleryIndex = 0;
 
 $.bigPicture.addEventListener("click", function(e) {
 	galleryShow(false);
@@ -59,7 +43,7 @@ $.smallPictureList.addEventListener("click", function(e) {
 	//});
 	list.getView("window").add(menu.getView("menuListener"));
 	list.getView("window").add(menu.getView("menu"));
-	list.fillTable(currentTour.dots, userPosition, controller.getIndex(), currentTour.title);
+	list.fillTable(currentTour.dots, controller.getIndex(), currentTour.title);
 	list.getView("table").addEventListener("click", function(e) {
 	    controller.setIndex(e.index);
 	    centeringLogic();

@@ -38,6 +38,11 @@ $.buttonTours.addEventListener("click", function() {
 	Alloy.Globals.backToRootWindow();
 });
 
+$.buttonDiscover.addEventListener("click", function() {
+	var loadFromCloud = require("lib/loadFromCloud");
+	loadFromCloud.getDotsNear();
+});
+
 $.buttonMore.addEventListener("click", function() {
 	var more = Alloy.createController("more");
 	var menu = Alloy.createController("menuView");

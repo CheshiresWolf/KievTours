@@ -1,0 +1,11 @@
+<Alloy>
+	<Window id="window">
+		<View id="topPanel">
+			<ImageView id="backButton"></ImageView>
+			<ImageView id="titleIco"></ImageView>
+			<Label id="title">Discover Points Nearby</Label>
+			<ImageView id="logo"></ImageView>
+		</View>
+		<TableView id="table"></TableView>
+	</Window>
+</Alloy>
