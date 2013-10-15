@@ -1,23 +1,29 @@
-var audioPlayer, isPlay = false, songTime = 0, intervalStep = 1000;
+var audioPlayer, isPlay = false, songTime = 0, intervalStep = 1000, duration = audioPlayer.getDuration() * 1000;
+
+var interval = setInterval(function() {
+    //Ti.API.info('Time Played: ' + Math.round(e.progress) + ' milliseconds');
+    
+    songTime = audioPlayer.time;
+    $.sliderSong.value = songTime;
+	$.timePassed.text = secToString(songTime);
+}, intervalStep);
+
                               
 $.sliderVolume.addEventListener('change', function(e) {
-	Ti.API.info('audioPlayer| volume = ' + e.value); //====================
+	//Ti.API.info('audioPlayer| volume = ' + e.value); //====================
     audioPlayer.volume = e.value;
 });
 
 $.buttonBack.addEventListener("click", function () {
-	audioPlayer.pause();
-	if (songTime > 6000) {
-		//audioPlayer.setTime((songTime - 5) * 1000);
+	if (songTime > 5000) {
+		
+		Ti.API.info('audioPlayer| (<<) | newTime = ' + songTime); //====================
+		
+		audioPlayer.pause();
 		songTime -= 5000;
-		audioPlayer.setCurrentPlaybackTime(songTime);
-	} else {
-		audioPlayer.setCurrentPlaybackTime(0);
+		audioPlayer.setTime(songTime);
+		audioPlayer.play();
 	}
-	audioPlayer.play();
-	isPlay = true;
-	
-	Ti.API.info('audioPlayer| currentPlaybackTime = ' + audioPlayer.getCurrentPlaybackTime()); //====================
 });
 
 $.buttonPlay.addEventListener("click", function () {
@@ -33,18 +39,15 @@ $.buttonPlay.addEventListener("click", function () {
 });
 
 $.buttonForward.addEventListener("click", function () {
-	audioPlayer.pause();
-	if (songTime < audioPlayer.duration - 6000) {
-		//audioPlayer.setTime((songTime + 5) * 1000);
-		songTime += 5000;
-		audioPlayer.setCurrentPlaybackTime(songTime + 5000);
+	if (songTime < duration - 6000) {
 		
-	} else {
-		audioPlayer.setCurrentPlaybackTime(0);
+		Ti.API.info('audioPlayer| (>>) | newTime = ' + songTime); //====================
+		
+		audioPlayer.pause();
+		songTime += 5000;
+		audioPlayer.setTime(songTime);
+		audioPlayer.play();
 	}
-	
-	audioPlayer.play();
-	isPlay = true;
 });
 
 function secToString (ms) {
@@ -52,44 +55,32 @@ function secToString (ms) {
 	return min[0] + ":" + min[2] + min[3];
 }
 
-function audioProgress() {
-	if (isPlay) {
-		songTime = audioPlayer.getCurrentPlaybackTime();
-		$.sliderSong.value = songTime;
-		$.timePassed.text = secToString(songTime);
-	}
-}
-
 exports.initPlayer = function(width, player) {
-	
 	audioPlayer = player;
 	
-	$.timeLeft.text = secToString(audioPlayer.duration);
+	$.timeLeft.text = secToString(duration);
 	
 	$.container.applyProperties({
 		width: width * 0.6,
 		height: width / 3
 	});
 	
-	Ti.API.info('audioPlayer| duration = ' + audioPlayer.getDuration()); //====================
+	Ti.API.info('audioPlayer| duration = ' + duration); //====================
 	
 	$.sliderSong.applyProperties({
-		max: audioPlayer.getDuration(),
+		max: duration,
 		width: width * 0.6 - 40
 	});
 	
 	$.sliderVolume.applyProperties({
 		width: width * 0.6 - 40
 	});
-	
-	
-	setInterval(audioProgress, intervalStep);
 };
 
 exports.closePlayer = function () {
 	//$.buttonPlay.applyProperties({image: "images/dotsView/audioPlayerButtonPlay.png"});
-	clearInterval(audioProgress);
+	clearInterval(interval);
 	audioPlayer.pause();
-	audioPlayer.setCurrentPlaybackTime(0);
+	audioPlayer.setTime(0);
 	//audioPlayer.release();
 };

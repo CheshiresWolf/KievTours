@@ -3,13 +3,6 @@ function Controller() {
         var min = (ms / 6e4).toString();
         return min[0] + ":" + min[2] + min[3];
     }
-    function audioProgress() {
-        if (isPlay) {
-            songTime = audioPlayer.getCurrentPlaybackTime();
-            $.sliderSong.value = songTime;
-            $.timePassed.text = secToString(songTime);
-        }
-    }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "audioPlayer";
     arguments[0] ? arguments[0]["__parentSymbol"] : null;
@@ -126,19 +119,22 @@ function Controller() {
     exports.destroy = function() {};
     _.extend($, $.__views);
     var audioPlayer, isPlay = false, songTime = 0, intervalStep = 1e3;
+    var interval = setInterval(function() {
+        songTime = audioPlayer.time;
+        $.sliderSong.value = songTime;
+        $.timePassed.text = secToString(songTime);
+    }, intervalStep);
     $.sliderVolume.addEventListener("change", function(e) {
-        Ti.API.info("audioPlayer| volume = " + e.value);
         audioPlayer.volume = e.value;
     });
     $.buttonBack.addEventListener("click", function() {
-        audioPlayer.pause();
-        if (songTime > 6e3) {
+        if (songTime > 5e3) {
+            Ti.API.info("audioPlayer| (<<) | newTime = " + songTime);
+            audioPlayer.pause();
             songTime -= 5e3;
-            audioPlayer.setCurrentPlaybackTime(songTime);
-        } else audioPlayer.setCurrentPlaybackTime(0);
-        audioPlayer.play();
-        isPlay = true;
-        Ti.API.info("audioPlayer| currentPlaybackTime = " + audioPlayer.getCurrentPlaybackTime());
+            audioPlayer.setTime(songTime);
+            audioPlayer.play();
+        }
     });
     $.buttonPlay.addEventListener("click", function() {
         if (isPlay) {
@@ -156,35 +152,35 @@ function Controller() {
         }
     });
     $.buttonForward.addEventListener("click", function() {
-        audioPlayer.pause();
-        if (audioPlayer.duration - 6e3 > songTime) {
+        if (audioPlayer.getDuration() - 6e3 > songTime) {
+            Ti.API.info("audioPlayer| (>>) | newTime = " + songTime);
+            audioPlayer.pause();
             songTime += 5e3;
-            audioPlayer.setCurrentPlaybackTime(songTime + 5e3);
-        } else audioPlayer.setCurrentPlaybackTime(0);
-        audioPlayer.play();
-        isPlay = true;
+            audioPlayer.setTime(songTime);
+            audioPlayer.play();
+        }
     });
     exports.initPlayer = function(width, player) {
         audioPlayer = player;
-        $.timeLeft.text = secToString(audioPlayer.duration);
+        var duration = 1e3 * audioPlayer.getDuration();
+        $.timeLeft.text = secToString(duration);
         $.container.applyProperties({
             width: .6 * width,
             height: width / 3
         });
-        Ti.API.info("audioPlayer| duration = " + audioPlayer.getDuration());
+        Ti.API.info("audioPlayer| duration = " + duration);
         $.sliderSong.applyProperties({
-            max: audioPlayer.getDuration(),
+            max: duration,
             width: .6 * width - 40
         });
         $.sliderVolume.applyProperties({
             width: .6 * width - 40
         });
-        setInterval(audioProgress, intervalStep);
     };
     exports.closePlayer = function() {
-        clearInterval(audioProgress);
+        clearInterval(interval);
         audioPlayer.pause();
-        audioPlayer.setCurrentPlaybackTime(0);
+        audioPlayer.setTime(0);
     };
     _.extend($, exports);
 }

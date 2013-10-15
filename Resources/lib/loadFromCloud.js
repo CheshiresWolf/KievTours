@@ -68,13 +68,38 @@ function getAudio(tour) {
         file_id: tour.audio.id
     }, function(e) {
         Ti.API.info("loadFromCloud| Loading audio file (" + e.files[0].name + ")");
-        e.success ? tour.audio.player = Ti.Media.createVideoPlayer({
-            url: e.files[0].url,
-            volume: .5,
-            allowBackground: true,
-            autoplay: false,
-            useApplicationAudioSession: true
-        }) : alert("Error: " + (e.error && e.message || JSON.stringify(e)));
+        if (e.success) {
+            localFile = Titanium.Filesystem.getApplicationDataDirectory() + tour.id + ".mp3";
+            if (tour.isDownloaded) tour.audio.player = createPlayer(localFile); else {
+                remoteFile = e.files[0].url;
+                var httpClient = Titanium.Network.createHTTPClient();
+                httpClient.setTimeout(1e6);
+                httpClient.onload = function() {
+                    Ti.API.info("loadFromCloud| Save path - " + localFile);
+                    var file = Titanium.Filesystem.getFile(localFile);
+                    file.write(this.responseData);
+                    tour.audio.player = createPlayer(localFile);
+                    tour.isDownloaded = true;
+                };
+                httpClient.onreadystatechange = function(e) {
+                    4 === e.readyState && Ti.API.info("loadFromCloud.js| Download complete");
+                };
+                httpClient.onerror = function() {
+                    Ti.API.info("loadFromCloud.js| HTTP error!");
+                };
+                httpClient.open("GET", remoteFile);
+                httpClient.send();
+            }
+        } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
+    });
+}
+
+function createPlayer(path) {
+    return Ti.Media.createSound({
+        url: path,
+        volume: .5,
+        allowBackground: true,
+        autoplay: false
     });
 }
 

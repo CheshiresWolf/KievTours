@@ -141,7 +141,7 @@ function createRow(place) {
 	row.add(rate);
 	
 	var pathIco = Titanium.UI.createImageView({
-		image: "images/discover/icon_comment.png",
+		image: "images/discover/icon_path.png",
 		left: 180,
 		bottom: 0,
 		width: 20,

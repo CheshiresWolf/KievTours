@@ -35,7 +35,7 @@ function Controller() {
     function createMap(place) {
         var width = .6 * Titanium.Platform.displayCaps.platformWidth;
         var row = Titanium.UI.createTableViewRow({
-            height: width + 10
+            height: width + 90
         });
         var topImg = Ti.UI.createImageView({
             image: place.photo.urls.original,
@@ -55,6 +55,128 @@ function Controller() {
             zIndex: 4
         });
         row.add(bottomImg);
+        var button = Ti.UI.createImageView({
+            image: "images/discover/discover_showTours.png",
+            top: 10 + width,
+            right: 5,
+            width: 2 * width / 3,
+            height: 40,
+            zIndex: 4
+        });
+        row.add(button);
+        var iconContainer = Ti.UI.createView({
+            backgroundColor: "#dbdbdb",
+            top: 55 + width,
+            right: 7,
+            width: 2 * width / 3 - 4,
+            height: 30,
+            borderRadius: 5,
+            zIndex: 4
+        });
+        row.add(iconContainer);
+        var rateIco = Titanium.UI.createImageView({
+            image: "images/discover/icon_star.png",
+            left: 10,
+            width: 15,
+            height: 15,
+            zIndex: 4
+        });
+        iconContainer.add(rateIco);
+        var rate = Titanium.UI.createLabel({
+            text: "3",
+            font: {
+                fontSize: 10
+            },
+            left: 30,
+            width: 30,
+            height: 20,
+            textAlign: "left",
+            zIndex: 4
+        });
+        iconContainer.add(rate);
+        var pathIco = Titanium.UI.createImageView({
+            image: "images/discover/Discover_icon_path_green.png",
+            left: 2 * width / 6 - 10,
+            width: 15,
+            height: 15,
+            zIndex: 4
+        });
+        iconContainer.add(pathIco);
+        var roundPath = Alloy.Globals.getDistanceTo({
+            latitude: place.latitude,
+            longitude: place.longitude
+        }).toFixed(2);
+        var path = Titanium.UI.createLabel({
+            text: roundPath + " km",
+            font: {
+                fontSize: 10
+            },
+            left: 2 * width / 6 + 15,
+            width: 50,
+            height: 20,
+            textAlign: "left",
+            zIndex: 4
+        });
+        iconContainer.add(path);
+        var textContainer = Ti.UI.createView({
+            top: 10 + width,
+            left: 7,
+            width: width - 10,
+            height: 80,
+            zIndex: 4
+        });
+        row.add(textContainer);
+        var address = Ti.UI.createLabel({
+            text: place.address + ", " + place.city,
+            font: {
+                fontSize: 10
+            },
+            top: 0,
+            width: "auto",
+            textAlign: "center",
+            zIndex: 4
+        });
+        textContainer.add(address);
+        if (void 0 !== place.phone_number) {
+            var phone = Ti.UI.createLabel({
+                text: place.phone_number,
+                font: {
+                    fontSize: 10,
+                    fontWeight: "bold"
+                },
+                top: 20,
+                width: "auto",
+                textAlign: "center",
+                zIndex: 4
+            });
+            textContainer.add(phone);
+        }
+        if (void 0 !== place.custom_fields.email) {
+            var email = Ti.UI.createLabel({
+                text: "e-mail: " + place.custom_fields.email,
+                font: {
+                    fontSize: 10
+                },
+                top: 40,
+                width: "auto",
+                textAlign: "center",
+                zIndex: 4
+            });
+            textContainer.add(email);
+        }
+        if (void 0 !== place.website) {
+            var site = Ti.UI.createLabel({
+                text: place.website,
+                font: {
+                    fontSize: 10
+                },
+                top: 60,
+                width: "auto",
+                textAlign: "center",
+                zIndex: 4
+            });
+            textContainer.add(site);
+        }
         return row;
     }
     function createSummary(place) {
@@ -181,18 +303,21 @@ function Controller() {
         Alloy.Globals.closeWindow();
     });
     $.table.addEventListener("click", function(e) {
-        if (e.row.isparent) if (e.row.opened) {
-            e.row.openIco.image = "images/discover/discover_menu_close.png";
-            for (var i = e.row.sub.length; i > 0; i -= 1) $.table.deleteRow(e.index + i);
-            e.row.opened = false;
-        } else {
-            var currentIndex = e.index;
-            e.row.openIco.image = "images/discover/discover_menu_open.png";
-            for (var i = 0; e.row.sub.length > i; i++) {
-                $.table.insertRowAfter(currentIndex, e.row.sub[i]);
-                currentIndex++;
+        if (e.row.isparent) {
+            var i;
+            if (e.row.opened) {
+                e.row.openIco.image = "images/discover/discover_menu_close.png";
+                for (i = e.row.sub.length; i > 0; i -= 1) $.table.deleteRow(e.index + i);
+                e.row.opened = false;
+            } else {
+                var currentIndex = e.index;
+                e.row.openIco.image = "images/discover/discover_menu_open.png";
+                for (i = 0; e.row.sub.length > i; i++) {
+                    $.table.insertRowAfter(currentIndex, e.row.sub[i]);
+                    currentIndex++;
+                }
+                e.row.opened = true;
             }
-            e.row.opened = true;
         }
     });
     exports.fillTable = function(place) {

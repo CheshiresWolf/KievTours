@@ -6,11 +6,11 @@ $.table.addEventListener("click", function(e) {
 	
 	//Is this a parent cell?
 	if (e.row.isparent) {
-		
+		var i;
 		//Is it opened?
 		if (e.row.opened) {
 			e.row.openIco.image = "images/discover/discover_menu_close.png";
-			for(var i = e.row.sub.length; i > 0; i = i - 1) {
+			for(i = e.row.sub.length; i > 0; i = i - 1) {
 				$.table.deleteRow(e.index + i);
 			}
 			e.row.opened = false;
@@ -18,7 +18,7 @@ $.table.addEventListener("click", function(e) {
 			//Add teh children.
 			var currentIndex = e.index;
 			e.row.openIco.image = "images/discover/discover_menu_open.png";
-			for (var i = 0; i < e.row.sub.length; i++) {
+			for (i = 0; i < e.row.sub.length; i++) {
 				$.table.insertRowAfter(currentIndex, e.row.sub[i]);
 				currentIndex++;
 			}
@@ -66,7 +66,7 @@ function createRow(img, text) {
 function createMap(place) {
 	var width = Titanium.Platform.displayCaps.platformWidth * 0.6;
 	
-	var row = Titanium.UI.createTableViewRow({height: width + 10});
+	var row = Titanium.UI.createTableViewRow({height: width + 90});
 	
 	var topImg = Ti.UI.createImageView({
 		image: place.photo.urls.original,
@@ -88,6 +88,139 @@ function createMap(place) {
 	});
 	row.add(bottomImg);
 	
+	var button = Ti.UI.createImageView({
+		image: "images/discover/discover_showTours.png",
+		top: 10 + width,
+		right: 5,
+		width: (2 * width) / 3,
+		height: 40,
+		zIndex: 4
+	});
+	row.add(button);
+		
+	var iconContainer = Ti.UI.createView({
+		backgroundColor: "#dbdbdb",
+		top: 55 + width,
+		right: 7,
+		width: (2 * width) / 3 - 4,
+		height: 30,
+		borderRadius: 5,
+		//borderColor:'black',
+		zIndex: 4
+	});
+	row.add(iconContainer);
+	
+	var rateIco = Titanium.UI.createImageView({
+		image: "images/discover/icon_star.png",
+		left: 10,
+		width: 15,
+		height: 15,
+		zIndex: 4
+	});
+	iconContainer.add(rateIco);
+	
+	var rate = Titanium.UI.createLabel({
+		text: "3",
+		font: {
+			fontSize: 10 
+		},
+		left: 30,
+		width: 30,
+		height: 20,
+		textAlign: 'left',
+		zIndex: 4
+	});
+	iconContainer.add(rate);
+	
+	var pathIco = Titanium.UI.createImageView({
+		image: "images/discover/Discover_icon_path_green.png",
+		left: (2 * width) / 6 - 10,
+		//bottom: 0,
+		width: 15,
+		height: 15,
+		zIndex: 4
+	});
+	iconContainer.add(pathIco);
+	
+	var roundPath = Alloy.Globals.getDistanceTo({latitude: place.latitude, longitude: place.longitude}).toFixed(2);
+	
+	var path = Titanium.UI.createLabel({
+		text: roundPath + " km",
+		font: {
+			fontSize: 10 
+		},
+		left: (2 * width) / 6 + 15,
+		width: 50,
+		height: 20,
+		textAlign: 'left',
+		zIndex: 4
+	});
+	iconContainer.add(path);
+	
+	var textContainer = Ti.UI.createView({
+		top: 10 + width,
+		left: 7,
+		width: width - 10,
+		height: 80,
+		zIndex: 4
+	});
+	row.add(textContainer);
+	
+	var address = Ti.UI.createLabel({
+		text: place.address + ", " + place.city,
+		font: {
+			fontSize: 10 
+		},
+		top: 0,
+		width: "auto",
+		textAlign: 'center',
+		zIndex: 4
+	});
+	textContainer.add(address);
+	
+	if (place.phone_number !== undefined) {
+		var phone = Ti.UI.createLabel({
+			text: place.phone_number,
+			font: {
+				fontSize: 10,
+				fontWeight: 'bold'
+			},
+			top: 20,
+			width: "auto",
+			textAlign: 'center',
+			zIndex: 4
+		});
+		textContainer.add(phone);
+	}
+	
+	if (place.custom_fields.email !== undefined) {
+		var email = Ti.UI.createLabel({
+			text: "e-mail: " + place.custom_fields.email,
+			font: {
+				fontSize: 10
+			},
+			top: 40,
+			width: "auto",
+			textAlign: 'center',
+			zIndex: 4
+		});
+		textContainer.add(email);
+	}
+	
+	if (place.website !== undefined) {
+		var site = Ti.UI.createLabel({
+			text: place.website,
+			font: {
+				fontSize: 10
+			},
+			top: 60,
+			width: "auto",
+			textAlign: 'center',
+			zIndex: 4
+		});
+		textContainer.add(site);
+	}
+	
 	return row;
 }
 
@@ -104,18 +237,6 @@ function createSummary(place) {
 		left: 10
 	});
 	subRow.add(aA);
-	
-	/*var title = Ti.UI.createLabel({
-		text:
-		width: width,
-		height: 20,
-		top: 5,
-		left: 30,
-		font: {
-			fontWeight: 'bold'
-		}
-	});
-	subRow.add(title);*/
 	
 	var text = Ti.UI.createLabel({
 		text: place.custom_fields.text,

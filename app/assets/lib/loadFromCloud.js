@@ -226,16 +226,72 @@ function getAudio(tour) {
 		//=============================================<<<<<<<<<<
 		
 	    if (e.success) {
+		    //var length = 0;
+		 
+		    localFile = Titanium.Filesystem.getApplicationDataDirectory() + tour.id + ".mp3";
+		    
+		    if (tour.isDownloaded) {
+				tour.audio.player = createPlayer(localFile);
+		    } else {
+			    remoteFile = e.files[0].url;
+			 
+			    var httpClient = Titanium.Network.createHTTPClient();
+			    httpClient.setTimeout(1000000);
+			 
+			    // Data received
+			    httpClient.onload = function(e) {
+			        // Create a filestream and write the received data to a file
+			        //var writeFile = Titanium.Filesystem.getFile(localFile);
+			        //=============================================<<<<<<<<<<
+					Ti.API.info("loadFromCloud| Save path - " + localFile);
+					//=============================================<<<<<<<<<<
+					var file = Titanium.Filesystem.getFile(localFile);
+			        //var writeStream = Titanium.Filesystem.openStream(Titanium.Filesystem.MODE_WRITE, localFile);
+			        //writeStream.open(Titanium.Filesystem.MODE_WRITE);
+			        //writeStream.write(this.responseData);
+			        //writeStream.close();
+			        file.write(this.responseData);
+			        //file.close();
+			        
+			        tour.audio.player = createPlayer(localFile);
+			        tour.isDownloaded = true;
+			    };
+			 
+			    // Handle state change
+			    httpClient.onreadystatechange = function(e) {
+			        if (e.readyState === 4) {
+						Ti.API.info('loadFromCloud.js| Download complete');
+			        }
+			    };
+			 
+			    // Handle error event
+			    httpClient.onerror = function(e) {
+			        Ti.API.info('loadFromCloud.js| HTTP error!');
+			    };
+	
+			    httpClient.open('GET', remoteFile);
+			    httpClient.send();
+			}
+			/*
 			tour.audio.player = Ti.Media.createVideoPlayer({ 
 			    url: e.files[0].url,
 			    volume: 0.5,
 			    allowBackground: true,
 			    autoplay: false,
 			    useApplicationAudioSession: true
-			});
+			});*/
 	    } else {
 			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));  
 	    }
+	});
+}
+
+function createPlayer(path) {
+	return Ti.Media.createSound({ 
+	    url: path,
+	    volume: 0.5,
+	    allowBackground: true,
+	    autoplay: false
 	});
 }
 
