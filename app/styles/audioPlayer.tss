@@ -16,7 +16,7 @@
 	width: 20,
 	height: 20,
 	font: {
-        fontSize: '10dp'    
+        fontSize: '9dp'    
     }
 },
 "#sliderSong": {
@@ -37,7 +37,7 @@
 	width: 20,
 	height: 20,
 	font: {
-        fontSize: '10dp'    
+        fontSize: '9dp'    
     }
 },
 "#buttonBack": {

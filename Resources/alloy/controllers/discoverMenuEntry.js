@@ -33,7 +33,7 @@ function Controller() {
         return row;
     }
     function createMap(place) {
-        var width = .6 * Titanium.Platform.displayCaps.platformWidth;
+        var width = .55 * Titanium.Platform.displayCaps.platformWidth;
         var row = Titanium.UI.createTableViewRow({
             height: width + 90
         });
@@ -47,7 +47,7 @@ function Controller() {
         });
         row.add(topImg);
         var bottomImg = Ti.UI.createImageView({
-            image: place.photo.urls.original,
+            image: "images/dotsView/MapMask.png",
             top: 5,
             right: 5,
             width: width,
@@ -55,11 +55,39 @@ function Controller() {
             zIndex: 4
         });
         row.add(bottomImg);
+        var point = Ti.UI.createImageView({
+            width: 35,
+            height: 55,
+            image: "images/dotsView/MapPin_on.png"
+        });
+        var annot = Titanium.Map.createAnnotation({
+            title: 0,
+            image: point.toImage(),
+            latitude: place.latitude,
+            longitude: place.longitude
+        });
+        var map = Titanium.Map.createView({
+            mapType: Titanium.Map.STANDARD_TYPE,
+            userLocation: false,
+            region: {
+                latitude: place.latitude,
+                longitude: place.longitude,
+                latitudeDelta: .01,
+                longitudeDelta: .01
+            },
+            annotations: [ annot ],
+            top: 5,
+            right: 5,
+            width: width,
+            height: width,
+            zIndex: 3
+        });
+        row.add(map);
         var button = Ti.UI.createImageView({
             image: "images/discover/discover_showTours.png",
             top: 10 + width,
             right: 5,
-            width: 2 * width / 3,
+            width: .8 * width,
             height: 40,
             zIndex: 4
         });
@@ -68,7 +96,7 @@ function Controller() {
             backgroundColor: "#dbdbdb",
             top: 55 + width,
             right: 7,
-            width: 2 * width / 3 - 4,
+            width: .8 * width - 4,
             height: 30,
             borderRadius: 5,
             zIndex: 4
@@ -96,7 +124,6 @@ function Controller() {
         iconContainer.add(rate);
         var pathIco = Titanium.UI.createImageView({
             image: "images/discover/Discover_icon_path_green.png",
-            left: 2 * width / 6 - 10,
             width: 15,
             height: 15,
             zIndex: 4
@@ -111,7 +138,7 @@ function Controller() {
             font: {
                 fontSize: 10
             },
-            left: 2 * width / 6 + 15,
+            left: (.8 * width - 4) / 2 + 15,
             width: 50,
             height: 20,
             textAlign: "left",

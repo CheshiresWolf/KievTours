@@ -1,7 +1,12 @@
 function Controller() {
     function pressButton(img) {
+        if (void 0 !== $.loadingIco.interval) {
+            clearInterval($.loadingIco.interval);
+            $.loadingIco.setVisible(false);
+        }
         $.button.applyProperties({
-            image: img
+            image: img,
+            touchEnabled: true
         });
         listenerFlag++;
         Ti.API.info("pressButton");
@@ -186,9 +191,9 @@ function Controller() {
     $.__views.tourContent.add($.__views.button);
     $.__views.loadingIco = Ti.UI.createImageView({
         image: "images/tourView/loading/loading_ico_0.png",
-        width: 25,
-        height: 25,
-        bottom: 10,
+        width: 10,
+        height: 10,
+        bottom: 17,
         zIndex: 4,
         visible: false,
         id: "loadingIco"
@@ -225,10 +230,21 @@ function Controller() {
     $.button.addEventListener("click", function() {
         switch (listenerFlag) {
           case 0:
+            $.button.setTouchEnabled(false);
             currentTour.buy(pressButton);
             break;
 
           case 1:
+            $.button.setTouchEnabled(false);
+            $.loadingIco.setVisible(true);
+            $.loadingIco.index = 0;
+            $.loadingIco.interval = setInterval(function() {
+                $.loadingIco.applyProperties({
+                    image: "images/tourView/loading/loading_ico_" + $.loadingIco.index + ".png"
+                });
+                $.loadingIco.index++;
+                3 === $.loadingIco.index && ($.loadingIco.index = 0);
+            }, 500);
             currentTour.download(pressButton, $.loadingIco);
             break;
 

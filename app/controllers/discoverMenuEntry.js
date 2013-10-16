@@ -64,7 +64,7 @@ function createRow(img, text) {
 }
 
 function createMap(place) {
-	var width = Titanium.Platform.displayCaps.platformWidth * 0.6;
+	var width = Titanium.Platform.displayCaps.platformWidth * 0.55;
 	
 	var row = Titanium.UI.createTableViewRow({height: width + 90});
 	
@@ -79,7 +79,7 @@ function createMap(place) {
 	row.add(topImg);
 	
 	var bottomImg = Ti.UI.createImageView({
-		image: place.photo.urls.original,
+		image: "images/dotsView/MapMask.png",
 		top: 5,
 		right: 5,
 		width: width,
@@ -88,11 +88,42 @@ function createMap(place) {
 	});
 	row.add(bottomImg);
 	
+	var point = Ti.UI.createImageView({
+		width: 35,
+		height: 55,
+		image: "images/dotsView/MapPin_on.png",
+	});
+	
+	var annot = Titanium.Map.createAnnotation({
+		title: 0,
+		image: point.toImage(),
+		latitude: place.latitude,
+		longitude: place.longitude
+	});
+	
+	var map = Titanium.Map.createView({
+		mapType: Titanium.Map.STANDARD_TYPE,
+		userLocation: false,
+	    region: {
+			latitude: place.latitude,
+			longitude: place.longitude,
+			latitudeDelta: 0.01,
+			longitudeDelta: 0.01
+	    },
+	    annotations: [annot],
+	    top: 5,
+		right: 5,
+		width: width,
+		height: width,
+		zIndex: 3
+	});
+	row.add(map);
+	
 	var button = Ti.UI.createImageView({
 		image: "images/discover/discover_showTours.png",
 		top: 10 + width,
 		right: 5,
-		width: (2 * width) / 3,
+		width: width * 0.8,
 		height: 40,
 		zIndex: 4
 	});
@@ -102,7 +133,7 @@ function createMap(place) {
 		backgroundColor: "#dbdbdb",
 		top: 55 + width,
 		right: 7,
-		width: (2 * width) / 3 - 4,
+		width: width * 0.8 - 4,
 		height: 30,
 		borderRadius: 5,
 		//borderColor:'black',
@@ -134,7 +165,7 @@ function createMap(place) {
 	
 	var pathIco = Titanium.UI.createImageView({
 		image: "images/discover/Discover_icon_path_green.png",
-		left: (2 * width) / 6 - 10,
+		//right: (width * 0.8 - 4) / 2 - 10,
 		//bottom: 0,
 		width: 15,
 		height: 15,
@@ -149,7 +180,7 @@ function createMap(place) {
 		font: {
 			fontSize: 10 
 		},
-		left: (2 * width) / 6 + 15,
+		left: (width * 0.8 - 4) / 2 + 15,
 		width: 50,
 		height: 20,
 		textAlign: 'left',

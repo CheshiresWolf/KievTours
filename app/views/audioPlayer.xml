@@ -1,8 +1,8 @@
 <Alloy>
 	<View id="container">
-		<Label id="timePassed" class="index">0:00</Label>
+		<Label id="timePassed" class="index"></Label>
 		<Slider id="sliderSong" class="index"></Slider>
-		<Label id="timeLeft" class="index">0:00</Label>
+		<Label id="timeLeft" class="index"></Label>
 		<ImageView id="buttonBack" class="index"></ImageView>
 		<ImageView id="buttonPlay" class="index"></ImageView>
 		<ImageView id="buttonForward" class="index"></ImageView>

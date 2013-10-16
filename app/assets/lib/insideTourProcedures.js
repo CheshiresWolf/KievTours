@@ -113,6 +113,7 @@ function addAnotation(dot, i) {
 			fontSize: 10
 		}
 	});
+	
 	var annot = Titanium.Map.createAnnotation({
 		title: currentTour.dots[i].name,
 		image: annotImage.toImage(),
@@ -272,16 +273,6 @@ exports.initDotsView = function(newController, tour) {
 	controller = newController;
 	currentTour = tour;
 	
-	/*
-	controller.close = function () {
-		audioView.closePlayer();
-		Alloy.Globals.closeWindow();//controller.getView("window"));
-		pagingArray = [];
-		annotationArray = [];
-		isGallerySet = false;
-		activeDotIndex = 0;
-	};
-	*/
 	controller.getIndex = function () {
 		return activeDotIndex;
 	};
@@ -299,9 +290,6 @@ exports.initDotsView = function(newController, tour) {
 	controller.getView("scrollView").add(dotText.getView());
 		
 	var menu = Alloy.createController("menuView");
-	//menu.getView("buttonTours").addEventListener("click", function() {
-	//	controller.close();
-	//});
 	controller.getView("window").add(menu.getView("menuListener"));
 	controller.getView("window").add(menu.getView("menu"));
 	

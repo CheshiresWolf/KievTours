@@ -1,24 +1,15 @@
-var audioPlayer, isPlay = false, songTime = 0, intervalStep = 1000, duration = audioPlayer.getDuration() * 1000;
+var audioPlayer, isPlay = false, songTime = 0, intervalStep = 1000, duration = 0;
 
-var interval = setInterval(function() {
-    //Ti.API.info('Time Played: ' + Math.round(e.progress) + ' milliseconds');
-    
-    songTime = audioPlayer.time;
-    $.sliderSong.value = songTime;
-	$.timePassed.text = secToString(songTime);
-}, intervalStep);
-
+var interval = null;
                               
 $.sliderVolume.addEventListener('change', function(e) {
-	//Ti.API.info('audioPlayer| volume = ' + e.value); //====================
     audioPlayer.volume = e.value;
 });
 
 $.buttonBack.addEventListener("click", function () {
-	if (songTime > 5000) {
-		
-		Ti.API.info('audioPlayer| (<<) | newTime = ' + songTime); //====================
-		
+	initInterval();
+	
+	if (songTime > 5000) {		
 		audioPlayer.pause();
 		songTime -= 5000;
 		audioPlayer.setTime(songTime);
@@ -27,6 +18,8 @@ $.buttonBack.addEventListener("click", function () {
 });
 
 $.buttonPlay.addEventListener("click", function () {
+	initInterval();
+	
 	if (isPlay) {
 		$.buttonPlay.applyProperties({image: "images/dotsView/audioPlayerButtonPlay.png"});
 		audioPlayer.pause();
@@ -39,16 +32,25 @@ $.buttonPlay.addEventListener("click", function () {
 });
 
 $.buttonForward.addEventListener("click", function () {
-	if (songTime < duration - 6000) {
-		
-		Ti.API.info('audioPlayer| (>>) | newTime = ' + songTime); //====================
-		
+	initInterval();
+	
+	if (songTime < duration - 6000) {		
 		audioPlayer.pause();
 		songTime += 5000;
 		audioPlayer.setTime(songTime);
 		audioPlayer.play();
 	}
 });
+
+function initInterval() {
+	if (interval === null) {
+		interval = setInterval(function() {		    
+		    songTime = audioPlayer.time;
+		    $.sliderSong.value = songTime;
+			$.timePassed.text = secToString(songTime);
+		}, intervalStep);
+	}
+}
 
 function secToString (ms) {
 	var min = (ms / 60000).toString();
@@ -57,15 +59,15 @@ function secToString (ms) {
 
 exports.initPlayer = function(width, player) {
 	audioPlayer = player;
+	duration = audioPlayer.getDuration() * 1000;
 	
+	$.timePassed.text = "0:00";
 	$.timeLeft.text = secToString(duration);
 	
 	$.container.applyProperties({
 		width: width * 0.6,
 		height: width / 3
 	});
-	
-	Ti.API.info('audioPlayer| duration = ' + duration); //====================
 	
 	$.sliderSong.applyProperties({
 		max: duration,
@@ -78,9 +80,9 @@ exports.initPlayer = function(width, player) {
 };
 
 exports.closePlayer = function () {
-	//$.buttonPlay.applyProperties({image: "images/dotsView/audioPlayerButtonPlay.png"});
-	clearInterval(interval);
+	if (interval !== null) {
+		clearInterval(interval);
+	}
 	audioPlayer.pause();
 	audioPlayer.setTime(0);
-	//audioPlayer.release();
 };

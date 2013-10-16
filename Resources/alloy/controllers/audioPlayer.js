@@ -1,4 +1,11 @@
 function Controller() {
+    function initInterval() {
+        null === interval && (interval = setInterval(function() {
+            songTime = audioPlayer.time;
+            $.sliderSong.value = songTime;
+            $.timePassed.text = secToString(songTime);
+        }, intervalStep));
+    }
     function secToString(ms) {
         var min = (ms / 6e4).toString();
         return min[0] + ":" + min[2] + min[3];
@@ -21,9 +28,8 @@ function Controller() {
         width: 20,
         height: 20,
         font: {
-            fontSize: "10dp"
+            fontSize: "9dp"
         },
-        text: "0:00",
         id: "timePassed"
     });
     $.__views.container.add($.__views.timePassed);
@@ -49,9 +55,8 @@ function Controller() {
         width: 20,
         height: 20,
         font: {
-            fontSize: "10dp"
+            fontSize: "9dp"
         },
-        text: "0:00",
         id: "timeLeft"
     });
     $.__views.container.add($.__views.timeLeft);
@@ -118,18 +123,14 @@ function Controller() {
     $.__views.container.add($.__views.audioIconMax);
     exports.destroy = function() {};
     _.extend($, $.__views);
-    var audioPlayer, isPlay = false, songTime = 0, intervalStep = 1e3;
-    var interval = setInterval(function() {
-        songTime = audioPlayer.time;
-        $.sliderSong.value = songTime;
-        $.timePassed.text = secToString(songTime);
-    }, intervalStep);
+    var audioPlayer, isPlay = false, songTime = 0, intervalStep = 1e3, duration = 0;
+    var interval = null;
     $.sliderVolume.addEventListener("change", function(e) {
         audioPlayer.volume = e.value;
     });
     $.buttonBack.addEventListener("click", function() {
+        initInterval();
         if (songTime > 5e3) {
-            Ti.API.info("audioPlayer| (<<) | newTime = " + songTime);
             audioPlayer.pause();
             songTime -= 5e3;
             audioPlayer.setTime(songTime);
@@ -137,6 +138,7 @@ function Controller() {
         }
     });
     $.buttonPlay.addEventListener("click", function() {
+        initInterval();
         if (isPlay) {
             $.buttonPlay.applyProperties({
                 image: "images/dotsView/audioPlayerButtonPlay.png"
@@ -152,8 +154,8 @@ function Controller() {
         }
     });
     $.buttonForward.addEventListener("click", function() {
-        if (audioPlayer.getDuration() - 6e3 > songTime) {
-            Ti.API.info("audioPlayer| (>>) | newTime = " + songTime);
+        initInterval();
+        if (duration - 6e3 > songTime) {
             audioPlayer.pause();
             songTime += 5e3;
             audioPlayer.setTime(songTime);
@@ -162,13 +164,13 @@ function Controller() {
     });
     exports.initPlayer = function(width, player) {
         audioPlayer = player;
-        var duration = 1e3 * audioPlayer.getDuration();
+        duration = 1e3 * audioPlayer.getDuration();
+        $.timePassed.text = "0:00";
         $.timeLeft.text = secToString(duration);
         $.container.applyProperties({
             width: .6 * width,
             height: width / 3
         });
-        Ti.API.info("audioPlayer| duration = " + duration);
         $.sliderSong.applyProperties({
             max: duration,
             width: .6 * width - 40
@@ -178,7 +180,7 @@ function Controller() {
         });
     };
     exports.closePlayer = function() {
-        clearInterval(interval);
+        null !== interval && clearInterval(interval);
         audioPlayer.pause();
         audioPlayer.setTime(0);
     };

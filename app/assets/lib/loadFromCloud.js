@@ -1,5 +1,5 @@
 var Cloud = require("ti.cloud");
-var starter, dotViewStarter;
+var tourStarter, dotViewStarter, downloadedTours = [];
 var sityTips = [];
 
 //var loading = {
@@ -38,11 +38,13 @@ function DotViewStarter(pressButton, currentTour) {
 	
 	this.size = currentTour.tourPath.length;
 	this.index = 0;
+	
+	this.load();
 }
 
-DotViewStarter.prototype.loadDots = function() {
+DotViewStarter.prototype.load = function() {
 	var starter = this;
-	//getAudio(this.tour);
+	getAudio(this);
 	
 	Cloud.Places.query({
 		where: {
@@ -93,18 +95,21 @@ DotViewStarter.prototype.createDot = function(place) {
 DotViewStarter.prototype.saveDot = function(dot) {	
 	var i = this.tour.tourPath.indexOf(dot.id);
 	this.tour.dots[i] = dot;
+	this.isDownloaded();
+};
+
+DotViewStarter.prototype.isDownloaded = function() {
 	this.index++;
 	
-	if (this.index === this.size) {
+	if (this.index === (this.size + 1)) {	//dots + audio file
 		
 		//=============================================<<<<<<<<<<
 		Ti.API.info('loadFromCloud| Load finished');
 		//=============================================<<<<<<<<<<
 		
 		this.tour.isDownloaded = true;
-		//clearInterval(timer);
-		//loading.view.setVisible(false);
 		this.done("images/tourView/Play_Button.png");
+		saveToCloud(this.tour.id);
 	}
 };
 
@@ -118,6 +123,87 @@ function createPhotoArray(oldArray) {
 	return photoArray;
 }
 
+
+function getAudio(starter) {
+	Cloud.Files.show({
+		file_id: starter.tour.audio.id
+	}, function (e) {
+		
+		//=============================================<<<<<<<<<<
+		Ti.API.info("loadFromCloud| Loading audio file (" + e.files[0].name + ")");
+		//=============================================<<<<<<<<<<
+		
+	    if (e.success) {
+		 
+		    localFile = Titanium.Filesystem.getApplicationDataDirectory() + starter.tour.id + ".mp3";
+		    
+		    if (starter.tour.isDownloaded) {
+				//if file already loaded on phone
+				starter.tour.audio.player = createPlayer(localFile);
+				starter.isDownloaded();
+		    } else {
+				//load file from cloud
+			    //remoteFile = e.files[0].url;
+			 
+			    var httpClient = Titanium.Network.createHTTPClient();
+			    httpClient.setTimeout(1000000);
+			 
+			    // Data received
+			    httpClient.onload = function(e) {
+			        //=============================================<<<<<<<<<<
+					Ti.API.info("loadFromCloud| Save path - " + localFile);
+					//=============================================<<<<<<<<<<
+					
+					var file = Titanium.Filesystem.getFile(localFile);
+			        file.write(this.responseData);
+			        
+			        starter.tour.audio.player = createPlayer(localFile);
+			        starter.tour.isDownloaded = true;
+			        starter.isDownloaded();
+			    };
+			 
+			    // Handle state change
+			    httpClient.onreadystatechange = function(e) {
+			        if (e.readyState === 4) {
+						Ti.API.info('loadFromCloud.js| Download complete');
+			        }
+			    };
+			 
+			    // Handle error event
+			    httpClient.onerror = function(e) {
+			        Ti.API.info('loadFromCloud.js| HTTP error!');
+			    };
+	
+			    httpClient.open('GET', e.files[0].url);
+			    httpClient.send();
+			}
+	    } else {
+			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));  
+	    }
+	});
+}
+
+function createPlayer(path, starter) {
+	return Ti.Media.createSound({ 
+	    url: path,
+	    volume: 0.5,
+	    allowBackground: true,
+	    autoplay: false
+	});
+}
+
+function saveToCloud(id) {
+	downloadedTours.push(id);
+	
+	Cloud.Users.update({
+		login: "user1",
+		custom_fields: {
+			downloadedTours: downloadedTours
+		}
+	}, function(e) {
+		Ti.API.info("loadFromCloud| Updete user.downloadedTours = " + downloadedTours.toString());
+	});
+}
 //=================================</DotViewStarter>================================
 
 //=================================<Tour>================================
@@ -157,31 +243,12 @@ Tour.prototype.buy = function(pressButton) {
 	pressButton("images/tourView/Download_Button.png");
 };
 
-function timerTick(timer) {
-	Ti.API.info('loadFromCloud| timer index = ' + timer.index); //============================
-		
-	timer.view.applyProperties({image: "images/tourView/loading/loading_ico_" + timer.index + ".png"});
-	timer.index++;
-	if (timer.index === 3) timer.index = 0;
-}
-
 Tour.prototype.download = function(pressButton, view) {
 	//downloading
 	//...
-	//var loading = this.loading;
-	//loading.view = view;
-	//loading.view.setVisible(true);
-	//timer = setInterval(function() {
-	//	Ti.API.info('loadFromCloud| timer index = ' + loading.index); //============================
-	//		
-	//	loading.view.applyProperties({image: "images/tourView/loading/loading_ico_" + loading.index + ".png"});
-	//	loading.index++;
-	//	if (loading.index === 3) loading.index = 0;
-	//}, 1000);
 	
-	getAudio(this);
 	dotViewStarter = new DotViewStarter(pressButton, this);
-	dotViewStarter.loadDots();
+	//dotViewStarter.load();
 };
 
 function loadTour(tour) {
@@ -197,6 +264,9 @@ function loadTour(tour) {
 		tour.path,
 		tour.audio_id
 	);
+	if (downloadedTours.indexOf(bufTour.id) !== -1) {
+		bufTour.isDownloaded = true;
+	}
 	bufTour.dots = [tour.path.length];
 	setBackground(bufTour);
 }
@@ -209,89 +279,10 @@ function setBackground(tour) {
 	}, function (e) {
 	    if (e.success) {
 			tour.background = e.photos[0].urls.original;
-			starter.addTour(tour);
+			tourStarter.addTour(tour);
 	    } else {
 			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));
 	    }
-	});
-}
-
-function getAudio(tour) {
-	Cloud.Files.show({
-		file_id: tour.audio.id
-	}, function (e) {
-		
-		//=============================================<<<<<<<<<<
-		Ti.API.info("loadFromCloud| Loading audio file (" + e.files[0].name + ")");
-		//=============================================<<<<<<<<<<
-		
-	    if (e.success) {
-		    //var length = 0;
-		 
-		    localFile = Titanium.Filesystem.getApplicationDataDirectory() + tour.id + ".mp3";
-		    
-		    if (tour.isDownloaded) {
-				tour.audio.player = createPlayer(localFile);
-		    } else {
-			    remoteFile = e.files[0].url;
-			 
-			    var httpClient = Titanium.Network.createHTTPClient();
-			    httpClient.setTimeout(1000000);
-			 
-			    // Data received
-			    httpClient.onload = function(e) {
-			        // Create a filestream and write the received data to a file
-			        //var writeFile = Titanium.Filesystem.getFile(localFile);
-			        //=============================================<<<<<<<<<<
-					Ti.API.info("loadFromCloud| Save path - " + localFile);
-					//=============================================<<<<<<<<<<
-					var file = Titanium.Filesystem.getFile(localFile);
-			        //var writeStream = Titanium.Filesystem.openStream(Titanium.Filesystem.MODE_WRITE, localFile);
-			        //writeStream.open(Titanium.Filesystem.MODE_WRITE);
-			        //writeStream.write(this.responseData);
-			        //writeStream.close();
-			        file.write(this.responseData);
-			        //file.close();
-			        
-			        tour.audio.player = createPlayer(localFile);
-			        tour.isDownloaded = true;
-			    };
-			 
-			    // Handle state change
-			    httpClient.onreadystatechange = function(e) {
-			        if (e.readyState === 4) {
-						Ti.API.info('loadFromCloud.js| Download complete');
-			        }
-			    };
-			 
-			    // Handle error event
-			    httpClient.onerror = function(e) {
-			        Ti.API.info('loadFromCloud.js| HTTP error!');
-			    };
-	
-			    httpClient.open('GET', remoteFile);
-			    httpClient.send();
-			}
-			/*
-			tour.audio.player = Ti.Media.createVideoPlayer({ 
-			    url: e.files[0].url,
-			    volume: 0.5,
-			    allowBackground: true,
-			    autoplay: false,
-			    useApplicationAudioSession: true
-			});*/
-	    } else {
-			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));  
-	    }
-	});
-}
-
-function createPlayer(path) {
-	return Ti.Media.createSound({ 
-	    url: path,
-	    volume: 0.5,
-	    allowBackground: true,
-	    autoplay: false
 	});
 }
 
@@ -322,32 +313,38 @@ function loadTips() {
 
 exports.init = function() {
 	Cloud.Users.login({
-		login: "guest@gmail.com",
-		password: "12345"
+		login: "user1",
+		password: "user1"
 	}, function(e) {
 		if (e.success)   {
-			Cloud.Objects.query({
-				classname: 'Tour'
-			}, function(ee) {
-				if (ee.success) {
-					var i = 0;
-					starter = new Starter(ee.Tour.length);
-					
-					for (i; i < ee.Tour.length; i++) {
-						loadTour(ee.Tour[i]);
-					}
-					
-					loadTips();
-					
-				} else {
-					alert('Error: ' + ((ee.error && ee.message) || JSON.stringify(ee)));        
-				}
-			});
+			downloadedTours = e.users[0].custom_fields.downloadedTours;
+			
+			getToursFromCloud();
 		} else {
 			alert('Login Error: ' + ((e.error && e.message) || JSON.stringify(e)));
 		}
 	});
 };
+
+function getToursFromCloud() {
+	Cloud.Objects.query({
+		classname: 'Tour'
+	}, function(ee) {
+		if (ee.success) {
+			var i = 0;
+			tourStarter = new Starter(ee.Tour.length);
+			
+			for (i; i < ee.Tour.length; i++) {
+				loadTour(ee.Tour[i]);
+			}
+			
+			loadTips();
+			
+		} else {
+			alert('Error: ' + ((ee.error && ee.message) || JSON.stringify(ee)));        
+		}
+	});
+}
 
 //=================================</MAIN>===============================
 
@@ -367,13 +364,10 @@ exports.getDotsNear = function() {
 		if (e.success) {
 			var i = 0;
 			var discover = Alloy.createController("discoverMenu");
-			//Ti.API.info("loadFromCloud| Places:"); //========================
-			//for (i; i < e.places.length; i++) {
+
 			discover.fillTable(e.places);
 			discover.getView().windowName = "discoverMenu";
 			Alloy.Globals.openWindow(discover.getView());
-			//}
-			//Ti.API.info("loadFromCloud| Places end."); //========================
 			
 	    } else {
 			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));  
@@ -384,7 +378,7 @@ exports.getDotsNear = function() {
 //==============================</Discover>==============================
 
 exports.getTours = function() {
-	return starter.tours;
+	return tourStarter.tours;
 };
 
 exports.getTips = function() {

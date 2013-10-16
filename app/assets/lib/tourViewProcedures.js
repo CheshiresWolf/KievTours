@@ -102,7 +102,7 @@ function makeTourView (tour) {
 		image: buttonImgPath
 	});
 	tourView.getView("loadingIco").applyProperties({
-		left: bigImgSize / 2 + 56
+		left: bigImgSize / 2 + 51
 	});
 	
 	//show View
