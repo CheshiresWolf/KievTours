@@ -52,6 +52,87 @@ function makeTourView(tour) {
     return tourView.getView();
 }
 
+function openTutorial() {
+    var tutorial = Ti.UI.createView({
+        width: "auto",
+        height: "auto",
+        backgroundImage: "images/tutorial/tutorialScreen.png",
+        zIndex: 10
+    });
+    tutorial.addEventListener("click", function() {
+        controller.getView("window").remove(tutorial);
+    });
+    var slideText = Ti.UI.createLabel({
+        text: "Slide to choose tour.",
+        color: "white",
+        textAlign: "center",
+        width: 100
+    });
+    tutorial.add(slideText);
+    var slideArrowLeft = Ti.UI.createImageView({
+        image: "images/tutorial/tutorialArrow_left.png",
+        left: Titanium.Platform.displayCaps.platformWidth / 2 - 80,
+        width: 30,
+        height: 20
+    });
+    tutorial.add(slideArrowLeft);
+    var slideArrowRight = Ti.UI.createImageView({
+        image: "images/tutorial/tutorialArrow_right.png",
+        left: Titanium.Platform.displayCaps.platformWidth / 2 + 50,
+        width: 30,
+        height: 20
+    });
+    tutorial.add(slideArrowRight);
+    var buttonTopOffset = bigImageStyle.top + bigImageStyle.height - 60;
+    var buttonText = Ti.UI.createLabel({
+        text: "Buy / Download / Play",
+        top: buttonTopOffset,
+        color: "white",
+        textAlign: "center"
+    });
+    tutorial.add(buttonText);
+    var buttonArrowLeft = Ti.UI.createImageView({
+        image: "images/tutorial/tutorialArrow_right.png",
+        top: buttonTopOffset + 26,
+        left: Titanium.Platform.displayCaps.platformWidth / 2 - 67,
+        width: 30,
+        height: 20
+    });
+    tutorial.add(buttonArrowLeft);
+    var buttonArrowRight = Ti.UI.createImageView({
+        image: "images/tutorial/tutorialArrow_left.png",
+        top: buttonTopOffset + 26,
+        left: Titanium.Platform.displayCaps.platformWidth / 2 + 37,
+        width: 30,
+        height: 20
+    });
+    tutorial.add(buttonArrowRight);
+    var menuText = Ti.UI.createLabel({
+        text: "Tap here to open menu.",
+        bottom: 50,
+        right: 20,
+        color: "white",
+        textAlign: "center"
+    });
+    tutorial.add(menuText);
+    var menuArrow = Ti.UI.createImageView({
+        image: "images/tutorial/tutorialArrow_bottom.png",
+        bottom: 15,
+        right: 20,
+        width: 20,
+        height: 30
+    });
+    tutorial.add(menuArrow);
+    var closeText = Ti.UI.createLabel({
+        text: "< Tap to start >",
+        bottom: 0,
+        color: "white",
+        textAlign: "center"
+    });
+    tutorial.add(closeText);
+    controller.getView("window").add(tutorial);
+}
+
 var platformWidth = Titanium.Platform.displayCaps.platformWidth;
 
 var bigImgSize = .9 * platformWidth;
@@ -90,6 +171,7 @@ var smallImageStyle = {
 
 exports.initTourViews = function(index) {
     controller = index;
+    openTutorial();
     var toursLength = tours.length, pagingArray = [];
     var paging = controller.getView("paging"), scrollView = Ti.UI.createScrollableView();
     for (var i = 0; toursLength > i; i++) {

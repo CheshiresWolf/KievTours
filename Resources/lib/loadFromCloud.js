@@ -6,8 +6,32 @@ function Starter(toursAmount) {
 function DotViewStarter(pressButton, currentTour) {
     this.done = pressButton;
     this.tour = currentTour;
-    this.size = currentTour.tourPath.length;
+    this.size = currentTour.tourPath.length + 1;
     this.index = 0;
+    this.loadAudio = true;
+    this.load();
+}
+
+function createDot(place, starter) {
+    Cloud.PhotoCollections.showPhotos({
+        collection_id: place.custom_fields.collection_id
+    }, function(e) {
+        e.success ? e.photos ? saveDot({
+            id: place.id,
+            name: place.name,
+            text: place.custom_fields.text,
+            cover: place.photo.urls.original,
+            gallery: createPhotoArray(e.photos),
+            latitude: place.latitude,
+            longitude: place.longitude
+        }, starter) : alert("Success: No photos") : alert("Error:\n" + (e.error && e.message || JSON.stringify(e)));
+    });
+}
+
+function saveDot(dot, starter) {
+    var i = starter.tour.tourPath.indexOf(dot.id);
+    starter.tour.dots[i] = dot;
+    starter.loadAudio && starter.isDownloaded();
 }
 
 function createPhotoArray(oldArray) {
@@ -90,19 +114,14 @@ function Tour(tourId, tourImage, backgroundImage, tourTitle, tourText, fileSize,
     this.isDownloaded = false;
 }
 
-function timerTick(timer) {
-    Ti.API.info("loadFromCloud| timer index = " + timer.index);
-    timer.view.applyProperties({
-        image: "images/tourView/loading/loading_ico_" + timer.index + ".png"
-    });
-    timer.index++;
-    3 === timer.index && (timer.index = 0);
-}
-
 function loadTour(tour) {
     var bufTour = new Tour(tour.id, tour.photo.urls.original, null, tour.name, tour.text, tour.audio_size, tour.audio_length, tour.price, tour.path, tour.audio_id);
-    -1 !== downloadedTours.indexOf(bufTour.id) && (bufTour.isDownloaded = true);
-    bufTour.dots = [ tour.path.length ];
+    if (-1 !== downloadedTours.indexOf(bufTour.id)) {
+        var bufStarter = new DotViewStarter(null, bufTour);
+        bufStarter.loadAudio = false;
+        bufTour.isBuyed = true;
+        bufTour.isDownloaded = true;
+    }
     setBackground(bufTour);
 }
 
@@ -162,7 +181,7 @@ Starter.prototype.addTour = function(tour) {
 
 DotViewStarter.prototype.load = function() {
     var starter = this;
-    getAudio(this);
+    this.loadAudio && getAudio(this);
     Cloud.Places.query({
         where: {
             tags_array: this.tour.id
@@ -171,37 +190,14 @@ DotViewStarter.prototype.load = function() {
         if (e.success) {
             var i = 0;
             this.size = e.places.length;
-            for (i; this.size > i; i++) starter.createDot(e.places[i]);
+            for (i; this.size > i; i++) createDot(e.places[i], starter);
         } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
     });
 };
 
-DotViewStarter.prototype.createDot = function(place) {
-    var starter = this;
-    Cloud.PhotoCollections.showPhotos({
-        collection_id: place.custom_fields.collection_id
-    }, function(e) {
-        e.success ? e.photos ? starter.saveDot({
-            id: place.id,
-            name: place.name,
-            text: place.custom_fields.text,
-            cover: place.photo.urls.original,
-            gallery: createPhotoArray(e.photos),
-            latitude: place.latitude,
-            longitude: place.longitude
-        }) : alert("Success: No photos") : alert("Error:\n" + (e.error && e.message || JSON.stringify(e)));
-    });
-};
-
-DotViewStarter.prototype.saveDot = function(dot) {
-    var i = this.tour.tourPath.indexOf(dot.id);
-    this.tour.dots[i] = dot;
-    this.isDownloaded();
-};
-
 DotViewStarter.prototype.isDownloaded = function() {
     this.index++;
-    if (this.index === this.size + 1) {
+    if (this.index === this.size) {
         Ti.API.info("loadFromCloud| Load finished");
         this.tour.isDownloaded = true;
         this.done("images/tourView/Play_Button.png");
@@ -215,8 +211,8 @@ Tour.prototype.buy = function(pressButton) {
 };
 
 Tour.prototype.download = function(pressButton) {
+    Ti.API.info("loadFromCloud| Tour.title = " + this.title);
     dotViewStarter = new DotViewStarter(pressButton, this);
-    dotViewStarter.load();
 };
 
 exports.init = function() {

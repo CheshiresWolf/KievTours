@@ -36,15 +36,18 @@ function DotViewStarter(pressButton, currentTour) {
 	this.done = pressButton;
 	this.tour = currentTour;
 	
-	this.size = currentTour.tourPath.length;
+	this.size = currentTour.tourPath.length + 1; // + 1 audio file
 	this.index = 0;
+	this.loadAudio = true;
 	
 	this.load();
 }
 
 DotViewStarter.prototype.load = function() {
 	var starter = this;
-	getAudio(this);
+	if (this.loadAudio) {
+		getAudio(this);
+	}
 	
 	Cloud.Places.query({
 		where: {
@@ -57,7 +60,7 @@ DotViewStarter.prototype.load = function() {
 			this.size = e.places.length;
 			
 			for (i; i < this.size; i++) {
-				starter.createDot(e.places[i]);
+				createDot(e.places[i], starter);
 			}
 	    } else {
 			alert('Error: ' + ((e.error && e.message) || JSON.stringify(e)));  
@@ -65,43 +68,10 @@ DotViewStarter.prototype.load = function() {
 	});
 };
 
-DotViewStarter.prototype.createDot = function(place) {
-	var starter = this;
-	
-	Cloud.PhotoCollections.showPhotos({
-		collection_id: place.custom_fields.collection_id
-	}, function (e) {
-	    if (e.success) {
-	        if (!e.photos) {
-	            alert('Success: No photos');
-	        } else {
-				
-	            starter.saveDot({
-					id: place.id,
-					name: place.name,
-					text: place.custom_fields.text,
-					cover: place.photo.urls.original,
-					gallery: createPhotoArray(e.photos),
-					latitude: place.latitude,
-					longitude: place.longitude
-	            });
-	        }
-	    } else {
-	        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-	    }
-	});
-};
-
-DotViewStarter.prototype.saveDot = function(dot) {	
-	var i = this.tour.tourPath.indexOf(dot.id);
-	this.tour.dots[i] = dot;
-	this.isDownloaded();
-};
-
 DotViewStarter.prototype.isDownloaded = function() {
 	this.index++;
 	
-	if (this.index === (this.size + 1)) {	//dots + audio file
+	if (this.index === this.size) {	//dots + audio file
 		
 		//=============================================<<<<<<<<<<
 		Ti.API.info('loadFromCloud| Load finished');
@@ -112,6 +82,40 @@ DotViewStarter.prototype.isDownloaded = function() {
 		saveToCloud(this.tour.id);
 	}
 };
+
+function createDot(place, starter) {
+	Cloud.PhotoCollections.showPhotos({
+		collection_id: place.custom_fields.collection_id
+	}, function (e) {
+	    if (e.success) {
+	        if (!e.photos) {
+	            alert('Success: No photos');
+	        } else {
+				
+	            saveDot({
+					id: place.id,
+					name: place.name,
+					text: place.custom_fields.text,
+					cover: place.photo.urls.original,
+					gallery: createPhotoArray(e.photos),
+					latitude: place.latitude,
+					longitude: place.longitude
+	            }, starter);
+	        }
+	    } else {
+	        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+	    }
+	});
+}
+
+function saveDot(dot, starter) {		
+	var i = starter.tour.tourPath.indexOf(dot.id);
+	starter.tour.dots[i] = dot;
+	//if audio file already loaded we don't need to wait
+	if (starter.loadAudio) {
+		starter.isDownloaded();
+	}
+}
 
 function createPhotoArray(oldArray) {
 	var photoArray = [], i = 0;
@@ -142,9 +146,7 @@ function getAudio(starter) {
 				starter.tour.audio.player = createPlayer(localFile);
 				starter.isDownloaded();
 		    } else {
-				//load file from cloud
-			    //remoteFile = e.files[0].url;
-			 
+				//load file from cloud			 
 			    var httpClient = Titanium.Network.createHTTPClient();
 			    httpClient.setTimeout(1000000);
 			 
@@ -183,7 +185,7 @@ function getAudio(starter) {
 	});
 }
 
-function createPlayer(path, starter) {
+function createPlayer(path) {
 	return Ti.Media.createSound({ 
 	    url: path,
 	    volume: 0.5,
@@ -247,6 +249,10 @@ Tour.prototype.download = function(pressButton, view) {
 	//downloading
 	//...
 	
+	//=============================================<<<<<<<<<<
+	Ti.API.info("loadFromCloud| Tour.title = " + this.title);
+	//=============================================<<<<<<<<<<
+	
 	dotViewStarter = new DotViewStarter(pressButton, this);
 	//dotViewStarter.load();
 };
@@ -265,9 +271,12 @@ function loadTour(tour) {
 		tour.audio_id
 	);
 	if (downloadedTours.indexOf(bufTour.id) !== -1) {
+		var bufStarter = new DotViewStarter(null, bufTour);
+		bufStarter.loadAudio = false;
+		bufTour.isBuyed = true;
 		bufTour.isDownloaded = true;
 	}
-	bufTour.dots = [tour.path.length];
+	//bufTour.dots = [tour.path.length];
 	setBackground(bufTour);
 }
 
