@@ -37,10 +37,7 @@ $.smallPictureAudio.addEventListener("click", function(e) {
 $.smallPictureList.addEventListener("click", function(e) {
 	var list = Alloy.createController("dotsList");
 	var menu = Alloy.createController("menuView");
-	//menu.getView("buttonTours").addEventListener("click", function() {
-	//	controller.close();
-	//	Alloy.Globals.closeWindow(list.getView("window"));
-	//});
+
 	list.getView("window").add(menu.getView("menuListener"));
 	list.getView("window").add(menu.getView("menu"));
 	list.fillTable(currentTour.dots, controller.getIndex(), currentTour.title);
