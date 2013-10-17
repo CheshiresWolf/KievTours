@@ -31,16 +31,15 @@
 },
 "#galleryLeft": {
 	image: "images/dotsView/galleryControlsLeft.png",
-	//bottom: 80,
 	left: 10,
 	width: 10,
 	height: 30,
 	zIndex: 5,
-	visible: false
+	visible: false,
+	touchEnabled: false
 },
 "#galleryPaging": {
 	color: "white",
-	//bottom: 80,
 	width: 30,
 	height: 30,
 	zIndex: 5,
@@ -52,11 +51,25 @@
 },
 "#galleryRight": {
 	image: "images/dotsView/galleryControlsRight.png",
-	//bottom: 80,
 	right: 10,
 	width: 10,
 	height: 30,
 	zIndex: 5,
+	visible: false,
+	touchEnabled: false
+},
+"#galleryLeftListener": {
+	left: 10,
+	width: 40,
+	height: 30,
+	zIndex: 6,
+	visible: false
+},
+"#galleryRightListener": {
+	right: 10,
+	width: 40,
+	height: 30,
+	zIndex: 6,
 	visible: false
 },
 "#dotsPaging": {

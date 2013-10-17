@@ -1,10 +1,15 @@
 function Controller() {
     function initInterval() {
-        null === interval && (interval = setInterval(function() {
-            songTime = audioPlayer.time;
-            $.sliderSong.value = songTime;
-            $.timePassed.text = secToString(songTime);
-        }, intervalStep));
+        if (null === interval) {
+            $.buttonPlay.applyProperties({
+                image: "images/dotsView/audioPlayerButtonPause.png"
+            });
+            interval = setInterval(function() {
+                songTime = audioPlayer.time;
+                $.sliderSong.value = songTime;
+                $.timePassed.text = secToString(songTime);
+            }, intervalStep);
+        }
     }
     function secToString(ms) {
         var min = (ms / 6e4).toString();
@@ -66,26 +71,52 @@ function Controller() {
         left: 20,
         width: 15,
         height: 15,
+        touchEnabled: false,
         id: "buttonBack"
     });
     $.__views.container.add($.__views.buttonBack);
+    $.__views.buttonBackListener = Ti.UI.createView({
+        zIndex: 5,
+        image: "images/dotsView/audioPlayerButtonBack.png",
+        left: 0,
+        height: 30,
+        id: "buttonBackListener"
+    });
+    $.__views.container.add($.__views.buttonBackListener);
     $.__views.buttonPlay = Ti.UI.createImageView({
         zIndex: 4,
         image: "images/dotsView/audioPlayerButtonPlay.png",
         width: 15,
         height: 15,
+        touchEnabled: false,
         id: "buttonPlay"
     });
     $.__views.container.add($.__views.buttonPlay);
+    $.__views.buttonPlayListener = Ti.UI.createView({
+        zIndex: 5,
+        image: "images/dotsView/audioPlayerButtonPlay.png",
+        height: 30,
+        id: "buttonPlayListener"
+    });
+    $.__views.container.add($.__views.buttonPlayListener);
     $.__views.buttonForward = Ti.UI.createImageView({
         zIndex: 4,
         image: "images/dotsView/audioPlayerButtonForward.png",
         right: 20,
         width: 15,
         height: 15,
+        touchEnabled: false,
         id: "buttonForward"
     });
     $.__views.container.add($.__views.buttonForward);
+    $.__views.buttonForwardListener = Ti.UI.createView({
+        zIndex: 5,
+        image: "images/dotsView/audioPlayerButtonForward.png",
+        right: 0,
+        height: 30,
+        id: "buttonForwardListener"
+    });
+    $.__views.container.add($.__views.buttonForwardListener);
     $.__views.audioIconMin = Ti.UI.createImageView({
         zIndex: 4,
         image: "images/dotsView/audioPlayerVolumeMin.png",
@@ -128,7 +159,7 @@ function Controller() {
     $.sliderVolume.addEventListener("change", function(e) {
         audioPlayer.volume = e.value;
     });
-    $.buttonBack.addEventListener("click", function() {
+    $.buttonBackListener.addEventListener("click", function() {
         initInterval();
         if (songTime > 5e3) {
             audioPlayer.pause();
@@ -137,7 +168,7 @@ function Controller() {
             audioPlayer.play();
         }
     });
-    $.buttonPlay.addEventListener("click", function() {
+    $.buttonPlayListener.addEventListener("click", function() {
         initInterval();
         if (isPlay) {
             $.buttonPlay.applyProperties({
@@ -153,7 +184,7 @@ function Controller() {
             isPlay = true;
         }
     });
-    $.buttonForward.addEventListener("click", function() {
+    $.buttonForwardListener.addEventListener("click", function() {
         initInterval();
         if (duration - 6e3 > songTime) {
             audioPlayer.pause();
@@ -167,16 +198,26 @@ function Controller() {
         duration = 1e3 * audioPlayer.getDuration();
         $.timePassed.text = "0:00";
         $.timeLeft.text = secToString(duration);
+        var containerWidth = .6 * width;
         $.container.applyProperties({
-            width: .6 * width,
+            width: containerWidth,
             height: width / 3
+        });
+        $.buttonBackListener.applyProperties({
+            width: containerWidth / 3
+        });
+        $.buttonPlayListener.applyProperties({
+            width: containerWidth / 3
+        });
+        $.buttonForwardListener.applyProperties({
+            width: containerWidth / 3
         });
         $.sliderSong.applyProperties({
             max: duration,
-            width: .6 * width - 40
+            width: containerWidth - 40
         });
         $.sliderVolume.applyProperties({
-            width: .6 * width - 40
+            width: containerWidth - 40
         });
     };
     exports.closePlayer = function() {

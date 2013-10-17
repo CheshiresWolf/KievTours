@@ -1,27 +1,29 @@
 <Alloy>
 	<View id="dotContainer">
-		<View id="map" ns="Ti.Map" mapType="Titanium.Map.STANDARD_TYPE"></View>
+		<View id="map" ns="Ti.Map" mapType="Titanium.Map.STANDARD_TYPE" />
 		
-		<ImageView id="maskCenter"></ImageView>
-		<ImageView id="maskTop" class="mask"></ImageView>
-		<ImageView id="maskBottom" class="mask"></ImageView>
-		<ImageView id="maskLeft" class="mask"></ImageView>
-		<ImageView id="maskRight" class="mask"></ImageView>
+		<ImageView id="maskCenter" />
+		<ImageView id="maskTop" class="mask" />
+		<ImageView id="maskBottom" class="mask" />
+		<ImageView id="maskLeft" class="mask" />
+		<ImageView id="maskRight" class="mask" />
 		
-		<View id="bigPicture"></View>
-		<ImageView id="smallPicturePhoto" class="index"></ImageView>
+		<View id="bigPicture" />
+		<ImageView id="smallPicturePhoto" class="index" />
 		<View id="smallPictureAudio" class="index">
-			<View id="player"></View>
+			<View id="player" />
 		</View>
-		<ImageView id="smallPictureList" class="index"></ImageView>
-		<ImageView id="smallPictureCenter" class="index"></ImageView>
+		<ImageView id="smallPictureList" class="index" />
+		<ImageView id="smallPictureCenter" class="index" />
 		
-		<ScrollableView id="gallery"></ScrollableView>
-		<ImageView id="galleryLeft"></ImageView>
-		<Label id="galleryPaging"></Label>
-		<ImageView id="galleryRight"></ImageView>
+		<ScrollableView id="gallery" />
+		<ImageView id="galleryLeft" />
+		<View id="galleryLeftListener" />
+		<Label id="galleryPaging" />
+		<ImageView id="galleryRight" />
+		<View id="galleryRightListener" />
 		
-		<View id="dotsPaging"></View>
+		<View id="dotsPaging" />
 		
 		<!--View id="dotsDesc"></View-->
 	</View>

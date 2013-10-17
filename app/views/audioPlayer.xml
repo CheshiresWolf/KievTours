@@ -1,13 +1,16 @@
 <Alloy>
 	<View id="container">
-		<Label id="timePassed" class="index"></Label>
-		<Slider id="sliderSong" class="index"></Slider>
-		<Label id="timeLeft" class="index"></Label>
-		<ImageView id="buttonBack" class="index"></ImageView>
-		<ImageView id="buttonPlay" class="index"></ImageView>
-		<ImageView id="buttonForward" class="index"></ImageView>
-		<ImageView id="audioIconMin" class="index"></ImageView>
-		<Slider id="sliderVolume" class="index"></Slider>
-		<ImageView id="audioIconMax" class="index"></ImageView>
+		<Label id="timePassed" class="index" />
+		<Slider id="sliderSong" class="index" />
+		<Label id="timeLeft" class="index" />
+		<ImageView id="buttonBack" class="index" />
+		<View id="buttonBackListener" class="listeners" />
+		<ImageView id="buttonPlay" class="index" />
+		<View id="buttonPlayListener" class="listeners"/>
+		<ImageView id="buttonForward" class="index" />
+		<View id="buttonForwardListener" class="listeners"/>
+		<ImageView id="audioIconMin" class="index" />
+		<Slider id="sliderVolume" class="index" />
+		<ImageView id="audioIconMax" class="index" />
 	</View>
 </Alloy>

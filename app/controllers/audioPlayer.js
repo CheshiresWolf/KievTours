@@ -6,7 +6,7 @@ $.sliderVolume.addEventListener('change', function(e) {
     audioPlayer.volume = e.value;
 });
 
-$.buttonBack.addEventListener("click", function () {
+$.buttonBackListener.addEventListener("click", function () {
 	initInterval();
 	
 	if (songTime > 5000) {		
@@ -17,7 +17,7 @@ $.buttonBack.addEventListener("click", function () {
 	}
 });
 
-$.buttonPlay.addEventListener("click", function () {
+$.buttonPlayListener.addEventListener("click", function () {
 	initInterval();
 	
 	if (isPlay) {
@@ -31,7 +31,7 @@ $.buttonPlay.addEventListener("click", function () {
 	}
 });
 
-$.buttonForward.addEventListener("click", function () {
+$.buttonForwardListener.addEventListener("click", function () {
 	initInterval();
 	
 	if (songTime < duration - 6000) {		
@@ -44,6 +44,7 @@ $.buttonForward.addEventListener("click", function () {
 
 function initInterval() {
 	if (interval === null) {
+		$.buttonPlay.applyProperties({image: "images/dotsView/audioPlayerButtonPause.png"});
 		interval = setInterval(function() {		    
 		    songTime = audioPlayer.time;
 		    $.sliderSong.value = songTime;
@@ -64,18 +65,24 @@ exports.initPlayer = function(width, player) {
 	$.timePassed.text = "0:00";
 	$.timeLeft.text = secToString(duration);
 	
+	var containerWidth = width * 0.6;
+	
 	$.container.applyProperties({
-		width: width * 0.6,
+		width: containerWidth,
 		height: width / 3
 	});
 	
+	$.buttonBackListener.applyProperties({width: containerWidth / 3});
+	$.buttonPlayListener.applyProperties({width: containerWidth / 3});
+	$.buttonForwardListener.applyProperties({width: containerWidth / 3});
+	
 	$.sliderSong.applyProperties({
 		max: duration,
-		width: width * 0.6 - 40
+		width: containerWidth - 40
 	});
 	
 	$.sliderVolume.applyProperties({
-		width: width * 0.6 - 40
+		width: containerWidth - 40
 	});
 };
 

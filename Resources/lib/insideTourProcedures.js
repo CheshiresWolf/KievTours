@@ -150,6 +150,12 @@ function createDotView() {
     dotsView.getView("galleryRight").applyProperties({
         top: galleryControlsOffset
     });
+    dotsView.getView("galleryLeftListener").applyProperties({
+        top: galleryControlsOffset
+    });
+    dotsView.getView("galleryRightListener").applyProperties({
+        top: galleryControlsOffset
+    });
     Ti.API.info("insideTourProcedures| createDotView | form view");
     dotsView.getView("smallPictureAudio").applyProperties(smallSircleAudioStyle);
     dotsView.getView("player").add(audioView.getView());

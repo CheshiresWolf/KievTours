@@ -1,14 +1,8 @@
-//<Label id="timePassed"></Label>
-//<ProgressBar id="progressBar"></ProgressBar>
-//<Label id="timeLeft"></Label>
-//<ImageView id="buttonBack"></ImageView>
-//<ImageView id="buttonPlay"></ImageView>
-//<ImageView id="buttonForward"></ImageView>
-//<ImageView id="audioIconMin"></ImageView>
-//<Slider id="slider" min="0" max="100" value="50" onChange="updateLabel"></Slider>
-//<ImageView id="audioIconMax"></ImageView>
 ".index": {
 	zIndex: 4
+},
+".listeners": {
+	zIndex: 5
 },
 "#timePassed": {
 	top: 0,
@@ -42,23 +36,37 @@
 },
 "#buttonBack": {
 	image: "images/dotsView/audioPlayerButtonBack.png",
-	//top: 25,
 	left:  20,
 	width: 15,
-	height: 15
+	height: 15,
+	touchEnabled: false
 },
 "#buttonPlay": {
 	image: "images/dotsView/audioPlayerButtonPlay.png",
-	//top: 25,
 	width: 15,
-	height: 15
+	height: 15,
+	touchEnabled: false
 },
 "#buttonForward": {
 	image: "images/dotsView/audioPlayerButtonForward.png",
-	//top: 25,
 	right: 20,
 	width: 15,
-	height: 15
+	height: 15,
+	touchEnabled: false
+},
+"#buttonBackListener": {
+	image: "images/dotsView/audioPlayerButtonBack.png",
+	left:  0,
+	height: 30
+},
+"#buttonPlayListener": {
+	image: "images/dotsView/audioPlayerButtonPlay.png",
+	height: 30
+},
+"#buttonForwardListener": {
+	image: "images/dotsView/audioPlayerButtonForward.png",
+	right: 0,
+	height: 30
 },
 "#audioIconMin": {
 	image: "images/dotsView/audioPlayerVolumeMin.png",

@@ -17,8 +17,10 @@ function Controller() {
             image: img
         });
         $.galleryLeft.setVisible(flag);
+        $.galleryLeftListener.setVisible(flag);
         $.galleryPaging.setVisible(flag);
         $.galleryRight.setVisible(flag);
+        $.galleryRightListener.setVisible(flag);
         $.gallery.setVisible(flag);
         $.dotsPaging.setVisible(!flag);
     }
@@ -147,9 +149,19 @@ function Controller() {
         height: 30,
         zIndex: 5,
         visible: false,
+        touchEnabled: false,
         id: "galleryLeft"
     });
     $.__views.dotContainer.add($.__views.galleryLeft);
+    $.__views.galleryLeftListener = Ti.UI.createView({
+        left: 10,
+        width: 40,
+        height: 30,
+        zIndex: 6,
+        visible: false,
+        id: "galleryLeftListener"
+    });
+    $.__views.dotContainer.add($.__views.galleryLeftListener);
     $.__views.galleryPaging = Ti.UI.createLabel({
         color: "white",
         width: 30,
@@ -170,9 +182,19 @@ function Controller() {
         height: 30,
         zIndex: 5,
         visible: false,
+        touchEnabled: false,
         id: "galleryRight"
     });
     $.__views.dotContainer.add($.__views.galleryRight);
+    $.__views.galleryRightListener = Ti.UI.createView({
+        right: 10,
+        width: 40,
+        height: 30,
+        zIndex: 6,
+        visible: false,
+        id: "galleryRightListener"
+    });
+    $.__views.dotContainer.add($.__views.galleryRightListener);
     $.__views.dotsPaging = Ti.UI.createView({
         zIndex: 4,
         id: "dotsPaging"
@@ -225,7 +247,7 @@ function Controller() {
         Alloy.Globals.openWindow(list.getView("window"));
     });
     $.smallPictureCenter.addEventListener("click", centeringLogic);
-    $.galleryLeft.addEventListener("click", function() {
+    $.galleryLeftListener.addEventListener("click", function() {
         if (galleryIndex > 0) {
             galleryIndex--;
             $.gallery.scrollToView(galleryIndex);
@@ -233,7 +255,7 @@ function Controller() {
         }
         Ti.API.info("dotsView| gallery.length = " + $.gallery.getViews().length);
     });
-    $.galleryRight.addEventListener("click", function() {
+    $.galleryRightListener.addEventListener("click", function() {
         if (currentDot.gallery.length - 1 > galleryIndex) {
             galleryIndex++;
             if (galleryIndex > alreadyLoaded) {

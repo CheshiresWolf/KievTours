@@ -228,6 +228,9 @@ function createDotView() {
 	dotsView.getView("galleryPaging").applyProperties({top: galleryControlsOffset}); // "1/tour.dots.length"
 	dotsView.getView("galleryRight").applyProperties({top: galleryControlsOffset});
 	
+	dotsView.getView("galleryLeftListener").applyProperties({top: galleryControlsOffset});
+	dotsView.getView("galleryRightListener").applyProperties({top: galleryControlsOffset});
+	
 	Ti.API.info('insideTourProcedures| createDotView | form view');   //===================================
 	
 	//init audio sircle and player

@@ -55,7 +55,7 @@ $.smallPictureList.addEventListener("click", function(e) {
 
 $.smallPictureCenter.addEventListener("click", centeringLogic);
 
-$.galleryLeft.addEventListener("click", function(e) {
+$.galleryLeftListener.addEventListener("click", function(e) {
 	if (galleryIndex > 0) {
 		galleryIndex--;
 		$.gallery.scrollToView(galleryIndex);
@@ -65,7 +65,7 @@ $.galleryLeft.addEventListener("click", function(e) {
 	Ti.API.info('dotsView| gallery.length = ' + $.gallery.getViews().length);   //===================================
 });
 
-$.galleryRight.addEventListener("click", function(e) {
+$.galleryRightListener.addEventListener("click", function(e) {
 	if (galleryIndex < currentDot.gallery.length - 1) {
 		galleryIndex++;
 		
@@ -105,8 +105,10 @@ function galleryShow(flag) {
 	
 	$.smallPicturePhoto.applyProperties({image: img});
 	$.galleryLeft.setVisible(flag);
+	$.galleryLeftListener.setVisible(flag);
 	$.galleryPaging.setVisible(flag);
 	$.galleryRight.setVisible(flag);
+	$.galleryRightListener.setVisible(flag);
 	$.gallery.setVisible(flag);
 	$.dotsPaging.setVisible(!flag);
 }
@@ -144,16 +146,13 @@ exports.setDot = function(i) {
 	galleryIndex = 0;
 	alreadyLoaded = 0;
 	
-	//Ti.API.info('dotsView| setDot (v) | gallery.length = ' + $.gallery.getViews().length); //===================================
 	$.gallery.views = [];
-	//Ti.API.info('dotsView| setDot (^) | gallery.length = ' + $.gallery.getViews().length); //===================================
 	
 	var img = Ti.UI.createImageView({
 		image: currentDot.gallery[0],
 		top: bigImageStyle.top,
 		width: Titanium.Platform.displayCaps.platformWidth
 	});
-	//img.top = (bigImageStyle.top - img.toImage().height) / 2;
 	$.gallery.addView(img);
 	centeringMap();
 	
