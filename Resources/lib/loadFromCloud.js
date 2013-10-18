@@ -12,19 +12,28 @@ function DotViewStarter(pressButton, currentTour) {
     this.load();
 }
 
+function getText(text) {
+    var res = "";
+    if ("string" == typeof text) res = text; else for (var i = 0; text.length > i; i++) res += text[i] + " ";
+    return res;
+}
+
 function createDot(place, starter) {
     Cloud.PhotoCollections.showPhotos({
         collection_id: place.custom_fields.collection_id
     }, function(e) {
-        e.success ? e.photos ? saveDot({
-            id: place.id,
-            name: place.name,
-            text: place.custom_fields.text,
-            cover: place.photo.urls.original,
-            gallery: createPhotoArray(e.photos),
-            latitude: place.latitude,
-            longitude: place.longitude
-        }, starter) : alert("Success: No photos") : alert("Error:\n" + (e.error && e.message || JSON.stringify(e)));
+        if (e.success) if (e.photos) {
+            var text = getText(place.custom_fields.text);
+            saveDot({
+                id: place.id,
+                name: place.name,
+                text: text,
+                cover: place.photo.urls.original,
+                gallery: createPhotoArray(e.photos),
+                latitude: place.latitude,
+                longitude: place.longitude
+            }, starter);
+        } else alert("Success: No photos"); else alert("Error:\n" + (e.error && e.message || JSON.stringify(e)));
     });
 }
 
@@ -184,12 +193,13 @@ DotViewStarter.prototype.load = function() {
     this.loadAudio && getAudio(this);
     Cloud.Places.query({
         where: {
-            tags_array: this.tour.id
+            tags_array: starter.tour.id
         }
     }, function(e) {
         if (e.success) {
             var i = 0;
             this.size = e.places.length;
+            Ti.API.info(starter.tour.name + " ||||||||||||" + starter.tour.id + "||||||||||| " + starter.size);
             for (i; this.size > i; i++) createDot(e.places[i], starter);
         } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
     });

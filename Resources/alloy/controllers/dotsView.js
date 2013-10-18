@@ -263,7 +263,9 @@ function Controller() {
                 $.gallery.addView(Ti.UI.createImageView({
                     image: currentDot.gallery[galleryIndex],
                     top: bigImageStyle.top,
-                    width: Titanium.Platform.displayCaps.platformWidth
+                    left: bigImageStyle.left,
+                    width: bigImageStyle.width,
+                    height: bigImageStyle.height
                 }));
             }
             $.gallery.scrollToView(galleryIndex);
@@ -278,13 +280,14 @@ function Controller() {
         });
         galleryIndex = 0;
         alreadyLoaded = 0;
-        $.gallery.views = [];
         var img = Ti.UI.createImageView({
             image: currentDot.gallery[0],
             top: bigImageStyle.top,
-            width: Titanium.Platform.displayCaps.platformWidth
+            left: bigImageStyle.left,
+            width: bigImageStyle.width,
+            height: bigImageStyle.height
         });
-        $.gallery.addView(img);
+        $.gallery.views = [ img ];
         centeringMap();
         $.galleryPaging.text = "1/" + currentDot.gallery.length;
     };

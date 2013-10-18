@@ -71,8 +71,10 @@ $.galleryRightListener.addEventListener("click", function(e) {
 			
 			$.gallery.addView(Ti.UI.createImageView({
 				image: currentDot.gallery[galleryIndex],
-				top: bigImageStyle.top, 
-				width: Titanium.Platform.displayCaps.platformWidth
+				top: bigImageStyle.top,
+				left: bigImageStyle.left,
+				width: bigImageStyle.width,
+				height: bigImageStyle.height
 			}));
 		}
 		
@@ -143,14 +145,16 @@ exports.setDot = function(i) {
 	galleryIndex = 0;
 	alreadyLoaded = 0;
 	
-	$.gallery.views = [];
+	//$.gallery.views = [];
 	
 	var img = Ti.UI.createImageView({
 		image: currentDot.gallery[0],
 		top: bigImageStyle.top,
-		width: Titanium.Platform.displayCaps.platformWidth
+		left: bigImageStyle.left,
+		width: bigImageStyle.width,
+		height: bigImageStyle.height
 	});
-	$.gallery.addView(img);
+	$.gallery.views = [img];
 	centeringMap();
 	
 	$.galleryPaging.text = "1/" + currentDot.gallery.length;

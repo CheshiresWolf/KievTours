@@ -2,12 +2,6 @@ var Cloud = require("ti.cloud");
 var tourStarter, dotViewStarter, downloadedTours = [];
 var sityTips = [];
 
-//var loading = {
-//	index: 0,
-//	view: null
-//};
-//var timer;
-
 Cloud.debug = true;
 
 //=================================<Starter>================================
@@ -51,13 +45,15 @@ DotViewStarter.prototype.load = function() {
 	
 	Cloud.Places.query({
 		where: {
-			tags_array: this.tour.id
+			tags_array: starter.tour.id
 		}
 	}, function(e) {
 		if (e.success) {
 			var i = 0;
 			
 			this.size = e.places.length;
+			
+			Ti.API.info(starter.tour.name + ' ||||||||||||' + starter.tour.id + '||||||||||| ' + starter.size); //======================================
 			
 			for (i; i < this.size; i++) {
 				createDot(e.places[i], starter);
@@ -83,6 +79,20 @@ DotViewStarter.prototype.isDownloaded = function() {
 	}
 };
 
+function getText(text) {
+	var res = "";
+	
+	if (typeof text === 'string') {
+		res = text;
+	} else {		
+		for (var i = 0; i < text.length; i++) {
+			res += text[i] + " ";
+		}
+	}
+	
+	return res;
+}
+
 function createDot(place, starter) {
 	Cloud.PhotoCollections.showPhotos({
 		collection_id: place.custom_fields.collection_id
@@ -91,11 +101,12 @@ function createDot(place, starter) {
 	        if (!e.photos) {
 	            alert('Success: No photos');
 	        } else {
+				var text = getText(place.custom_fields.text);
 				
 	            saveDot({
 					id: place.id,
 					name: place.name,
-					text: place.custom_fields.text,
+					text: text,
 					cover: place.photo.urls.original,
 					gallery: createPhotoArray(e.photos),
 					latitude: place.latitude,

@@ -39,14 +39,15 @@ Titanium.Geolocation.getCurrentPosition(function(e) {
 var loadFromCloud = require("lib/loadFromCloud");
 loadFromCloud.init();
 
+//var updateCloud = require("lib/updateCloud");
+//updateCloud.start();
+
 //======================</Start>=====================
 
 function closeWindowAnimation(win) {
 	var rightSlide = Titanium.UI.createAnimation();
     rightSlide.left = Titanium.Platform.displayCaps.platformWidth; // to put it back to the right side of the window
     rightSlide.duration = 300;
-    
-    //var win = windowStack.pop();
     
     if (win.cleanTour !== undefined) win.cleanTour();
     
@@ -77,8 +78,6 @@ function isInStackAlready(win) {
 function backToStackPos(pos) {
 	var last = windowStack.pop();
     var i = windowStack.length - 1;
-    
-    //Ti.API.info('alloy.js| backToStackPos | i = ' + i + "; pos = " + pos); //==========================
     
 	for (i; i > pos; i--) {
 		if (windowStack[i].cleanTour !== undefined) windowStack[i].cleanTour();
@@ -128,23 +127,16 @@ Alloy.Globals.backToRootWindow = function() {
 Alloy.Globals.openWindow = function(win) {
 	var pos = isInStackAlready(win);
 	
-	//Ti.API.info('alloy.js| windowPos = ' + pos + " -----------------------------------"); //==========================
-	
 	switch(pos) {
 		case -1:
 			openWindowAnimation(win);
 			windowStack.push(win);
-			
-			//Ti.API.info('alloy.js| case = -1'); //==========================
 		break;
 		case (windowStack.length - 1):
 			//if user try to open window from the same window
-			//Ti.API.info('alloy.js| case = ' + (windowStack.length - 1)); //==========================
 		break;
 		default:
 			backToStackPos(pos);
-			
-			//Ti.API.info('alloy.js| case = def'); //==========================
 		break;
 	}
 };
