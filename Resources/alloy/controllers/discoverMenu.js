@@ -227,9 +227,20 @@ function Controller() {
     });
     $.table.addEventListener("click", function(e) {
         var discoverEntry = Alloy.createController("discoverMenuEntry");
-        discoverEntry.fillTable(places[e.index]);
-        discoverEntry.getView().windowName = "discoverMenuEntry";
-        Alloy.Globals.openWindow(discoverEntry.getView());
+        var place = places[e.index];
+        var Cloud = require("ti.cloud");
+        Cloud.Objects.query({
+            classname: "PlaceComments",
+            where: {
+                id: place.custom_fields.comments_id
+            }
+        }, function(ee) {
+            if (ee.success) {
+                discoverEntry.fillTable(place, ee.PlaceComments[0]);
+                discoverEntry.getView().windowName = "discoverMenuEntry";
+                Alloy.Globals.openWindow(discoverEntry.getView());
+            } else alert("Error: " + (ee.error && ee.message || JSON.stringify(ee)));
+        });
     });
     exports.fillTable = function(newPlaces) {
         var tableData = [], i = 0;

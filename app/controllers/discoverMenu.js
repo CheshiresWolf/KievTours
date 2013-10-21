@@ -20,10 +20,23 @@ $.titleIco.addEventListener("click", function() {
 
 $.table.addEventListener("click", function(e) {    
     var discoverEntry = Alloy.createController("discoverMenuEntry");
+    var place = places[e.index];
+    var Cloud = require("ti.cloud");
     
-    discoverEntry.fillTable(places[e.index]);
-    discoverEntry.getView().windowName = "discoverMenuEntry";
-    Alloy.Globals.openWindow(discoverEntry.getView());
+    Cloud.Objects.query({
+		classname: 'PlaceComments',
+		where: {
+			id: place.custom_fields.comments_id
+		}
+	}, function(ee) {
+		if (ee.success) {    
+		    discoverEntry.fillTable(place, ee.PlaceComments[0]);
+		    discoverEntry.getView().windowName = "discoverMenuEntry";
+		    Alloy.Globals.openWindow(discoverEntry.getView());
+		} else {
+			alert('Error: ' + ((ee.error && ee.message) || JSON.stringify(ee)));        
+		}
+	});
 });
 
 function createRow(place) {
@@ -181,8 +194,6 @@ exports.fillTable = function(newPlaces) {
 	}
 	
 	$.table.data = tableData;
-	//$.table.searchHidden = true;
-    //$.table.filterAtribute = "my_filter";
     
     var menu = Alloy.createController("menuView");
     

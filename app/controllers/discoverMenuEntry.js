@@ -1,3 +1,5 @@
+var width = Titanium.Platform.displayCaps.platformWidth;
+
 $.backButton.addEventListener("click", function() {
 	Alloy.Globals.closeWindow();
 });
@@ -316,14 +318,171 @@ function createTicket(place) {
 	return row;
 }
 
-function createRate(place) {
+function createRate(place, commentObj) {
 	var row = createRow("images/discover/discover_rate.png", "Rate&Comment");
+	var subRow = Titanium.UI.createTableViewRow({layout: "vertical", touchEnabled: false});
+	var i = 0;
 	
-	var subRow = Titanium.UI.createTableViewRow({title: "O_O", height: 60});
+	var rateContainer = Ti.UI.createView({
+		top: 0,
+		width: "auto",
+		height: 20,
+		layout: "horizontal"
+	});
+	
+	var rateText = Ti.UI.createLabel({
+		text: "Rate:   ",
+		font: {
+			fontSize: 10
+		}
+	});
+	rateContainer.add(rateText);
+	
+	for (i; i < 5; i++) {
+		rateContainer.add(
+			Ti.UI.createImageView({
+				image: "images/discover/icon_star_off.png",
+				width: 20,
+				height: 20
+			})
+		);
+	}
+	
+	var rateNumbers = Ti.UI.createLabel({
+		text: "   " + commentObj.rate + "(" + commentObj.rate_number + ")",
+		font: {
+			fontSize: 10
+		}
+	});
+	rateContainer.add(rateNumbers);
+	
+	subRow.add(rateContainer);
+	
+	i = 0;
+	var splitBuf;
+	for (i; i < commentObj.comments.length; i++) {
+		splitBuf = commentObj.comments[i].split("|");
+		
+		var commentContainer = Ti.UI.createView();
+		
+		var commentUser = Ti.UI.createLabel({
+			text: splitBuf[0],
+			top: 0,
+			left: 0,
+			font: {
+				fontSize: 10,
+				fontWeight: 'bold'
+			}
+		});
+		commentContainer.add(commentUser);
+		
+		var commentDate = Ti.UI.createLabel({
+			text: splitBuf[1],
+			top: 0,
+			right: 0,
+			font: {
+				fontSize: 10
+			}
+		});
+		commentContainer.add(commentDate);
+		
+		var comment = Ti.UI.createLabel({
+			text: splitBuf[2],
+			top: 25,
+			left: 0,
+			font: {
+				fontSize: 10
+			}
+		});
+		commentContainer.add(comment);
+		
+		subRow.add(commentContainer);
+	}
+	
+	var inputUser = Ti.UI.createTextField({
+		text: "Nickname",
+		color: "grey",
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+		width: width,
+		height: 30
+	});
+	inputUser.hintText = "Nickname";
+ 
+	inputUser.addEventListener('focus', textFocus);
+	inputUser.addEventListener('blur', textBlur);
+	subRow.add(inputUser);
+	
+	var inputMail = Ti.UI.createTextField({
+		text: "E-mail",
+		color: "grey",
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+		width: width,
+		height: 30
+	});
+	inputMail.hintText = "E-mail";
+ 
+	inputMail.addEventListener('focus', textFocus);
+	inputMail.addEventListener('blur', textBlur);
+	subRow.add(inputMail);
+	
+	var inputComment = Ti.UI.createTextField({
+		text: "Add comment",
+		color: "grey",
+		borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+		width: width,
+		height: 90
+	});
+	inputComment.hintText = "Add comment";
+ 
+	inputComment.addEventListener('focus', textFocus);
+	inputComment.addEventListener('blur', textBlur);
+	subRow.add(inputComment);
+	
+	var sendButton = Ti.UI.createButton({
+		icon: "images/discover/Send_Button.png",
+		right: 0,
+		width: 80,
+		height: 30
+	});
+	sendButton.addEventListener('click', function(e) {
+		var Cloud = require("ti.cloud");
+		var date = new Date();
+		var currentDate = date.getDay() + "." + date.getMonth() + "." + date.getFullYear();
+		commentObj.comments.push(inputUser.text + "|" + currentDate + "|" + inputComment.text);
+
+		Cloud.Objects.update({
+		    classname: 'PlaceComments',
+		    id: commentObj.id,
+		    fields: {
+		        comments: commentObj.comments
+		    }
+		}, function (e) {
+		    if (e.success) {
+		        Ti.API.info('Updated');
+		    } else {
+		        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+		    }
+		});
+	});
+	subRow.add(sendButton);
 	
 	row.sub = [subRow];
 	
 	return row;
+}
+
+function textFocus(e) {
+	if (e.source.text === e.source.hintText) {
+        e.source.text = "";
+        e.source.color = "black";
+    }
+}
+
+function textBlur(e) {
+	if (e.source.text === "") {
+        e.source.text = e.source.hintText;
+        e.source.color = "grey";
+    }
 }
 
 //some sort of magic
@@ -331,7 +490,7 @@ function createFooter(place) {
 	return Titanium.UI.createTableViewRow({height: 300});
 }
 
-exports.fillTable = function(place) {
+exports.fillTable = function(place, comments) {
 	var tableData = [], i = 0;
 
 	$.title.applyProperties({text: place.name, width: Titanium.Platform.displayCaps.platformWidth - 105});
@@ -340,7 +499,7 @@ exports.fillTable = function(place) {
 	tableData.push(createSummary(place));
 	tableData.push(createTime(place));
 	tableData.push(createTicket(place));
-	tableData.push(createRate(place));
+	tableData.push(createRate(place, comments));
 	tableData.push(createFooter(place));
 	
 	$.table.data = tableData;

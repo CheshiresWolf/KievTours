@@ -1,6 +1,6 @@
 var Cloud = require("ti.cloud");
 var tourStarter;
-var downloadedTours = [], sityTips = [];
+var sityTips = [];
 
 //Cloud.debug = true;
 
@@ -44,7 +44,7 @@ DotViewStarter.prototype.isDownloaded = function() {
 		
 		this.tour.isDownloaded = true;
 		this.done();
-		saveToCloud(this.tour.id);
+		//saveToCloud(this.tour.id);
 	}
 };
 
@@ -263,15 +263,12 @@ function loadTour(tour) {
 		tour.audio_id
 	);
 	//if audio file already loaded
-	if (downloadedTours.indexOf(bufTour.id) !== -1) {
-		//if file hasn't been removed
-		if (Titanium.Filesystem.getFile(Titanium.Filesystem.getApplicationDataDirectory(), bufTour.id + ".mp3").exists()) {
-			var bufStarter = new DotViewStarter(null, bufTour);
-			bufStarter.loadAudio = false;
-			bufStarter.size -= 1;
-			bufTour.isBuyed = true;
-			bufTour.isDownloaded = true;
-		}
+	if (Titanium.Filesystem.getFile(Titanium.Filesystem.getApplicationDataDirectory(), bufTour.id + ".mp3").exists()) {
+		var bufStarter = new DotViewStarter(null, bufTour);
+		bufStarter.loadAudio = false;
+		bufStarter.size -= 1;
+		bufTour.isBuyed = true;
+		bufTour.isDownloaded = true;
 	}
 	
 	setBackground(bufTour);
@@ -323,8 +320,7 @@ exports.init = function() {
 		password: "user1"
 	}, function(e) {
 		if (e.success)   {
-			downloadedTours = e.users[0].custom_fields.downloadedTours;
-			
+			//downloadedTours = e.users[0].custom_fields.downloadedTours;			
 			getToursFromCloud();
 		} else {
 			alert('Login Error: ' + ((e.error && e.message) || JSON.stringify(e)));
@@ -345,7 +341,6 @@ function getToursFromCloud() {
 			}
 			
 			loadTips();
-			
 		} else {
 			alert('Error: ' + ((ee.error && ee.message) || JSON.stringify(ee)));        
 		}

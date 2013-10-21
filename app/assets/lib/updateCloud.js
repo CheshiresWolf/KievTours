@@ -16,13 +16,15 @@ var places = [];
 
 function login() {
 	Cloud.Users.login({
-		login: "guest@gmail.com",
-		password: "guest"
+		login: "admin@gmail.com",
+		password: "admin"
 	}, function(e) {
 		if (e.success)   {
-			Ti.API.info("Logged as guest.");
+			Ti.API.info("Logged as admin.");
 			//upload();
-			createCollections();
+			//createCollections();
+			//cleanComments();
+			createComments();
 		} else {
 			alert('Login Error: ' + ((e.error && e.message) || JSON.stringify(e)));
 		}
@@ -69,7 +71,7 @@ function createCollections() {
 	}
 }
 
-exports.start = function() {
+function misticKievInit() {
 	var e2 = ["Могучее дерево за оградой – «Старейшина липа», или липа Петра Могилы – является одним из самых старых деревьев Украины.",
 	"Сейчас ей почти 400 лет.",
 	"Считается, что липа исполняет желания, но исполнитель она довольно капризный: приходить с разными желаниями нужно в разное время дня, а уходя – обязательно поблагодарить «старейшину» и извиниться за беспокойство. Желание нужно загадать мысленно и молча постоять перед деревом минутку.",
@@ -225,6 +227,94 @@ exports.start = function() {
 	"«Зеленый театр» возле станции метро «Арсенальная» тоже имеет дурную славу – это руины крепости, место, обросшее огромным количеством мифов и легенд.",
 	"Здесь тебе и «кладбище проклятых», и сгоревший монастырь, и древние подземные ходы, и призраки, и «Хозяин» места – полный набор для любителей мистики всех мастей."];
 	places.push(new Place("Конец-начало", 50.449976, 30.523213, "", e16, "526119f3a9d4500b0d000993"));
+}
+
+function createComments() {
+	Cloud.Places.query({ 
+	    per_page: 100
+	}, function (e) {
+	    if (e.success) {
+	        getPlaces(e.places);
+	    } else {
+	        alert('Error:\n' +
+	            ((e.error && e.message) || JSON.stringify(e)));
+	    }
+	});	
+}
+
+function getPlaces(places) {
+	for (var i = 0; i < places.length; i++) {
+        saveComment(places[i].id);
+    }
+}
+
+function saveComment(placeId) {
+	Cloud.Objects.create({
+	    classname: 'PlaceComments',
+	    fields: {
+	    	rate: 0,
+			users_vouted: [],
+			comments: [],
+			rate_number: 0
+	    }
+	}, function (e) {
+	    if (e.success) {
+	        updatePlace(e.PlaceComments[0].id, placeId);
+	    } else {
+	        alert('Error:\n' +
+	            ((e.error && e.message) || JSON.stringify(e)));
+	    }
+	});
+}
+
+function updatePlace(commentId, placeId) {
+	Cloud.Places.update({
+	    place_id: placeId,
+	    custom_fields: {
+	    	comments_id: commentId
+	    }
+	}, function (e) {
+	    if (e.success) {
+	        Ti.API.info('updateCloud.js| updatePlace');
+	    } else {
+	        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+	    }
+	});
+}
+
+function cleanComments() {
+	Cloud.Objects.query({
+	    classname: 'PlaceComments',
+	    per_page: 100
+	}, function (e) {
+	    if (e.success) {
+	    	for (var i = 0; i < e.PlaceComments.length; i++) {
+	        	deleteComment(e.PlaceComments[i].id);
+			}
+	    } else {
+	        alert('Error:\n' +
+	            ((e.error && e.message) || JSON.stringify(e)));
+	    }
+	});
+}
+
+function deleteComment(id) {
+	Cloud.Objects.remove({
+	    classname: 'PlaceComments',
+	    id: id
+	}, function (e) {
+	    if (e.success) {
+	        Ti.API.info('Success');
+	    } else {
+	        alert('Error:\n' +
+	            ((e.error && e.message) || JSON.stringify(e)));
+	    }
+	});
+}
+
+exports.start = function() {
+	//getPlaces();
+	//deleteComment();
 	
 	login();
 };

@@ -139,7 +139,7 @@ function Tour(tourId, tourImage, backgroundImage, tourTitle, tourText, fileSize,
 
 function loadTour(tour) {
     var bufTour = new Tour(tour.id, tour.photo.urls.original, null, tour.name, tour.text, tour.audio_size, tour.audio_length, tour.price, tour.path, tour.audio_id);
-    if (-1 !== downloadedTours.indexOf(bufTour.id) && Titanium.Filesystem.getFile(Titanium.Filesystem.getApplicationDataDirectory(), bufTour.id + ".mp3").exists()) {
+    if (Titanium.Filesystem.getFile(Titanium.Filesystem.getApplicationDataDirectory(), bufTour.id + ".mp3").exists()) {
         var bufStarter = new DotViewStarter(null, bufTour);
         bufStarter.loadAudio = false;
         bufStarter.size -= 1;
@@ -190,7 +190,7 @@ var Cloud = require("ti.cloud");
 
 var tourStarter;
 
-var downloadedTours = [], sityTips = [];
+var sityTips = [];
 
 Starter.prototype.addTour = function(tour) {
     this.tours.push(tour);
@@ -206,7 +206,6 @@ DotViewStarter.prototype.isDownloaded = function() {
     if (this.index === this.size) {
         this.tour.isDownloaded = true;
         this.done();
-        saveToCloud(this.tour.id);
     }
 };
 
@@ -223,10 +222,7 @@ exports.init = function() {
         login: "user1",
         password: "user1"
     }, function(e) {
-        if (e.success) {
-            downloadedTours = e.users[0].custom_fields.downloadedTours;
-            getToursFromCloud();
-        } else alert("Login Error: " + (e.error && e.message || JSON.stringify(e)));
+        e.success ? getToursFromCloud() : alert("Login Error: " + (e.error && e.message || JSON.stringify(e)));
     });
 };
 

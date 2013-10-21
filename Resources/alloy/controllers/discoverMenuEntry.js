@@ -253,14 +253,143 @@ function Controller() {
         row.sub = [ subRow ];
         return row;
     }
-    function createRate() {
+    function createRate(place, commentObj) {
         var row = createRow("images/discover/discover_rate.png", "Rate&Comment");
         var subRow = Titanium.UI.createTableViewRow({
-            title: "O_O",
-            height: 60
+            layout: "vertical",
+            touchEnabled: false
         });
+        var i = 0;
+        var rateContainer = Ti.UI.createView({
+            top: 0,
+            width: "auto",
+            height: 20,
+            layout: "horizontal"
+        });
+        var rateText = Ti.UI.createLabel({
+            text: "Rate:   ",
+            font: {
+                fontSize: 10
+            }
+        });
+        rateContainer.add(rateText);
+        for (i; 5 > i; i++) rateContainer.add(Ti.UI.createImageView({
+            image: "images/discover/icon_star_off.png",
+            width: 20,
+            height: 20
+        }));
+        var rateNumbers = Ti.UI.createLabel({
+            text: "   " + commentObj.rate + "(" + commentObj.rate_number + ")",
+            font: {
+                fontSize: 10
+            }
+        });
+        rateContainer.add(rateNumbers);
+        subRow.add(rateContainer);
+        i = 0;
+        var splitBuf;
+        for (i; commentObj.comments.length > i; i++) {
+            splitBuf = commentObj.comments[i].split("|");
+            var commentContainer = Ti.UI.createView();
+            var commentUser = Ti.UI.createLabel({
+                text: splitBuf[0],
+                top: 0,
+                left: 0,
+                font: {
+                    fontSize: 10,
+                    fontWeight: "bold"
+                }
+            });
+            commentContainer.add(commentUser);
+            var commentDate = Ti.UI.createLabel({
+                text: splitBuf[1],
+                top: 0,
+                right: 0,
+                font: {
+                    fontSize: 10
+                }
+            });
+            commentContainer.add(commentDate);
+            var comment = Ti.UI.createLabel({
+                text: splitBuf[2],
+                top: 25,
+                left: 0,
+                font: {
+                    fontSize: 10
+                }
+            });
+            commentContainer.add(comment);
+            subRow.add(commentContainer);
+        }
+        var inputUser = Ti.UI.createTextField({
+            text: "Nickname",
+            color: "grey",
+            borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+            width: width,
+            height: 30
+        });
+        inputUser.hintText = "Nickname";
+        inputUser.addEventListener("focus", textFocus);
+        inputUser.addEventListener("blur", textBlur);
+        subRow.add(inputUser);
+        var inputMail = Ti.UI.createTextField({
+            text: "E-mail",
+            color: "grey",
+            borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+            width: width,
+            height: 30
+        });
+        inputMail.hintText = "E-mail";
+        inputMail.addEventListener("focus", textFocus);
+        inputMail.addEventListener("blur", textBlur);
+        subRow.add(inputMail);
+        var inputComment = Ti.UI.createTextField({
+            text: "Add comment",
+            color: "grey",
+            borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+            width: width,
+            height: 90
+        });
+        inputComment.hintText = "Add comment";
+        inputComment.addEventListener("focus", textFocus);
+        inputComment.addEventListener("blur", textBlur);
+        subRow.add(inputComment);
+        var sendButton = Ti.UI.createButton({
+            icon: "images/discover/Send_Button.png",
+            right: 0,
+            width: 80,
+            height: 30
+        });
+        sendButton.addEventListener("click", function() {
+            var Cloud = require("ti.cloud");
+            var date = new Date();
+            var currentDate = date.getDay() + "." + date.getMonth() + "." + date.getFullYear();
+            commentObj.comments.push(inputUser.text + "|" + currentDate + "|" + inputComment.text);
+            Cloud.Objects.update({
+                classname: "PlaceComments",
+                id: commentObj.id,
+                fields: {
+                    comments: commentObj.comments
+                }
+            }, function(e) {
+                e.success ? Ti.API.info("Updated") : alert("Error:\n" + (e.error && e.message || JSON.stringify(e)));
+            });
+        });
+        subRow.add(sendButton);
         row.sub = [ subRow ];
         return row;
+    }
+    function textFocus(e) {
+        if (e.source.text === e.source.hintText) {
+            e.source.text = "";
+            e.source.color = "black";
+        }
+    }
+    function textBlur(e) {
+        if ("" === e.source.text) {
+            e.source.text = e.source.hintText;
+            e.source.color = "grey";
+        }
     }
     function createFooter() {
         return Titanium.UI.createTableViewRow({
@@ -331,6 +460,7 @@ function Controller() {
     $.__views.window.add($.__views.table);
     exports.destroy = function() {};
     _.extend($, $.__views);
+    var width = Titanium.Platform.displayCaps.platformWidth;
     $.backButton.addEventListener("click", function() {
         Alloy.Globals.closeWindow();
     });
@@ -352,7 +482,7 @@ function Controller() {
             }
         }
     });
-    exports.fillTable = function(place) {
+    exports.fillTable = function(place, comments) {
         var tableData = [];
         $.title.applyProperties({
             text: place.name,
@@ -362,7 +492,7 @@ function Controller() {
         tableData.push(createSummary(place));
         tableData.push(createTime(place));
         tableData.push(createTicket(place));
-        tableData.push(createRate(place));
+        tableData.push(createRate(place, comments));
         tableData.push(createFooter(place));
         $.table.data = tableData;
         var menu = Alloy.createController("menuView");
