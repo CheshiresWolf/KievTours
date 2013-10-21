@@ -41,7 +41,7 @@ var Alloy = require("alloy"), _ = Alloy._, Backbone = Alloy.Backbone;
 
 Ti.API.info("alloy.js| Start");
 
-var windowStack = [];
+var windowStack = [], downloadLock = false;
 
 var userPosition = {
     latitude: 0,
@@ -58,6 +58,19 @@ Titanium.Geolocation.getCurrentPosition(function(e) {
 var loadFromCloud = require("lib/loadFromCloud");
 
 loadFromCloud.init();
+
+Alloy.Globals.openLock = function() {
+    downloadLock = false;
+};
+
+Alloy.Globals.isLocked = function() {
+    if (!downloadLock) {
+        Ti.API.info("alloy.js| downloadLock = true");
+        downloadLock = true;
+        return false;
+    }
+    return true;
+};
 
 Alloy.Globals.getDistanceTo = function(dot) {
     var R = 6371;

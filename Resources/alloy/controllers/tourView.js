@@ -1,15 +1,15 @@
 function Controller() {
-    function pressButton(img) {
+    function pressButton() {
         if (void 0 !== $.loadingIco.interval) {
             clearInterval($.loadingIco.interval);
             $.loadingIco.setVisible(false);
         }
+        Alloy.Globals.openLock();
         $.button.applyProperties({
-            image: img,
+            image: "images/tourView/Play_Button.png",
             touchEnabled: true
         });
         listenerFlag++;
-        Ti.API.info("pressButton");
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));
     this.__controllerPath = "tourView";
@@ -230,22 +230,27 @@ function Controller() {
     $.button.addEventListener("click", function() {
         switch (listenerFlag) {
           case 0:
-            $.button.setTouchEnabled(false);
-            currentTour.buy(pressButton);
+            currentTour.buy();
+            $.button.applyProperties({
+                image: "images/tourView/Download_Button.png"
+            });
+            listenerFlag++;
             break;
 
           case 1:
-            $.button.setTouchEnabled(false);
-            $.loadingIco.setVisible(true);
-            $.loadingIco.index = 0;
-            $.loadingIco.interval = setInterval(function() {
-                $.loadingIco.applyProperties({
-                    image: "images/tourView/loading/loading_ico_" + $.loadingIco.index + ".png"
-                });
-                $.loadingIco.index++;
-                3 === $.loadingIco.index && ($.loadingIco.index = 0);
-            }, 500);
-            currentTour.download(pressButton, $.loadingIco);
+            if (!Alloy.Globals.isLocked()) {
+                $.button.setTouchEnabled(false);
+                $.loadingIco.setVisible(true);
+                $.loadingIco.index = 0;
+                $.loadingIco.interval = setInterval(function() {
+                    $.loadingIco.applyProperties({
+                        image: "images/tourView/loading/loading_ico_" + $.loadingIco.index + ".png"
+                    });
+                    $.loadingIco.index++;
+                    3 === $.loadingIco.index && ($.loadingIco.index = 0);
+                }, 500);
+                currentTour.download(pressButton);
+            }
             break;
 
           case 2:

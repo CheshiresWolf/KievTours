@@ -9,12 +9,27 @@ function DotViewStarter(pressButton, currentTour) {
     this.size = currentTour.tourPath.length + 1;
     this.index = 0;
     this.loadAudio = true;
-    this.load();
+    load(this);
+}
+
+function load(starter) {
+    starter.loadAudio && getAudio(starter);
+    Cloud.Places.query({
+        per_page: 100,
+        where: {
+            tags_array: starter.tour.id
+        }
+    }, function(e) {
+        if (e.success) {
+            var i = 0;
+            for (i; e.places.length > i; i++) createDot(e.places[i], starter);
+        } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
+    });
 }
 
 function getText(text) {
-    var res = "";
-    if ("string" == typeof text) res = text; else for (var i = 0; text.length > i; i++) res += text[i] + " ";
+    var res = "", i = 0;
+    if ("string" == typeof text) res = text; else for (i; text.length > i; i++) res += text[i] + " ";
     return res;
 }
 
@@ -53,7 +68,6 @@ function getAudio(starter) {
     Cloud.Files.show({
         file_id: starter.tour.audio.id
     }, function(e) {
-        Ti.API.info("loadFromCloud| Loading audio file (" + e.files[0].name + ")");
         if (e.success) {
             localFile = Titanium.Filesystem.getApplicationDataDirectory() + starter.tour.id + ".mp3";
             if (starter.tour.isDownloaded) {
@@ -125,9 +139,10 @@ function Tour(tourId, tourImage, backgroundImage, tourTitle, tourText, fileSize,
 
 function loadTour(tour) {
     var bufTour = new Tour(tour.id, tour.photo.urls.original, null, tour.name, tour.text, tour.audio_size, tour.audio_length, tour.price, tour.path, tour.audio_id);
-    if (-1 !== downloadedTours.indexOf(bufTour.id)) {
+    if (-1 !== downloadedTours.indexOf(bufTour.id) && Titanium.Filesystem.getFile(Titanium.Filesystem.getApplicationDataDirectory(), bufTour.id + ".mp3").exists()) {
         var bufStarter = new DotViewStarter(null, bufTour);
         bufStarter.loadAudio = false;
+        bufStarter.size -= 1;
         bufTour.isBuyed = true;
         bufTour.isDownloaded = true;
     }
@@ -173,11 +188,9 @@ function getToursFromCloud() {
 
 var Cloud = require("ti.cloud");
 
-var tourStarter, dotViewStarter, downloadedTours = [];
+var tourStarter;
 
-var sityTips = [];
-
-Cloud.debug = true;
+var downloadedTours = [], sityTips = [];
 
 Starter.prototype.addTour = function(tour) {
     this.tours.push(tour);
@@ -188,41 +201,21 @@ Starter.prototype.addTour = function(tour) {
     }
 };
 
-DotViewStarter.prototype.load = function() {
-    var starter = this;
-    this.loadAudio && getAudio(this);
-    Cloud.Places.query({
-        where: {
-            tags_array: starter.tour.id
-        }
-    }, function(e) {
-        if (e.success) {
-            var i = 0;
-            this.size = e.places.length;
-            Ti.API.info(starter.tour.name + " ||||||||||||" + starter.tour.id + "||||||||||| " + starter.size);
-            for (i; this.size > i; i++) createDot(e.places[i], starter);
-        } else alert("Error: " + (e.error && e.message || JSON.stringify(e)));
-    });
-};
-
 DotViewStarter.prototype.isDownloaded = function() {
     this.index++;
     if (this.index === this.size) {
-        Ti.API.info("loadFromCloud| Load finished");
         this.tour.isDownloaded = true;
-        this.done("images/tourView/Play_Button.png");
+        this.done();
         saveToCloud(this.tour.id);
     }
 };
 
-Tour.prototype.buy = function(pressButton) {
+Tour.prototype.buy = function() {
     this.isBuyed = true;
-    pressButton("images/tourView/Download_Button.png");
 };
 
 Tour.prototype.download = function(pressButton) {
-    Ti.API.info("loadFromCloud| Tour.title = " + this.title);
-    dotViewStarter = new DotViewStarter(pressButton, this);
+    new DotViewStarter(pressButton, this);
 };
 
 exports.init = function() {

@@ -1,4 +1,9 @@
 function Controller() {
+    function getText(text) {
+        var res = "", i = 0;
+        if ("string" == typeof text) res = text; else for (i; text.length > i; i++) res += text[i] + " ";
+        return res;
+    }
     function createRow(img, text) {
         var row = Titanium.UI.createTableViewRow({
             isparent: true,
@@ -218,7 +223,7 @@ function Controller() {
         });
         subRow.add(aA);
         var text = Ti.UI.createLabel({
-            text: place.custom_fields.text,
+            text: getText(place.custom_fields.text),
             width: Titanium.Platform.displayCaps.platformWidth - 35,
             top: 5,
             left: 35,

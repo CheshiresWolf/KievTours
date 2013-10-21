@@ -29,6 +29,20 @@ $.table.addEventListener("click", function(e) {
 			
 });
 
+function getText(text) {
+	var res = "", i = 0;
+	
+	if (typeof text === 'string') {
+		res = text;
+	} else {		
+		for (i; i < text.length; i++) {
+			res += text[i] + " ";
+		}
+	}
+	
+	return res;
+}
+
 function createRow(img, text) {
 	var row = Titanium.UI.createTableViewRow({isparent: true, opened: false, height: 30});
 	
@@ -136,7 +150,6 @@ function createMap(place) {
 		width: width * 0.8 - 4,
 		height: 30,
 		borderRadius: 5,
-		//borderColor:'black',
 		zIndex: 4
 	});
 	row.add(iconContainer);
@@ -165,8 +178,6 @@ function createMap(place) {
 	
 	var pathIco = Titanium.UI.createImageView({
 		image: "images/discover/Discover_icon_path_green.png",
-		//right: (width * 0.8 - 4) / 2 - 10,
-		//bottom: 0,
 		width: 15,
 		height: 15,
 		zIndex: 4
@@ -270,7 +281,7 @@ function createSummary(place) {
 	subRow.add(aA);
 	
 	var text = Ti.UI.createLabel({
-		text: place.custom_fields.text,
+		text: getText(place.custom_fields.text),
 		width: Titanium.Platform.displayCaps.platformWidth - 35,
 		top: 5,
 		left: 35,
@@ -325,19 +336,14 @@ exports.fillTable = function(place) {
 
 	$.title.applyProperties({text: place.name, width: Titanium.Platform.displayCaps.platformWidth - 105});
 	
-	//for (i; i < places.length; i++) {
 	tableData.push(createMap(place));	
 	tableData.push(createSummary(place));
 	tableData.push(createTime(place));
 	tableData.push(createTicket(place));
 	tableData.push(createRate(place));
 	tableData.push(createFooter(place));
-	//}
-	//$.window.add(createMap(place));
 	
 	$.table.data = tableData;
-	//$.table.searchHidden = true;
-    //$.table.filterAtribute = "my_filter";
     
     var menu = Alloy.createController("menuView");
     

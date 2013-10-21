@@ -14,7 +14,7 @@
 Ti.API.info("alloy.js| Start");
 //===========================================
 
-var windowStack = [];
+var windowStack = [], downloadLock = false;
 
 //==================<UserPosition>=================
 
@@ -80,7 +80,9 @@ function backToStackPos(pos) {
     var i = windowStack.length - 1;
     
 	for (i; i > pos; i--) {
-		if (windowStack[i].cleanTour !== undefined) windowStack[i].cleanTour();
+		if (windowStack[i].cleanTour !== undefined) {
+			windowStack[i].cleanTour();
+		}
 		windowStack[i].close();
 		windowStack.pop();
 	}
@@ -92,6 +94,21 @@ function toRad(grad) {
 	return Math.PI * grad / 180;
 }
 
+Alloy.Globals.openLock = function() {
+	downloadLock = false;
+};
+
+Alloy.Globals.isLocked = function() {
+	if (!downloadLock) {
+		//====================================================
+		Ti.API.info('alloy.js| downloadLock = true');
+		//====================================================
+		downloadLock = true;
+		return false;
+	}
+	return true;
+};
+
 //in google we trust
 Alloy.Globals.getDistanceTo = function(dot) {
    
@@ -102,10 +119,10 @@ Alloy.Globals.getDistanceTo = function(dot) {
 	var y = (latB - latA);
     
     return Math.acos(
-	    	Math.sin(latA) * Math.sin(latB) +
-	    	Math.cos(latA) * Math.cos(latB) *
-	    	Math.cos(lonB - lonA)
-    	) * R;
+			Math.sin(latA) * Math.sin(latB) +
+			Math.cos(latA) * Math.cos(latB) *
+			Math.cos(lonB - lonA)
+	) * R;
 };
 
 Alloy.Globals.getTours = function() {
