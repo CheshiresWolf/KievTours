@@ -107,7 +107,7 @@ function createMap(place) {
 	var point = Ti.UI.createImageView({
 		width: 35,
 		height: 55,
-		image: "images/dotsView/MapPin_on.png",
+		image: "images/dotsView/MapPin_on.png"
 	});
 	
 	var annot = Titanium.Map.createAnnotation({

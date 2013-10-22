@@ -62,7 +62,7 @@ function Controller() {
     $.__views.dotContainer && $.addTopLevelView($.__views.dotContainer);
     $.__views.logo = Ti.UI.createImageView({
         zIndex: 6,
-        image: "images/APP_Kiev_logo.png",
+        image: "images/APP_Kiev_logo_green.png",
         width: 50,
         heigth: 50,
         top: 15,
