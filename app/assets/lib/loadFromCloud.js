@@ -2,6 +2,9 @@ var Cloud = require("ti.cloud");
 var tourStarter;
 var sityTips = [];
 
+var user = "user1";
+var password = "user1";
+
 //Cloud.debug = true;
 
 //=================================<Starter>================================
@@ -316,8 +319,8 @@ function loadTips() {
 
 exports.init = function() {
 	Cloud.Users.login({
-		login: "user1",
-		password: "user1"
+		login: user,
+		password: password
 	}, function(e) {
 		if (e.success)   {
 			//downloadedTours = e.users[0].custom_fields.downloadedTours;			

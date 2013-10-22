@@ -262,6 +262,8 @@ exports.initDotsView = function(newController, tour) {
 	controller = newController;
 	currentTour = tour;
 	
+	controller.getView("logo").setVisible(false);
+	
 	controller.getIndex = function () {
 		return activeDotIndex;
 	};
@@ -270,8 +272,6 @@ exports.initDotsView = function(newController, tour) {
 		changeDot(id);
 		dotsView.getView("map").selectAnnotation(annotationArray[id]);
 	};
-	
-	controller.getView("logo").applyProperties({image: "images/APP_Kiev_logo_green.png"});
 	
 	controller.getView("scrollView").add(createDotView());
 	dotText = Alloy.createController("dotsViewText");

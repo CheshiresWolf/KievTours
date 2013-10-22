@@ -11,10 +11,14 @@
 // Alloy.Globals.someGlobalFunction = function(){};
 
 //===========================================
-Ti.API.info("alloy.js| Start");
-//===========================================
 
 var windowStack = [], downloadLock = false;
+
+var normalMode = true;
+
+//=================================================
+
+Ti.API.info("alloy.js| App starting in normal mode (" + normalMode + ")");
 
 //==================<UserPosition>=================
 
@@ -36,11 +40,13 @@ Titanium.Geolocation.getCurrentPosition(function(e) {
 
 //======================<Start>=====================
 
-var loadFromCloud = require("lib/loadFromCloud");
-loadFromCloud.init();
-
-//var updateCloud = require("lib/updateCloud");
-//updateCloud.start();
+if (normalMode) {
+	var loadFromCloud = require("lib/loadFromCloud");
+	loadFromCloud.init();
+} else {
+	var updateCloud = require("lib/updateCloud");
+	updateCloud.start();
+}
 
 //======================</Start>=====================
 

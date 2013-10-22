@@ -244,6 +244,7 @@ exports.initDotsView = function(newController, tour) {
     Ti.API.info("insideTourProcedures| initDotsView");
     controller = newController;
     currentTour = tour;
+    controller.getView("logo").setVisible(false);
     controller.getIndex = function() {
         return activeDotIndex;
     };

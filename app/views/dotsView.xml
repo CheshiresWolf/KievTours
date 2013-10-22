@@ -1,5 +1,6 @@
 <Alloy>
 	<View id="dotContainer">
+		<ImageView id="logo" />
 		<View id="map" ns="Ti.Map" mapType="Titanium.Map.STANDARD_TYPE" />
 		
 		<ImageView id="maskCenter" />

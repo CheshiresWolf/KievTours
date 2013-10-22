@@ -318,13 +318,19 @@ function createTicket(place) {
 	return row;
 }
 
-function createRate(place, commentObj) {
+function createRate(commentObj) {
 	var row = createRow("images/discover/discover_rate.png", "Rate&Comment");
-	var subRow = Titanium.UI.createTableViewRow({layout: "vertical", touchEnabled: false});
-	var i = 0;
+	var subRow = Titanium.UI.createTableViewRow({name: "rateAndComment"});
+	var container = Titanium.UI.createView({width: (width - 20), top: 0, left: 10});
+	var i = 0, topOffset = 0, commentsOffset = 0;
+	
+	//========================<Rate>=======================
+	
+	//container.add(getSpace(10));
+	topOffset += 10;
 	
 	var rateContainer = Ti.UI.createView({
-		top: 0,
+		top: topOffset,
 		width: "auto",
 		height: 20,
 		layout: "horizontal"
@@ -333,7 +339,7 @@ function createRate(place, commentObj) {
 	var rateText = Ti.UI.createLabel({
 		text: "Rate:   ",
 		font: {
-			fontSize: 10
+			fontSize: 14
 		}
 	});
 	rateContainer.add(rateText);
@@ -351,120 +357,231 @@ function createRate(place, commentObj) {
 	var rateNumbers = Ti.UI.createLabel({
 		text: "   " + commentObj.rate + "(" + commentObj.rate_number + ")",
 		font: {
-			fontSize: 10
+			fontSize: 14
 		}
 	});
 	rateContainer.add(rateNumbers);
 	
-	subRow.add(rateContainer);
+	container.add(rateContainer);
+	topOffset += 20;
+	
+	//========================<Comments>=======================
+	
+	//container.add(getSpace(20));
+	topOffset += 20;
+	
+	//var commentsContainer = Ti.UI.createView({top: topOffset, backgroundColor: "red"});
 	
 	i = 0;
 	var splitBuf;
 	for (i; i < commentObj.comments.length; i++) {
+		//==========================================================================
+		Ti.API.info('discoverMenuEntry| topOffset = ' + topOffset);
+		//==========================================================================
+		
 		splitBuf = commentObj.comments[i].split("|");
-		
-		var commentContainer = Ti.UI.createView();
-		
-		var commentUser = Ti.UI.createLabel({
+	
+		container.add(Ti.UI.createLabel({
 			text: splitBuf[0],
-			top: 0,
+			top: topOffset,
 			left: 0,
 			font: {
 				fontSize: 10,
 				fontWeight: 'bold'
 			}
-		});
-		commentContainer.add(commentUser);
+		}));
 		
-		var commentDate = Ti.UI.createLabel({
+		container.add(Ti.UI.createLabel({
 			text: splitBuf[1],
-			top: 0,
+			top: topOffset,
 			right: 0,
 			font: {
 				fontSize: 10
 			}
-		});
-		commentContainer.add(commentDate);
+		}));
+	
+		topOffset += 20;
 		
-		var comment = Ti.UI.createLabel({
+		var commentText = Ti.UI.createLabel({
 			text: splitBuf[2],
-			top: 25,
+			top: topOffset,
 			left: 0,
 			font: {
-				fontSize: 10
+				fontSize: 14
 			}
 		});
-		commentContainer.add(comment);
-		
-		subRow.add(commentContainer);
+		container.add(commentText);
+		topOffset += commentText.toImage().height + 20;
 	}
 	
+	//container.add(commentsContainer);
+	commentsOffset = topOffset;
+	
+	//========================<Input>=======================	
+	
+	topOffset += 20;
+	
+	var inputWidth = width - 20;
+	var inputContainer = Ti.UI.createView({top: topOffset, left: 0, height: 177});
+	
 	var inputUser = Ti.UI.createTextField({
-		text: "Nickname",
-		color: "grey",
-		borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
-		width: width,
-		height: 30
+		value: "Nickname",
+		color: "gray",
+		top: 0,
+		//borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+		borderRadius: 5,
+		borderColor: "e1e1e1",
+		width: inputWidth,
+		height: 25
 	});
-	inputUser.hintText = "Nickname";
+	inputUser.hintText = inputUser.value;
  
 	inputUser.addEventListener('focus', textFocus);
 	inputUser.addEventListener('blur', textBlur);
-	subRow.add(inputUser);
+	inputContainer.add(inputUser);
+	
+	topOffset += 26;
 	
 	var inputMail = Ti.UI.createTextField({
-		text: "E-mail",
-		color: "grey",
-		borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
-		width: width,
-		height: 30
+		value: "E-mail",
+		color: "gray",
+		top: 26,
+		//borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+		borderRadius: 5,
+		borderColor: "e1e1e1",
+		width: inputWidth,
+		height: 25
 	});
-	inputMail.hintText = "E-mail";
+	inputMail.hintText = inputMail.value;
  
 	inputMail.addEventListener('focus', textFocus);
 	inputMail.addEventListener('blur', textBlur);
-	subRow.add(inputMail);
+	inputContainer.add(inputMail);
+	
+	topOffset += 26;
 	
 	var inputComment = Ti.UI.createTextField({
-		text: "Add comment",
-		color: "grey",
-		borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
-		width: width,
-		height: 90
+		value: "Add comment",
+		color: "gray",
+		top: 52,
+		//borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+		borderRadius: 5,
+		borderColor: "e1e1e1",
+		width: inputWidth,
+		height: 75
 	});
-	inputComment.hintText = "Add comment";
+	inputComment.hintText = inputComment.value;
  
 	inputComment.addEventListener('focus', textFocus);
 	inputComment.addEventListener('blur', textBlur);
-	subRow.add(inputComment);
+	inputContainer.add(inputComment);
+	
+	topOffset += 85;
+	
+	//container.add(getSpace(20));
 	
 	var sendButton = Ti.UI.createButton({
-		icon: "images/discover/Send_Button.png",
+		backgroundImage: "images/discover/Send_Button.png",
+		top: 137,
 		right: 0,
 		width: 80,
 		height: 30
 	});
 	sendButton.addEventListener('click', function(e) {
-		var Cloud = require("ti.cloud");
-		var date = new Date();
-		var currentDate = date.getDay() + "." + date.getMonth() + "." + date.getFullYear();
-		commentObj.comments.push(inputUser.text + "|" + currentDate + "|" + inputComment.text);
-
-		Cloud.Objects.update({
-		    classname: 'PlaceComments',
-		    id: commentObj.id,
-		    fields: {
-		        comments: commentObj.comments
-		    }
-		}, function (e) {
-		    if (e.success) {
-		        Ti.API.info('Updated');
-		    } else {
-		        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-		    }
-		});
+		//==========================================================================
+		Ti.API.info('discoverMenuEntry| sendButton');
+		//==========================================================================
+		
+		if (inputUser.value !== inputUser.hintText) {
+			if (inputMail.value !== inputMail.hintText) {
+				if (inputComment.value !== inputComment.hintText) {
+					
+					var Cloud = require("ti.cloud");
+					var date = new Date();
+					var currentDate = date.getDay() + "." + date.getMonth() + "." + date.getFullYear();
+					commentObj.comments.push(inputUser.value + "|" + currentDate + "|" + inputComment.value + "|" + inputMail.value);
+					
+					
+					Cloud.Objects.update({
+					    classname: 'PlaceComments',
+					    id: commentObj.id,
+					    fields: {
+					        comments: commentObj.comments
+					    }
+					}, function (e) {
+					    if (e.success) {
+							//==========================================================================
+					        Ti.API.info("Comment to \'" + commentObj.place_name + "\' saved.");
+							//==========================================================================
+							
+							var commentText = Ti.UI.createLabel({
+								text: inputComment.value,
+								top: commentsOffset + 20,
+								left: 0,
+								font: {
+									fontSize: 14
+								}
+							});
+							var commentTextHeight = commentText.toImage().height + 40;
+							topOffset += commentTextHeight;
+							container.animate({height: container.height + commentTextHeight});
+							
+							inputContainer.animate({top: inputContainer.top + commentTextHeight});
+							
+							container.add(Ti.UI.createLabel({
+								text: inputUser.value,
+								top: commentsOffset,
+								left: 0,
+								font: {
+									fontSize: 10,
+									fontWeight: 'bold'
+								}
+							}));
+							
+							container.add(Ti.UI.createLabel({
+								text: currentDate,
+								top: commentsOffset,
+								right: 0,
+								font: {
+									fontSize: 10
+								}
+							}));
+							
+							container.add(commentText);
+							
+							commentsOffset += commentTextHeight;
+							
+							inputComment.color = "gray";
+							inputComment.value = inputComment.hintText;
+							
+							inputMail.color = "gray";
+							inputMail.value = inputMail.hintText;
+							
+							inputUser.color = "gray";
+							inputUser.value = inputUser.hintText;
+					    } else {
+					        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+					    }
+					});
+					
+				} else {
+					inputComment.color = "red";
+				}
+			} else {
+				inputMail.color = "red";
+			}
+		} else {
+			inputUser.color = "red";
+		}
 	});
-	subRow.add(sendButton);
+	inputContainer.add(sendButton);
+	
+	//container.add(getSpace(20));
+	topOffset += 40;
+	
+	container.add(inputContainer);
+	container.height = topOffset;
+	subRow.add(container);
 	
 	row.sub = [subRow];
 	
@@ -472,16 +589,16 @@ function createRate(place, commentObj) {
 }
 
 function textFocus(e) {
-	if (e.source.text === e.source.hintText) {
-        e.source.text = "";
+	if (e.source.value === e.source.hintText) {
+        e.source.value = "";
         e.source.color = "black";
     }
 }
 
 function textBlur(e) {
-	if (e.source.text === "") {
-        e.source.text = e.source.hintText;
-        e.source.color = "grey";
+	if (e.source.value === "") {
+        e.source.color = "gray";
+        e.source.value = e.source.hintText;
     }
 }
 
@@ -499,7 +616,7 @@ exports.fillTable = function(place, comments) {
 	tableData.push(createSummary(place));
 	tableData.push(createTime(place));
 	tableData.push(createTicket(place));
-	tableData.push(createRate(place, comments));
+	tableData.push(createRate(comments));
 	tableData.push(createFooter(place));
 	
 	$.table.data = tableData;

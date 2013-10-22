@@ -60,6 +60,16 @@ function Controller() {
         id: "dotContainer"
     });
     $.__views.dotContainer && $.addTopLevelView($.__views.dotContainer);
+    $.__views.logo = Ti.UI.createImageView({
+        zIndex: 6,
+        image: "images/APP_Kiev_logo.png",
+        width: 50,
+        heigth: 50,
+        top: 15,
+        left: 15,
+        id: "logo"
+    });
+    $.__views.dotContainer.add($.__views.logo);
     var __alloyId0 = [];
     $.__views.map = Ti.Map.createView({
         width: "auto",

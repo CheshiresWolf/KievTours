@@ -192,6 +192,10 @@ var tourStarter;
 
 var sityTips = [];
 
+var user = "user1";
+
+var password = "user1";
+
 Starter.prototype.addTour = function(tour) {
     this.tours.push(tour);
     if (this.tours.length === this.size) {
@@ -219,8 +223,8 @@ Tour.prototype.download = function(pressButton) {
 
 exports.init = function() {
     Cloud.Users.login({
-        login: "user1",
-        password: "user1"
+        login: user,
+        password: password
     }, function(e) {
         e.success ? getToursFromCloud() : alert("Login Error: " + (e.error && e.message || JSON.stringify(e)));
     });

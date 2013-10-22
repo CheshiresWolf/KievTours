@@ -39,9 +39,11 @@ function toRad(grad) {
 
 var Alloy = require("alloy"), _ = Alloy._, Backbone = Alloy.Backbone;
 
-Ti.API.info("alloy.js| Start");
-
 var windowStack = [], downloadLock = false;
+
+var normalMode = true;
+
+Ti.API.info("alloy.js| App starting in normal mode (" + normalMode + ")");
 
 var userPosition = {
     latitude: 0,
@@ -55,9 +57,13 @@ Titanium.Geolocation.getCurrentPosition(function(e) {
     }
 });
 
-var loadFromCloud = require("lib/loadFromCloud");
-
-loadFromCloud.init();
+if (normalMode) {
+    var loadFromCloud = require("lib/loadFromCloud");
+    loadFromCloud.init();
+} else {
+    var updateCloud = require("lib/updateCloud");
+    updateCloud.start();
+}
 
 Alloy.Globals.openLock = function() {
     downloadLock = false;

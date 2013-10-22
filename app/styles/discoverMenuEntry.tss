@@ -38,5 +38,6 @@
 	left: 0,
 	width: "auto",
 	height: "auto",
-	filterAttribute: "my_filter"
+	filterAttribute: "my_filter",
+	selectionStyle: "none"
 }
