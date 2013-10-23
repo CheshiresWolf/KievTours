@@ -232,6 +232,14 @@ function Controller() {
             }
         });
         subRow.add(text);
+        var footer = Ti.UI.createView({
+            backgroundColor: "white",
+            top: text.top + text.toImage().height,
+            left: 0,
+            width: "100%",
+            height: 10
+        });
+        subRow.add(footer);
         row.sub = [ subRow ];
         return row;
     }
@@ -474,7 +482,7 @@ function Controller() {
     }
     function createFooter() {
         return Titanium.UI.createTableViewRow({
-            height: 300
+            height: 30
         });
     }
     require("alloy/controllers/BaseController").apply(this, Array.prototype.slice.call(arguments));

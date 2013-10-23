@@ -100,7 +100,7 @@ function Controller() {
         top: 0,
         left: 0,
         width: "auto",
-        height: 50,
+        height: 30,
         id: "foter"
     });
     $.__views.textContainer.add($.__views.foter);
@@ -121,6 +121,9 @@ function Controller() {
         });
         $.Aa.applyProperties({
             top: title.height + 12
+        });
+        $.container.applyProperties({
+            height: title.height + $.textContainer.toImage().height + 40
         });
     };
     _.extend($, exports);

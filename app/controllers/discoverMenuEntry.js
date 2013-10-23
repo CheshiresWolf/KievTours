@@ -295,6 +295,15 @@ function createSummary() {
 	});
 	subRow.add(text);
 	
+	var footer = Ti.UI.createView({
+		backgroundColor: "white",
+		top: text.top + text.toImage().height,
+		left: 0,
+		width: "100%",
+		height: 10
+	});
+	subRow.add(footer);
+	
 	row.sub = [subRow];
 	
 	return row;
@@ -612,7 +621,7 @@ function textBlur(e) {
 
 //some sort of magic
 function createFooter() {
-	return Titanium.UI.createTableViewRow({height: 300});
+	return Titanium.UI.createTableViewRow({height: 30});
 }
 
 exports.fillTable = function(place, comments) {

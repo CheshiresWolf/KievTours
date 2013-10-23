@@ -1,13 +1,8 @@
 "#container": {
 	top: 0,
 	backgroundColor: "white",
-	//width: "auto",
-	//height: "auto",
 	zIndex: 5
 },
-//"#topContainer": {
-//	top: 0
-//},
 "#dotNumber": {
 	top: 0,
 	width: 15,
@@ -48,9 +43,8 @@
 	layout: "vertical"
 },
 "#foter": {
-	//backgroundColor: "red",
 	top: 0,
 	left: 0,
 	width: "auto",
-	height: 50
+	height: 30
 }

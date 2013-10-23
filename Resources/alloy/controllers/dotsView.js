@@ -147,6 +147,7 @@ function Controller() {
         height: "auto",
         visible: false,
         zIndex: 3,
+        touchEnabled: false,
         views: __alloyId1,
         id: "gallery"
     });

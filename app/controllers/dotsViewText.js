@@ -76,4 +76,8 @@ exports.initText = function(dot, i) {
 	$.Aa.applyProperties({
 		top: title.height + 12
 	});
+	
+	$.container.applyProperties({
+		height: title.height + $.textContainer.toImage().height + 40
+	});
 };
