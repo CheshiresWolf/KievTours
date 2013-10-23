@@ -213,7 +213,7 @@ function createDotView() {
 	dotsView.setDot(0);
 	var galleryControlsOffset = bigSircleSize + topOffsetBig - 30;
 	dotsView.getView("galleryLeft").applyProperties({top: galleryControlsOffset});
-	dotsView.getView("galleryPaging").applyProperties({top: galleryControlsOffset}); // "1/tour.dots.length"
+	dotsView.getView("galleryPaging").applyProperties({top: galleryControlsOffset + 35}); // "1/tour.dots.length"
 	dotsView.getView("galleryRight").applyProperties({top: galleryControlsOffset});
 	
 	dotsView.getView("galleryLeftListener").applyProperties({top: galleryControlsOffset});

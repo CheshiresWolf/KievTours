@@ -136,7 +136,7 @@ function createDotView() {
         top: galleryControlsOffset
     });
     dotsView.getView("galleryPaging").applyProperties({
-        top: galleryControlsOffset
+        top: galleryControlsOffset + 35
     });
     dotsView.getView("galleryRight").applyProperties({
         top: galleryControlsOffset

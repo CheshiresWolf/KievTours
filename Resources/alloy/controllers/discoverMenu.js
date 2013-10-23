@@ -72,7 +72,7 @@ function Controller() {
         });
         row.add(commentIco);
         var comment = Titanium.UI.createLabel({
-            text: "3",
+            text: place.custom_fields.comments_number,
             font: {
                 fontSize: 10
             },
@@ -94,7 +94,7 @@ function Controller() {
         });
         row.add(rateIco);
         var rate = Titanium.UI.createLabel({
-            text: "3",
+            text: place.custom_fields.rate,
             font: {
                 fontSize: 10
             },

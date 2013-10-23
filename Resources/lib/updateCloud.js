@@ -14,7 +14,7 @@ function login() {
     }, function(e) {
         if (e.success) {
             Ti.API.info("Logged as admin.");
-            modifyComments();
+            updatePlaces();
         } else alert("Login Error: " + (e.error && e.message || JSON.stringify(e)));
     });
 }
@@ -73,7 +73,7 @@ function setCommentName(place) {
     });
 }
 
-function createComments() {
+function updatePlaces() {
     Cloud.Places.query({
         per_page: 100
     }, function(e) {
@@ -82,7 +82,8 @@ function createComments() {
 }
 
 function getPlaces(places) {
-    for (var i = 0; places.length > i; i++) saveComment(places[i].id);
+    var i = 0, length = places.length;
+    for (i; length > i; i++) updatePlace(places[i].id);
 }
 
 function saveComment(placeId) {
@@ -99,11 +100,13 @@ function saveComment(placeId) {
     });
 }
 
-function updatePlace(commentId, placeId) {
+function updatePlace(placeId) {
     Cloud.Places.update({
         place_id: placeId,
+        acl_id: "52665a2243a1b5561200fada",
         custom_fields: {
-            comments_id: commentId
+            rate: 0,
+            comments_number: 0
         }
     }, function(e) {
         e.success ? Ti.API.info("updateCloud.js| updatePlace") : alert("Error:\n" + (e.error && e.message || JSON.stringify(e)));

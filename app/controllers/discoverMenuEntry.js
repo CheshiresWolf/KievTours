@@ -1,4 +1,6 @@
-var width = Titanium.Platform.displayCaps.platformWidth;
+var Cloud = require("ti.cloud");
+
+var width = Titanium.Platform.displayCaps.platformWidth, currentPlace;
 
 $.backButton.addEventListener("click", function() {
 	Alloy.Globals.closeWindow();
@@ -79,13 +81,13 @@ function createRow(img, text) {
 	return row;
 }
 
-function createMap(place) {
+function createMap() {
 	var width = Titanium.Platform.displayCaps.platformWidth * 0.55;
 	
 	var row = Titanium.UI.createTableViewRow({height: width + 90});
 	
 	var topImg = Ti.UI.createImageView({
-		image: place.photo.urls.original,
+		image: currentPlace.photo.urls.original,
 		top: 5,
 		left: 5,
 		width: width,
@@ -113,16 +115,16 @@ function createMap(place) {
 	var annot = Titanium.Map.createAnnotation({
 		title: 0,
 		image: point.toImage(),
-		latitude: place.latitude,
-		longitude: place.longitude
+		latitude: currentPlace.latitude,
+		longitude: currentPlace.longitude
 	});
 	
 	var map = Titanium.Map.createView({
 		mapType: Titanium.Map.STANDARD_TYPE,
 		userLocation: false,
 	    region: {
-			latitude: place.latitude,
-			longitude: place.longitude,
+			latitude: currentPlace.latitude,
+			longitude: currentPlace.longitude,
 			latitudeDelta: 0.01,
 			longitudeDelta: 0.01
 	    },
@@ -186,7 +188,7 @@ function createMap(place) {
 	});
 	iconContainer.add(pathIco);
 	
-	var roundPath = Alloy.Globals.getDistanceTo({latitude: place.latitude, longitude: place.longitude}).toFixed(2);
+	var roundPath = Alloy.Globals.getDistanceTo({latitude: currentPlace.latitude, longitude: currentPlace.longitude}).toFixed(2);
 	
 	var path = Titanium.UI.createLabel({
 		text: roundPath + " km",
@@ -211,7 +213,7 @@ function createMap(place) {
 	row.add(textContainer);
 	
 	var address = Ti.UI.createLabel({
-		text: place.address + ", " + place.city,
+		text: currentPlace.address + ", " + currentPlace.city,
 		font: {
 			fontSize: 10 
 		},
@@ -222,9 +224,9 @@ function createMap(place) {
 	});
 	textContainer.add(address);
 	
-	if (place.phone_number !== undefined) {
+	if (currentPlace.phone_number !== undefined) {
 		var phone = Ti.UI.createLabel({
-			text: place.phone_number,
+			text: currentPlace.phone_number,
 			font: {
 				fontSize: 10,
 				fontWeight: 'bold'
@@ -237,9 +239,9 @@ function createMap(place) {
 		textContainer.add(phone);
 	}
 	
-	if (place.custom_fields.email !== undefined) {
+	if (currentPlace.custom_fields.email !== undefined) {
 		var email = Ti.UI.createLabel({
-			text: "e-mail: " + place.custom_fields.email,
+			text: "e-mail: " + currentPlace.custom_fields.email,
 			font: {
 				fontSize: 10
 			},
@@ -251,9 +253,9 @@ function createMap(place) {
 		textContainer.add(email);
 	}
 	
-	if (place.website !== undefined) {
+	if (currentPlace.website !== undefined) {
 		var site = Ti.UI.createLabel({
-			text: place.website,
+			text: currentPlace.website,
 			font: {
 				fontSize: 10
 			},
@@ -268,7 +270,7 @@ function createMap(place) {
 	return row;
 }
 
-function createSummary(place) {
+function createSummary() {
 	var row = createRow("images/discover/discover_summary.png", "Summary");
 	
 	var subRow = Titanium.UI.createTableViewRow();
@@ -283,7 +285,7 @@ function createSummary(place) {
 	subRow.add(aA);
 	
 	var text = Ti.UI.createLabel({
-		text: getText(place.custom_fields.text),
+		text: getText(currentPlace.custom_fields.text),
 		width: Titanium.Platform.displayCaps.platformWidth - 35,
 		top: 5,
 		left: 35,
@@ -298,7 +300,7 @@ function createSummary(place) {
 	return row;
 }
 
-function createTime(place) {
+function createTime() {
 	var row = createRow("images/discover/discover_time.png", "Working hours");
 	
 	var subRow = Titanium.UI.createTableViewRow({title: "O_o_O", height: 60});
@@ -308,7 +310,7 @@ function createTime(place) {
 	return row;
 }
 
-function createTicket(place) {
+function createTicket() {
 	var row = createRow("images/discover/discover_ticket.png", "Tickets");
 	
 	var subRow = Titanium.UI.createTableViewRow({title: "o_O_o", height: 60});
@@ -326,7 +328,6 @@ function createRate(commentObj) {
 	
 	//========================<Rate>=======================
 	
-	//container.add(getSpace(10));
 	topOffset += 10;
 	
 	var rateContainer = Ti.UI.createView({
@@ -367,17 +368,11 @@ function createRate(commentObj) {
 	
 	//========================<Comments>=======================
 	
-	//container.add(getSpace(20));
 	topOffset += 20;
-	
-	//var commentsContainer = Ti.UI.createView({top: topOffset, backgroundColor: "red"});
 	
 	i = 0;
 	var splitBuf;
 	for (i; i < commentObj.comments.length; i++) {
-		//==========================================================================
-		Ti.API.info('discoverMenuEntry| topOffset = ' + topOffset);
-		//==========================================================================
 		
 		splitBuf = commentObj.comments[i].split("|");
 	
@@ -414,7 +409,6 @@ function createRate(commentObj) {
 		topOffset += commentText.toImage().height + 20;
 	}
 	
-	//container.add(commentsContainer);
 	commentsOffset = topOffset;
 	
 	//========================<Input>=======================	
@@ -496,73 +490,57 @@ function createRate(commentObj) {
 			if (inputMail.value !== inputMail.hintText) {
 				if (inputComment.value !== inputComment.hintText) {
 					
-					var Cloud = require("ti.cloud");
 					var date = new Date();
 					var currentDate = date.getDay() + "." + date.getMonth() + "." + date.getFullYear();
 					commentObj.comments.push(inputUser.value + "|" + currentDate + "|" + inputComment.value + "|" + inputMail.value);
 					
+					updateComment(commentObj);
 					
-					Cloud.Objects.update({
-					    classname: 'PlaceComments',
-					    id: commentObj.id,
-					    fields: {
-					        comments: commentObj.comments
-					    }
-					}, function (e) {
-					    if (e.success) {
-							//==========================================================================
-					        Ti.API.info("Comment to \'" + commentObj.place_name + "\' saved.");
-							//==========================================================================
-							
-							var commentText = Ti.UI.createLabel({
-								text: inputComment.value,
-								top: commentsOffset + 20,
-								left: 0,
-								font: {
-									fontSize: 14
-								}
-							});
-							var commentTextHeight = commentText.toImage().height + 40;
-							topOffset += commentTextHeight;
-							container.animate({height: container.height + commentTextHeight});
-							
-							inputContainer.animate({top: inputContainer.top + commentTextHeight});
-							
-							container.add(Ti.UI.createLabel({
-								text: inputUser.value,
-								top: commentsOffset,
-								left: 0,
-								font: {
-									fontSize: 10,
-									fontWeight: 'bold'
-								}
-							}));
-							
-							container.add(Ti.UI.createLabel({
-								text: currentDate,
-								top: commentsOffset,
-								right: 0,
-								font: {
-									fontSize: 10
-								}
-							}));
-							
-							container.add(commentText);
-							
-							commentsOffset += commentTextHeight;
-							
-							inputComment.color = "gray";
-							inputComment.value = inputComment.hintText;
-							
-							inputMail.color = "gray";
-							inputMail.value = inputMail.hintText;
-							
-							inputUser.color = "gray";
-							inputUser.value = inputUser.hintText;
-					    } else {
-					        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
-					    }
+					var commentText = Ti.UI.createLabel({
+						text: inputComment.value,
+						top: commentsOffset + 20,
+						left: 0,
+						font: {
+							fontSize: 14
+						}
 					});
+					var commentTextHeight = commentText.toImage().height + 40;
+					topOffset += commentTextHeight;
+					container.animate({height: container.height + commentTextHeight});
+					
+					inputContainer.animate({top: inputContainer.top + commentTextHeight});
+					
+					container.add(Ti.UI.createLabel({
+						text: inputUser.value,
+						top: commentsOffset,
+						left: 0,
+						font: {
+							fontSize: 10,
+							fontWeight: 'bold'
+						}
+					}));
+					
+					container.add(Ti.UI.createLabel({
+						text: currentDate,
+						top: commentsOffset,
+						right: 0,
+						font: {
+							fontSize: 10
+						}
+					}));
+					
+					container.add(commentText);
+					
+					commentsOffset += commentTextHeight;
+					
+					inputComment.color = "gray";
+					inputComment.value = inputComment.hintText;
+					
+					inputMail.color = "gray";
+					inputMail.value = inputMail.hintText;
+					
+					inputUser.color = "gray";
+					inputUser.value = inputUser.hintText;
 					
 				} else {
 					inputComment.color = "red";
@@ -576,7 +554,6 @@ function createRate(commentObj) {
 	});
 	inputContainer.add(sendButton);
 	
-	//container.add(getSpace(20));
 	topOffset += 40;
 	
 	container.add(inputContainer);
@@ -586,6 +563,37 @@ function createRate(commentObj) {
 	row.sub = [subRow];
 	
 	return row;
+}
+
+function updateComment(commentObj) {
+	Cloud.Objects.update({
+	    classname: 'PlaceComments',
+	    id: commentObj.id,
+	    fields: {
+	        comments: commentObj.comments
+	    }
+	}, function (e) {
+	    if (e.success) {
+			//==========================================================================
+	        Ti.API.info("Comment to \'" + commentObj.place_name + "\' saved.");
+			//==========================================================================
+		} else {
+			alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+	    }
+	});
+	
+	Cloud.Places.update({
+	    place_id: currentPlace.id,
+	    custom_fields: {
+			comments_number: commentObj.comments.length
+	    }
+	}, function (e) {
+	    if (e.success) {
+	        Ti.API.info('updateCloud.js| updatePlace');
+	    } else {
+	        alert('Error:\n' + ((e.error && e.message) || JSON.stringify(e)));
+	    }
+	});
 }
 
 function textFocus(e) {
@@ -603,21 +611,22 @@ function textBlur(e) {
 }
 
 //some sort of magic
-function createFooter(place) {
+function createFooter() {
 	return Titanium.UI.createTableViewRow({height: 300});
 }
 
 exports.fillTable = function(place, comments) {
 	var tableData = [], i = 0;
+	currentPlace = place;
 
-	$.title.applyProperties({text: place.name, width: Titanium.Platform.displayCaps.platformWidth - 105});
+	$.title.applyProperties({text: currentPlace.name, width: Titanium.Platform.displayCaps.platformWidth - 105});
 	
-	tableData.push(createMap(place));	
-	tableData.push(createSummary(place));
-	tableData.push(createTime(place));
-	tableData.push(createTicket(place));
+	tableData.push(createMap());	
+	tableData.push(createSummary());
+	tableData.push(createTime());
+	tableData.push(createTicket());
 	tableData.push(createRate(comments));
-	tableData.push(createFooter(place));
+	tableData.push(createFooter());
 	
 	$.table.data = tableData;
     

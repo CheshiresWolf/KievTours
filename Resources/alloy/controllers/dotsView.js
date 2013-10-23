@@ -147,7 +147,6 @@ function Controller() {
         height: "auto",
         visible: false,
         zIndex: 3,
-        touchEnabled: false,
         views: __alloyId1,
         id: "gallery"
     });
@@ -173,7 +172,6 @@ function Controller() {
     });
     $.__views.dotContainer.add($.__views.galleryLeftListener);
     $.__views.galleryPaging = Ti.UI.createLabel({
-        color: "white",
         width: 30,
         height: 30,
         zIndex: 5,

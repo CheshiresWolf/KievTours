@@ -6,7 +6,8 @@ function makeTourView(tour) {
     smallImageStyle.image = tour.img;
     tourView.getView("smallPicture").applyProperties(smallImageStyle);
     tourView.getView("background").applyProperties({
-        image: tour.background
+        image: tour.background,
+        height: "100%"
     });
     tourView.getView("title").text = tour.title;
     textWidth = tourView.getView("title").toImage().width;

@@ -41,7 +41,7 @@ function makeTourView (tour) {
 	tourView.getView("smallPicture").applyProperties(smallImageStyle);
 	
 	//background
-	tourView.getView("background").applyProperties({image: tour.background});
+	tourView.getView("background").applyProperties({image: tour.background, height: "100%"});
 	
 	//title
 	tourView.getView("title").text = tour.title;
